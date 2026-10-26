@@ -1,26 +1,29 @@
-import { useState, useEffect } from "react";
-import { Button } from "react-native-paper";
-import {
-  Text,
-  ImageBackground,
-  View,
-  ScrollView,
-  Pressable,
-  Image,
-  Alert,
-  ActivityIndicator,
-  StyleSheet,
-} from "react-native";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import * as SecureStore from "expo-secure-store";
-import { getRestaurantById, Restaurant } from "../api/restaurantApi";
+import { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { Button } from "react-native-paper";
 import {
   getFavorites,
   toggleFavorite,
   type FavoriteRestaurant,
 } from "../api/favoritesApi";
-import { resolveImageUrl } from "../api/restaurantApi";
+import {
+  getRestaurantById,
+  resolveImageUrl,
+  Restaurant,
+} from "../api/restaurantApi";
+import { getRestaurantReviews, type Review } from "../api/reviewApi";
 
 const TABS = ["Overview", "Menu", "Reviews"] as const;
 type Tab = (typeof TABS)[number];
@@ -36,6 +39,8 @@ export default function BookATable() {
   const [activeTab, setActiveTab] = useState<Tab>("Overview");
   const [isFavorite, setIsFavorite] = useState(false);
   const [isAboutExpanded, setIsAboutExpanded] = useState(false);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [loadingReviews, setLoadingReviews] = useState(true);
 
   useEffect(() => {
     const fetchRestaurantDetails = async () => {
@@ -74,6 +79,14 @@ export default function BookATable() {
     }, 6000);
 
     return () => clearInterval(interval);
+  }, [restaurant]);
+  useEffect(() => {
+    if (restaurant) {
+      getRestaurantReviews(restaurant._id)
+        .then((data) => setReviews(data))
+        .catch((err) => console.log("Failed to load reviews:", err))
+        .finally(() => setLoadingReviews(false));
+    }
   }, [restaurant]);
 
   const handleToggleFavorite = async () => {
@@ -223,7 +236,7 @@ export default function BookATable() {
           </View>
 
           {/* Tabs */}
-          <View className="flex-row gap-6 mt-6 border-b border-gray-200">
+          <View className="flex-row gap-16 mt-6 border-b border-gray-200">
             {TABS.map((tab) => (
               <Pressable
                 key={tab}
