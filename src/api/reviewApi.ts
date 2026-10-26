@@ -54,13 +54,13 @@ export const getRestaurantReviews = async (restaurantId: string): Promise<Review
 };
 
 
-// export const createOrUpdateReview = async (
-//   payload: CreateReviewPayload
-// ): Promise<{ message: string; review: Review }> => {
-//   try {
-//     const response = await api.post<{ message: string; review: Review }>("/reviews", payload);
-//     return response.data;
-//   } catch (error: any) {
-//     throw new Error(error.response?.data?.message || "Failed to submit review");
-//   }
-// };
+export const createOrUpdateReview = async (
+  payload: CreateReviewPayload
+): Promise<{ message: string; review: Review }> => {
+  try {
+    const response = await api.post<{ message: string; review: Review }>("/reviews", payload);
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || "Failed to submit review");
+  }
+};
