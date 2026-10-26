@@ -28,7 +28,7 @@ app.use("/api/favorites", favoriteRoutes);
 
 app.use("/api/admin", adminRoutes);
 app.use("/api/notifications", notifictionRoutes);
-app.use("/api/review", reviewRoutes);
+app.use("/api/reviews", reviewRoutes);
 const port = process.env.PORT || 3000;
 
 app.get("/", (req: Request, res: Response) => {

@@ -13,7 +13,7 @@ import {
 import { cancelBooking, getMyBookings, type Booking } from "../api/bookingApi";
 import { getRestaurantById, type Restaurant } from "../api/restaurantApi";
 import { getBookingCode } from "../utils/booking";
-import { ReviewModal } from "./components/ReviewModal"; // <-- Added import
+import { ReviewModal } from "./components/ReviewModal";
 
 type IconName = keyof typeof Ionicons.glyphMap;
 
@@ -167,7 +167,6 @@ const BookingDetails = () => {
     return () => clearInterval(interval);
   }, [booking?.status, loadBooking]);
 
-  // Load the restaurant once we know which one this booking belongs to
   const { id: restaurantId, name: populatedName } = getRestaurantRef(booking);
 
   useEffect(() => {
@@ -361,11 +360,11 @@ const BookingDetails = () => {
           </View>
 
           <View className="mt-6 w-full">
-            {/* Show Leave Review Button ONLY for completed bookings */}
+            
             {booking.status === "completed" && (
               <Pressable
                 onPress={() => setReviewModalVisible(true)}
-                className="mb-3 flex-row items-center justify-center rounded-full bg-amber-500 py-4 shadow-sm active:opacity-90">
+                className="mb-3 flex-row items-center justify-center rounded-full bg-green-500 py-4 shadow-sm active:opacity-90">
                 <Ionicons name="star" size={20} color="white" />
                 <Text className="ml-2 text-lg font-bold text-white">
                   Leave a Review
