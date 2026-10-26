@@ -34,7 +34,6 @@ const api = axios.create({
   },
 });
 
-
 api.interceptors.request.use(async (config) => {
   const token = await SecureStore.getItemAsync("authToken");
   if (token) {
@@ -43,22 +42,27 @@ api.interceptors.request.use(async (config) => {
   return config;
 });
 
-
-export const getRestaurantReviews = async (restaurantId: string): Promise<Review[]> => {
+export const getRestaurantReviews = async (
+  restaurantId: string,
+): Promise<Review[]> => {
   try {
-    const response = await api.get<Review[]>(`/reviews/restaurant/${restaurantId}`);
+    const response = await api.get<Review[]>(
+      `/reviews/restaurant/${restaurantId}`,
+    );
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Failed to fetch reviews");
   }
 };
 
-
 export const createOrUpdateReview = async (
-  payload: CreateReviewPayload
+  payload: CreateReviewPayload,
 ): Promise<{ message: string; review: Review }> => {
   try {
-    const response = await api.post<{ message: string; review: Review }>("/reviews", payload);
+    const response = await api.post<{ message: string; review: Review }>(
+      "/reviews",
+      payload,
+    );
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || "Failed to submit review");
