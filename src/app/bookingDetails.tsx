@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { cancelBooking, getMyBookings, type Booking } from "../api/bookingApi";
 import { getRestaurantById, type Restaurant } from "../api/restaurantApi";
+import { getRestaurantReviews } from "../api/reviewApi";
 import { getBookingCode } from "../utils/booking";
 import { ReviewModal } from "./components/ReviewModal";
 
@@ -131,6 +132,7 @@ const BookingDetails = () => {
   const [cancelling, setCancelling] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [reviewModalVisible, setReviewModalVisible] = useState(false);
+  const [hasReviewed, setHasReviewed] = useState(false);
 
   const loadBooking = useCallback(async () => {
     try {
@@ -184,6 +186,23 @@ const BookingDetails = () => {
       active = false;
     };
   }, [restaurantId]);
+
+  // 2. Check if the user has already left a review for this completed booking
+  useEffect(() => {
+    if (booking?.status === "completed" && restaurantId) {
+      getRestaurantReviews(restaurantId)
+        .then((reviews) => {
+          const alreadyReviewed = reviews.some(
+            (r) =>
+              r.booking === booking._id ||
+              (typeof r.booking === "object" &&
+                (r.booking as any)?._id === booking._id),
+          );
+          if (alreadyReviewed) setHasReviewed(true);
+        })
+        .catch((err) => console.log("Failed to check review status:", err));
+    }
+  }, [booking?._id, booking?.status, restaurantId]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -300,7 +319,8 @@ const BookingDetails = () => {
               </View>
 
               <View className={`rounded-full px-3 py-1.5 ${config.pillClass}`}>
-                <Text className={`text-xs font-semibold ${config.pillTextClass}`}>
+                <Text
+                  className={`text-xs font-semibold ${config.pillTextClass}`}>
                   {config.pillLabel}
                 </Text>
               </View>
@@ -360,14 +380,22 @@ const BookingDetails = () => {
           </View>
 
           <View className="mt-6 w-full">
-            
             {booking.status === "completed" && (
               <Pressable
-                onPress={() => setReviewModalVisible(true)}
-                className="mb-3 flex-row items-center justify-center rounded-full bg-green-500 py-4 shadow-sm active:opacity-90">
-                <Ionicons name="star" size={20} color="white" />
+                onPress={() => !hasReviewed && setReviewModalVisible(true)}
+                disabled={hasReviewed}
+                className={`mb-3 flex-row items-center justify-center rounded-full py-4 shadow-sm ${
+                  hasReviewed
+                    ? "bg-green-600 opacity-90"
+                    : "bg-amber-700 active:opacity-90"
+                }`}>
+                <Ionicons
+                  name={hasReviewed ? "checkmark-circle" : "star"}
+                  size={20}
+                  color="white"
+                />
                 <Text className="ml-2 text-lg font-bold text-white">
-                  Leave a Review
+                  {hasReviewed ? "Review Submitted" : "Leave a Review"}
                 </Text>
               </Pressable>
             )}
@@ -398,7 +426,9 @@ const BookingDetails = () => {
               <Pressable
                 onPress={() => router.push("/listBookings")}
                 className="flex-1 items-center rounded-full bg-blue-700 py-4">
-                <Text className="text-lg font-bold text-white">My Bookings</Text>
+                <Text className="text-lg font-bold text-white">
+                  My Bookings
+                </Text>
               </Pressable>
             </View>
           </View>
@@ -414,6 +444,7 @@ const BookingDetails = () => {
           restaurantName={restaurantName}
           bookingId={booking._id}
           onSuccess={() => {
+            setHasReviewed(true);
             loadBooking();
           }}
         />
