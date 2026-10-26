@@ -9,6 +9,7 @@ import notifictionRoutes from "./routes/notificationRoutes.js";
 import restaurantRoutes from "./routes/restaurantRouters.js";
 
 import favoriteRoutes from "./routes/favoriteRoutes.js";
+import { reviewRoutes } from "./routes/reviewRoutes.js";
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use("/api/favorites", favoriteRoutes);
 
 app.use("/api/admin", adminRoutes);
 app.use("/api/notifications", notifictionRoutes);
+app.use("/api/review", reviewRoutes);
 const port = process.env.PORT || 3000;
 
 app.get("/", (req: Request, res: Response) => {
