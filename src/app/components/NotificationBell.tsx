@@ -23,10 +23,8 @@ export default function NotificationBell({
           if (active) setCount(n);
         } catch {}
       };
-
       void refresh();
       const interval = setInterval(refresh, 30000);
-
       return () => {
         active = false;
         clearInterval(interval);
