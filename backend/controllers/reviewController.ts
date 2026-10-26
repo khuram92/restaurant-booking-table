@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import Restaurant from "../models/Restaurant.js";
 import { Review } from "../models/Review.js";
 
-// Helper function to recalculate restaurant rating stats
+
 const updateRestaurantRatingStats = async (restaurantId: string) => {
   const stats = await Review.aggregate([
     { $match: { restaurant: restaurantId } },
@@ -45,6 +45,7 @@ export const getRestaurantReviews = async (
       .json({ message: error.message || "Failed to fetch reviews" });
   }
 };
+
 
 export const createReview = async (
   req: Request,
