@@ -3,7 +3,6 @@ import * as SecureStore from "expo-secure-store";
 
 const API_URL = "http://10.0.2.2:3000/api";
 
-
 export interface ReviewUser {
   _id: string;
   firstName?: string;
@@ -28,50 +27,40 @@ export interface CreateReviewPayload {
   bookingId?: string;
 }
 
-// Helper to get auth headers
-const getAuthHeaders = async () => {
-  const token = await SecureStore.getItemAsync("authToken");
-  return {
+const api = axios.create({
+  baseURL: API_URL,
+  headers: {
     "Content-Type": "application/json",
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  };
-};
+  },
+});
 
-/**
- * Fetch all reviews for a specific restaurant
- */
+
+api.interceptors.request.use(async (config) => {
+  const token = await SecureStore.getItemAsync("authToken");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+
 export const getRestaurantReviews = async (restaurantId: string): Promise<Review[]> => {
-  const response = await fetch(`${API_URL}/reviews/restaurant/${restaurantId}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.message || "Failed to fetch reviews");
+  try {
+    const response = await api.get<Review[]>(`/reviews/restaurant/${restaurantId}`);
+    return response.data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || "Failed to fetch reviews");
   }
-
-  return data;
 };
 
-/**
- * Submit or update a review for a restaurant
- */
-export const createOrUpdateReview = async (payload: CreateReviewPayload): Promise<{ message: string; review: Review }> => {
-  const headers = await getAuthHeaders();
 
-  const response = await fetch(`${API_URL}/reviews`, {
-    method: "POST",
-    headers,
-    body: JSON.stringify(payload),
-  });
-
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.message || "Failed to submit review");
-  }
-
-  return data;
-};
+// export const createOrUpdateReview = async (
+//   payload: CreateReviewPayload
+// ): Promise<{ message: string; review: Review }> => {
+//   try {
+//     const response = await api.post<{ message: string; review: Review }>("/reviews", payload);
+//     return response.data;
+//   } catch (error: any) {
+//     throw new Error(error.response?.data?.message || "Failed to submit review");
+//   }
+// };
