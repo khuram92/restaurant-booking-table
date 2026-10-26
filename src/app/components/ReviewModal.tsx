@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -11,7 +12,6 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { createOrUpdateReview } from "../../api/reviewApi";
 
 interface ReviewModalProps {
@@ -37,7 +37,10 @@ export const ReviewModal = ({
 
   const handleSubmit = async () => {
     if (!comment.trim()) {
-      Alert.alert("Error", "Please write a short comment about your experience.");
+      Alert.alert(
+        "Error",
+        "Please write a short comment about your experience.",
+      );
       return;
     }
 
@@ -71,7 +74,11 @@ export const ReviewModal = ({
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         className="flex-1 bg-black/60 justify-center">
         <ScrollView
-          contentContainerStyle={{ flexGrow: 1, justifyContent: "center", padding: 20 }}
+          contentContainerStyle={{
+            flexGrow: 1,
+            justifyContent: "center",
+            padding: 20,
+          }}
           keyboardShouldPersistTaps="handled">
           <View className="rounded-3xl bg-white p-6 shadow-2xl">
             {/* Modal Header */}
@@ -84,10 +91,8 @@ export const ReviewModal = ({
                   {restaurantName}
                 </Text>
               </View>
-              
             </View>
 
-           
             <View className="my-4 items-center">
               <Text className="mb-2 text-sm font-semibold text-gray-700">
                 Select Rating
@@ -110,16 +115,15 @@ export const ReviewModal = ({
                 {rating === 5
                   ? "Amazing!"
                   : rating === 4
-                  ? "Good"
-                  : rating === 3
-                  ? "Average"
-                  : rating === 2
-                  ? "Average"
-                  : "Poor"}
+                    ? "Good"
+                    : rating === 3
+                      ? "Average"
+                      : rating === 2
+                        ? "Average"
+                        : "Poor"}
               </Text>
             </View>
 
-            
             <View className="mb-4">
               <Text className="mb-1 text-sm font-semibold text-gray-700">
                 Review / Comments
@@ -136,7 +140,6 @@ export const ReviewModal = ({
               />
             </View>
 
-            
             <View className="flex-row gap-3">
               <Pressable
                 onPress={onClose}
@@ -153,10 +156,12 @@ export const ReviewModal = ({
                 {submitting ? (
                   <ActivityIndicator size="small" color="white" />
                 ) : (
-                  <Text className="font-semibold text-white">Submit Review</Text>
+                  <Text className="font-semibold text-white">
+                    Submit Review
+                  </Text>
                 )}
               </Pressable>
-            </View> 
+            </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
