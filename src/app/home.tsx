@@ -315,15 +315,15 @@ export default function Home() {
 
           <View className="flex-row items-center ml-2">
             <Link href="/favorite" asChild>
-              <Pressable className="bg-blue-700 w-11 h-11 rounded-full items-center justify-center mr-2">
-                <Ionicons name="heart" size={20} color="white" />
+              <Pressable className="w-11 h-11 rounded-full items-center justify-center mr-2">
+                <Ionicons name="heart" size={20} color="#2563EB" />
               </Pressable>
             </Link>
             <NotificationBell
-  color="white"
-  size={22}
-  containerClassName="h-11 w-11 items-center justify-center rounded-full bg-blue-700"
-/>
+              color="#2563EB"
+              size={22}
+              containerClassName="h-11 w-11 items-center justify-center rounded-full "
+            />
           </View>
         </View>
 

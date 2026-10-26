@@ -2,24 +2,25 @@ import { Request, Response } from "express";
 import Restaurant from "../models/Restaurant.js";
 import { Review } from "../models/Review.js";
 import { AuthRequest } from "../middleware/authMiddleware.js";
+import mongoose from "mongoose";
 
 
-const updateRestaurantRatingStats = async (restaurantId: string) => {
+export const updateRestaurantRatingStats = async (restaurantId: string) => {
   const stats = await Review.aggregate([
-    { $match: { restaurant: restaurantId } },
+    { $match: { restaurant: new mongoose.Types.ObjectId(restaurantId) } },
     {
       $group: {
         _id: "$restaurant",
+        numReviews: { $sum: 1 },
         avgRating: { $avg: "$rating" },
-        count: { $sum: 1 },
       },
     },
   ]);
 
   if (stats.length > 0) {
     await Restaurant.findByIdAndUpdate(restaurantId, {
-      rating: Number(stats[0].avgRating.toFixed(1)),
-      reviewCount: stats[0].count,
+      rating: Math.round(stats[0].avgRating * 10) / 10,
+      reviewCount: stats[0].numReviews,
     });
   } else {
     await Restaurant.findByIdAndUpdate(restaurantId, {

@@ -20,6 +20,8 @@ export type NewRestaurant = {
   floorNumbers: string[];
   availableSeats: number;
   seatingTypes: string[];
+  reviewCount?: number;
+  numReviews?: number;
 };
 export const createRestaurant = async (
   data: NewRestaurant,
@@ -53,7 +55,11 @@ export const getMyRestaurant = async (): Promise<Restaurant | null> => {
 
     // Only the controller's own "none found" reply means "no restaurant".
     // A 404 from a wrong URL has no such message, so it is treated as an error.
-    if (status === 404 && typeof message === "string" && /no restaurant/i.test(message)) {
+    if (
+      status === 404 &&
+      typeof message === "string" &&
+      /no restaurant/i.test(message)
+    ) {
       return null;
     }
 
@@ -79,12 +85,12 @@ export interface Restaurant {
   seatingTypes: string[];
 }
 
-
-export const getRestaurantById = async (restaurantId: string): Promise<Restaurant> => {
+export const getRestaurantById = async (
+  restaurantId: string,
+): Promise<Restaurant> => {
   const response = await API.get(`/restaurants/${restaurantId}`);
   return response.data.restaurant;
 };
-
 
 export const getAllRestaurants = async (): Promise<Restaurant[]> => {
   const response = await API.get("/restaurants");
@@ -95,7 +101,6 @@ export const resolveImageUrl = (url?: string): string | undefined => {
   if (!url) return undefined;
 
   try {
-    
     if (url.includes("google.com/imgres")) {
       const real = new URL(url).searchParams.get("imgurl");
       if (real) url = real;
@@ -106,4 +111,3 @@ export const resolveImageUrl = (url?: string): string | undefined => {
 
   return url.replace(/^http:\/\//i, "https://");
 };
-
