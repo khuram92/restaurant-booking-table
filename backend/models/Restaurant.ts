@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, Model } from "mongoose";
+import mongoose, { Document, Model, Schema } from "mongoose";
 
 export interface IRestaurant extends Document {
   owner?: mongoose.Types.ObjectId;
@@ -22,7 +22,12 @@ export interface IRestaurant extends Document {
 
 const restaurantSchema = new Schema<IRestaurant>(
   {
-    owner: { type: Schema.Types.ObjectId, ref: "User", unique: true, sparse: true },
+    owner: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      unique: true,
+      sparse: true,
+    },
     name: { type: String, required: true, trim: true },
     cuisines: { type: String },
     city: { type: String, trim: true },
