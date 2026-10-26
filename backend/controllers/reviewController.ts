@@ -28,7 +28,6 @@ const updateRestaurantRatingStats = async (restaurantId: string) => {
   }
 };
 
-// 1. Get all reviews for a specific restaurant
 export const getRestaurantReviews = async (
   req: Request,
   res: Response,
@@ -47,7 +46,6 @@ export const getRestaurantReviews = async (
   }
 };
 
-// 2. Add a new review
 export const createReview = async (
   req: Request,
   res: Response,
@@ -61,21 +59,18 @@ export const createReview = async (
       return;
     }
 
-    // Check if restaurant exists
     const restaurant = await Restaurant.findById(restaurantId);
     if (!restaurant) {
       res.status(404).json({ message: "Restaurant not found" });
       return;
     }
 
-    // Create or update review (upsert to let a user update their review)
     const review = await Review.findOneAndUpdate(
       { restaurant: restaurantId, customer: userId },
       { rating, comment, booking: bookingId },
       { new: true, upsert: true, setDefaultsOnInsert: true },
     );
 
-    // Recalculate restaurant ratings
     await updateRestaurantRatingStats(restaurantId);
 
     res.status(201).json({ message: "Review submitted successfully", review });
