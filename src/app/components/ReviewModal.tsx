@@ -35,31 +35,31 @@ export const ReviewModal = ({
   const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-//   const handleSubmit = async () => {
-//     if (!comment.trim()) {
-//       Alert.alert("Error", "Please write a short comment about your experience.");
-//       return;
-//     }
+  const handleSubmit = async () => {
+    if (!comment.trim()) {
+      Alert.alert("Error", "Please write a short comment about your experience.");
+      return;
+    }
 
-//     try {
-//       setSubmitting(true);
-//       await createOrUpdateReview({
-//         restaurantId,
-//         rating,
-//         comment: comment.trim(),
-//         bookingId,
-//       });
-//       Alert.alert("Success", "Review submitted successfully!");
-//       setComment("");
-//       setRating(5);
-//       onSuccess?.();
-//       onClose();
-//     } catch (error: any) {
-//       Alert.alert("Error", error.message || "Failed to submit review");
-//     } finally {
-//       setSubmitting(false);
-//     }
-//   };
+    try {
+      setSubmitting(true);
+      await createOrUpdateReview({
+        restaurantId,
+        rating,
+        comment: comment.trim(),
+        bookingId,
+      });
+      Alert.alert("Success", "Review submitted successfully!");
+      setComment("");
+      setRating(5);
+      onSuccess?.();
+      onClose();
+    } catch (error: any) {
+      Alert.alert("Error", error.message || "Failed to submit review");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <Modal
@@ -142,14 +142,14 @@ export const ReviewModal = ({
             </View>
 
             
-            {/* <View className="flex-row gap-3">
+            <View className="flex-row gap-3">
               <Pressable
                 onPress={onClose}
                 disabled={submitting}
                 className="flex-1 items-center justify-center rounded-xl bg-gray-100 py-3.5 active:bg-gray-200">
                 <Text className="font-semibold text-gray-700">Cancel</Text>
               </Pressable>
-              <Pressable
+              {/* <Pressable
                 onPress={handleSubmit}
                 disabled={submitting}
                 className={`flex-1 items-center justify-center rounded-xl py-3.5 shadow-sm active:opacity-90 ${
@@ -160,8 +160,8 @@ export const ReviewModal = ({
                 ) : (
                   <Text className="font-semibold text-white">Submit Review</Text>
                 )}
-              </Pressable>
-            </View>  */}
+              </Pressable> */}
+            </View> 
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
