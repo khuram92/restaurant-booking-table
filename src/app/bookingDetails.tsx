@@ -187,22 +187,22 @@ const BookingDetails = () => {
     };
   }, [restaurantId]);
 
-  // // 2. Check if the user has already left a review for this completed booking
-  // useEffect(() => {
-  //   if (booking?.status === "completed" && restaurantId) {
-  //     getRestaurantReviews(restaurantId)
-  //       .then((reviews) => {
-  //         const alreadyReviewed = reviews.some(
-  //           (r) =>
-  //             r.booking === booking._id ||
-  //             (typeof r.booking === "object" &&
-  //               (r.booking as any)?._id === booking._id),
-  //         );
-  //         if (alreadyReviewed) setHasReviewed(true);
-  //       })
-  //       .catch((err) => console.log("Failed to check review status:", err));
-  //   }
-  // }, [booking?._id, booking?.status, restaurantId]);
+  // 2. Check if the user has already left a review for this completed booking
+  useEffect(() => {
+    if (booking?.status === "completed" && restaurantId) {
+      getRestaurantReviews(restaurantId)
+        .then((reviews) => {
+          const alreadyReviewed = reviews.some(
+            (r) =>
+              r.booking === booking._id ||
+              (typeof r.booking === "object" &&
+                (r.booking as any)?._id === booking._id),
+          );
+          if (alreadyReviewed) setHasReviewed(true);
+        })
+        .catch((err) => console.log("Failed to check review status:", err));
+    }
+  }, [booking?._id, booking?.status, restaurantId]);
 
   const onRefresh = async () => {
     setRefreshing(true);
