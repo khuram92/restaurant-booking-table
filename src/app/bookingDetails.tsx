@@ -84,7 +84,6 @@ const DashedDivider = () => (
     <View className="h-2 border border-dashed border-gray-500" />
   </View>
 );
-
 const InfoColumn = ({
   icon,
   label,
@@ -112,7 +111,6 @@ const InfoColumn = ({
     </Text>
   </View>
 );
-
 const getRestaurantRef = (booking: Booking | null) => {
   const ref = (booking as any)?.restaurant;
   if (!ref) return { id: undefined, name: undefined };
