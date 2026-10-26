@@ -28,21 +28,20 @@ const updateRestaurantRatingStats = async (restaurantId: string) => {
   }
 };
 
-export const getRestaurantReviews = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
+export const getRestaurantReviews = async (req: Request, res: Response): Promise<void> => {
   try {
     const { restaurantId } = req.params;
+    
     const reviews = await Review.find({ restaurant: restaurantId })
-      .populate("customer", "firstName lastName")
+      .populate({
+        path: "customer",
+        select: "firstName lastName email profileImage", 
+      })
       .sort({ createdAt: -1 });
 
     res.status(200).json(reviews);
   } catch (error: any) {
-    res
-      .status(500)
-      .json({ message: error.message || "Failed to fetch reviews" });
+    res.status(500).json({ message: error.message || "Failed to fetch reviews" });
   }
 };
 
