@@ -44,7 +44,6 @@ const reviewSchema = new Schema<IReview>(
   { timestamps: true },
 );
 
-// Prevent a customer from leaving multiple reviews for the same restaurant/booking if desired
 reviewSchema.index({ restaurant: 1, customer: 1 }, { unique: true });
 
 export const Review = mongoose.model<IReview>("Review", reviewSchema);
