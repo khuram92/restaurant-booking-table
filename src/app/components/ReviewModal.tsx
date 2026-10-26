@@ -149,7 +149,7 @@ export const ReviewModal = ({
                 className="flex-1 items-center justify-center rounded-xl bg-gray-100 py-3.5 active:bg-gray-200">
                 <Text className="font-semibold text-gray-700">Cancel</Text>
               </Pressable>
-              {/* <Pressable
+              <Pressable
                 onPress={handleSubmit}
                 disabled={submitting}
                 className={`flex-1 items-center justify-center rounded-xl py-3.5 shadow-sm active:opacity-90 ${
@@ -160,7 +160,7 @@ export const ReviewModal = ({
                 ) : (
                   <Text className="font-semibold text-white">Submit Review</Text>
                 )}
-              </Pressable> */}
+              </Pressable>
             </View> 
           </View>
         </ScrollView>
