@@ -13,6 +13,7 @@ import {
 import { cancelBooking, getMyBookings, type Booking } from "../api/bookingApi";
 import { getRestaurantById, type Restaurant } from "../api/restaurantApi";
 import { getBookingCode } from "../utils/booking";
+import { ReviewModal } from "./components/ReviewModal"; // <-- Added import
 
 type IconName = keyof typeof Ionicons.glyphMap;
 
@@ -129,6 +130,7 @@ const BookingDetails = () => {
   const [error, setError] = useState("");
   const [cancelling, setCancelling] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [reviewModalVisible, setReviewModalVisible] = useState(false);
 
   const loadBooking = useCallback(async () => {
     try {
@@ -183,20 +185,6 @@ const BookingDetails = () => {
       active = false;
     };
   }, [restaurantId]);
-
-  useFocusEffect(
-    useCallback(() => {
-      loadBooking();
-    }, [loadBooking]),
-  );
-
-  // While the booking is pending, check again every 10 seconds
-  useEffect(() => {
-    if (booking?.status !== "pending") return;
-
-    const interval = setInterval(loadBooking, 10000);
-    return () => clearInterval(interval);
-  }, [booking?.status, loadBooking]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -266,143 +254,172 @@ const BookingDetails = () => {
     "Address unavailable";
 
   const bookingCode = getBookingCode(booking, restaurantName);
+
   return (
-    <ScrollView
-      className="flex-1 bg-white"
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }>
-      <View className="items-center px-6 pb-10 pt-20">
-        <View className="h-20 w-20 items-center justify-center rounded-full border border-green-100 bg-green-50">
-          <Ionicons name={config.icon} size={38} color="blue" />
-        </View>
+    <>
+      <ScrollView
+        className="flex-1 bg-white"
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }>
+        <View className="items-center px-6 pb-10 pt-20">
+          <View className="h-20 w-20 items-center justify-center rounded-full border border-green-100 bg-green-50">
+            <Ionicons name={config.icon} size={38} color="blue" />
+          </View>
 
-        <Text className="mt-6 text-center text-2xl font-bold text-blue-600">
-          {config.title}
-        </Text>
-        <Text className="mt-2 text-center text-sm text-gray-500">
-          {config.subtitle}
-        </Text>
+          <Text className="mt-6 text-center text-2xl font-bold text-blue-600">
+            {config.title}
+          </Text>
+          <Text className="mt-2 text-center text-sm text-gray-500">
+            {config.subtitle}
+          </Text>
 
-        <View
-          className="mt-8 w-full rounded-3xl border border-gray-100 bg-white shadow-lg"
-          style={{ elevation: 4 }}>
-          <View className="flex-row items-center p-6">
-            <View className="h-12 w-12 items-center justify-center rounded-xl border border-green-100 bg-green-100">
-              <Text className="text-2xl font-bold text-blue-700">
-                {restaurantName.charAt(0).toUpperCase()}
-              </Text>
-            </View>
+          <View
+            className="mt-8 w-full rounded-3xl border border-gray-100 bg-white shadow-lg"
+            style={{ elevation: 4 }}>
+            <View className="flex-row items-center p-6">
+              <View className="h-12 w-12 items-center justify-center rounded-xl border border-green-100 bg-green-100">
+                <Text className="text-2xl font-bold text-blue-700">
+                  {restaurantName.charAt(0).toUpperCase()}
+                </Text>
+              </View>
 
-            <View className="mx-3 flex-1">
-              <Text
-                numberOfLines={1}
-                className="text-base font-bold text-blue-600">
-                {restaurantName}
-              </Text>
-              <View className="mt-1 flex-row items-center">
-                <Ionicons name="location-sharp" size={14} color="blue" />
+              <View className="mx-3 flex-1">
                 <Text
                   numberOfLines={1}
-                  className="ml-1 flex-1 text-xs text-blue-500">
-                  {restaurantAddress}
+                  className="text-base font-bold text-blue-600">
+                  {restaurantName}
+                </Text>
+                <View className="mt-1 flex-row items-center">
+                  <Ionicons name="location-sharp" size={14} color="blue" />
+                  <Text
+                    numberOfLines={1}
+                    className="ml-1 flex-1 text-xs text-blue-500">
+                    {restaurantAddress}
+                  </Text>
+                </View>
+              </View>
+
+              <View className={`rounded-full px-3 py-1.5 ${config.pillClass}`}>
+                <Text className={`text-xs font-semibold ${config.pillTextClass}`}>
+                  {config.pillLabel}
+                </Text>
+              </View>
+            </View>
+            <View className="relative">
+              <DashedDivider />
+              <View className="absolute -left-3 -top-3 h-6 w-6 rounded-full bg-white" />
+              <View className="absolute -right-3 -top-3 h-6 w-6 rounded-full bg-white" />
+            </View>
+
+            <View className="flex-row px-6 py-5">
+              <InfoColumn
+                icon="calendar-outline"
+                label="DATE"
+                value={formattedDate}
+              />
+              <InfoColumn
+                icon="time-outline"
+                label="TIME"
+                value={booking.time}
+                withDivider
+              />
+              <InfoColumn
+                icon="people"
+                label="GUESTS"
+                value={String(booking.guests)}
+                withDivider
+              />
+              <InfoColumn
+                icon="home-outline"
+                label="SEATING"
+                value={booking.seatingType}
+                withDivider
+              />
+            </View>
+
+            <DashedDivider />
+
+            <View className="flex-row items-center justify-between p-6">
+              <View>
+                <Text className="text-xs tracking-widest text-gray-400">
+                  BOOKING ID
+                </Text>
+                <Text className="mt-1 text-lg font-bold text-blue-500">
+                  {bookingCode}
                 </Text>
               </View>
             </View>
 
-            <View className={`rounded-full px-3 py-1.5 ${config.pillClass}`}>
-              <Text className={`text-xs font-semibold ${config.pillTextClass}`}>
-                {config.pillLabel}
-              </Text>
-            </View>
-          </View>
-          <View className="relative">
-            <DashedDivider />
-            <View className="absolute -left-3 -top-3 h-6 w-6 rounded-full bg-white" />
-            <View className="absolute -right-3 -top-3 h-6 w-6 rounded-full bg-white" />
-          </View>
-
-          <View className="flex-row px-6 py-5">
-            <InfoColumn
-              icon="calendar-outline"
-              label="DATE"
-              value={formattedDate}
-            />
-            <InfoColumn
-              icon="time-outline"
-              label="TIME"
-              value={booking.time}
-              withDivider
-            />
-            <InfoColumn
-              icon="people"
-              label="GUESTS"
-              value={String(booking.guests)}
-              withDivider
-            />
-            <InfoColumn
-              icon="home-outline"
-              label="SEATING"
-              value={booking.seatingType}
-              withDivider
-            />
-          </View>
-
-          <DashedDivider />
-
-          <View className="flex-row items-center justify-between p-6">
-            <View>
-              <Text className="text-xs tracking-widest text-gray-400">
-                BOOKING ID
-              </Text>
-              <Text className="mt-1 text-lg font-bold text-blue-500">
-                {bookingCode}
-              </Text>
-            </View>
-          </View>
-
-          {booking.status === "cancelled" && (
-            <View className="mx-6 mb-6 rounded-xl border border-dashed border-gray-300 bg-gray-50 p-4">
-              <Text className="text-center text-sm text-gray-600">
-                Booking cancelled. You can make a new reservation anytime.
-              </Text>
-            </View>
-          )}
-        </View>
-
-        <View className="mt-6 w-full">
-          {config.canCancel && (
-            <Pressable
-              onPress={handleCancel}
-              disabled={cancelling}
-              className="mb-3 items-center rounded-full border border-gray-300 bg-red-50 py-4">
-              {cancelling ? (
-                <ActivityIndicator color="#dc2626" />
-              ) : (
-                <Text className="text-lg font-semibold text-red-600">
-                  Cancel Booking
+            {booking.status === "cancelled" && (
+              <View className="mx-6 mb-6 rounded-xl border border-dashed border-gray-300 bg-gray-50 p-4">
+                <Text className="text-center text-sm text-gray-600">
+                  Booking cancelled. You can make a new reservation anytime.
                 </Text>
-              )}
-            </Pressable>
-          )}
+              </View>
+            )}
+          </View>
 
-          <View className="flex-row gap-3">
-            <Pressable
-              onPress={() => router.replace("/home")}
-              className="flex-1 items-center rounded-full border border-gray-200 bg-white py-4">
-              <Text className="text-lg font-semibold text-blue-600">
-                Go Home
-              </Text>
-            </Pressable>
-            <Pressable
-              onPress={() => router.push("/listBookings")}
-              className="flex-1 items-center rounded-full bg-blue-700 py-4">
-              <Text className="text-lg font-bold text-white">My Bookings</Text>
-            </Pressable>
+          <View className="mt-6 w-full">
+            {/* Show Leave Review Button ONLY for completed bookings */}
+            {booking.status === "completed" && (
+              <Pressable
+                onPress={() => setReviewModalVisible(true)}
+                className="mb-3 flex-row items-center justify-center rounded-full bg-amber-500 py-4 shadow-sm active:opacity-90">
+                <Ionicons name="star" size={20} color="white" />
+                <Text className="ml-2 text-lg font-bold text-white">
+                  Leave a Review
+                </Text>
+              </Pressable>
+            )}
+
+            {config.canCancel && (
+              <Pressable
+                onPress={handleCancel}
+                disabled={cancelling}
+                className="mb-3 items-center rounded-full border border-gray-300 bg-red-50 py-4">
+                {cancelling ? (
+                  <ActivityIndicator color="#dc2626" />
+                ) : (
+                  <Text className="text-lg font-semibold text-red-600">
+                    Cancel Booking
+                  </Text>
+                )}
+              </Pressable>
+            )}
+
+            <View className="flex-row gap-3">
+              <Pressable
+                onPress={() => router.replace("/home")}
+                className="flex-1 items-center rounded-full border border-gray-200 bg-white py-4">
+                <Text className="text-lg font-semibold text-blue-600">
+                  Go Home
+                </Text>
+              </Pressable>
+              <Pressable
+                onPress={() => router.push("/listBookings")}
+                className="flex-1 items-center rounded-full bg-blue-700 py-4">
+                <Text className="text-lg font-bold text-white">My Bookings</Text>
+              </Pressable>
+            </View>
           </View>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+
+      {/* Review Modal Trigger */}
+      {restaurantId && (
+        <ReviewModal
+          visible={reviewModalVisible}
+          onClose={() => setReviewModalVisible(false)}
+          restaurantId={restaurantId}
+          restaurantName={restaurantName}
+          bookingId={booking._id}
+          onSuccess={() => {
+            loadBooking();
+          }}
+        />
+      )}
+    </>
   );
 };
 
