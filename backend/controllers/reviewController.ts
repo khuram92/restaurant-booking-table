@@ -46,37 +46,37 @@ export const getRestaurantReviews = async (
   }
 };
 
-export const createReview = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
-  try {
-    const userId = (req as any).user?._id; // Assumes your auth middleware attaches user
-    const { restaurantId, rating, comment, bookingId } = req.body;
+// export const createReview = async (
+//   req: Request,
+//   res: Response,
+// ): Promise<void> => {
+//   try {
+//     const userId = (req as any).user?._id; // Assumes your auth middleware attaches user
+//     const { restaurantId, rating, comment, bookingId } = req.body;
 
-    if (!rating || rating < 1 || rating > 5) {
-      res.status(400).json({ message: "Rating must be between 1 and 5" });
-      return;
-    }
+//     if (!rating || rating < 1 || rating > 5) {
+//       res.status(400).json({ message: "Rating must be between 1 and 5" });
+//       return;
+//     }
 
-    const restaurant = await Restaurant.findById(restaurantId);
-    if (!restaurant) {
-      res.status(404).json({ message: "Restaurant not found" });
-      return;
-    }
+//     const restaurant = await Restaurant.findById(restaurantId);
+//     if (!restaurant) {
+//       res.status(404).json({ message: "Restaurant not found" });
+//       return;
+//     }
 
-    const review = await Review.findOneAndUpdate(
-      { restaurant: restaurantId, customer: userId },
-      { rating, comment, booking: bookingId },
-      { new: true, upsert: true, setDefaultsOnInsert: true },
-    );
+//     const review = await Review.findOneAndUpdate(
+//       { restaurant: restaurantId, customer: userId },
+//       { rating, comment, booking: bookingId },
+//       { new: true, upsert: true, setDefaultsOnInsert: true },
+//     );
 
-    await updateRestaurantRatingStats(restaurantId);
+//     await updateRestaurantRatingStats(restaurantId);
 
-    res.status(201).json({ message: "Review submitted successfully", review });
-  } catch (error: any) {
-    res
-      .status(500)
-      .json({ message: error.message || "Failed to submit review" });
-  }
-};
+//     res.status(201).json({ message: "Review submitted successfully", review });
+//   } catch (error: any) {
+//     res
+//       .status(500)
+//       .json({ message: error.message || "Failed to submit review" });
+//   }
+// };
