@@ -84,7 +84,7 @@ export const ReviewModal = ({
                   {restaurantName}
                 </Text>
               </View>
-              {/* <Pressable
+              <Pressable
                 onPress={onClose}
                 disabled={submitting}
                 className="h-8 w-8 items-center justify-center rounded-full bg-gray-100 active:bg-gray-200">
@@ -106,12 +106,12 @@ export const ReviewModal = ({
                     <Ionicons
                       name={star <= rating ? "star" : "star-outline"}
                       size={32}
-                      color="#F59E0B"
+                      color="#3B82F6"
                     />
                   </Pressable>
                 ))}
               </View>
-              <Text className="mt-1 text-xs font-medium text-amber-600">
+              <Text className="mt-1 text-xs font-medium text-blue-700">
                 {rating === 5
                   ? "Amazing!"
                   : rating === 4
@@ -119,13 +119,13 @@ export const ReviewModal = ({
                   : rating === 3
                   ? "Average"
                   : rating === 2
-                  ? "Poor"
-                  : "Terrible"}
+                  ? "Average"
+                  : "Poor"}
               </Text>
             </View>
 
             
-            <View className="mb-4">
+            {/* <View className="mb-4">
               <Text className="mb-1 text-sm font-semibold text-gray-700">
                 Review / Comments
               </Text>
@@ -139,10 +139,10 @@ export const ReviewModal = ({
                 textAlignVertical="top"
                 className="rounded-xl border border-gray-300 p-3 text-base text-gray-900 bg-gray-50 min-h-[100px]"
               />
-            </View>
+            </View> */}
 
             
-            <View className="flex-row gap-3">
+            {/* <View className="flex-row gap-3">
               <Pressable
                 onPress={onClose}
                 disabled={submitting}
@@ -160,8 +160,8 @@ export const ReviewModal = ({
                 ) : (
                   <Text className="font-semibold text-white">Submit Review</Text>
                 )}
-              </Pressable>*/}
-            </View> 
+              </Pressable>
+            </View>  */}
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
