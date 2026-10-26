@@ -2,9 +2,9 @@ import { loginUser } from "@/api/authApi";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { Link, router, useLocalSearchParams } from "expo-router";
-import { useState, useEffect } from "react";
-import { Image, Pressable, Text, TextInput, View } from "react-native";
 import * as SecureStore from "expo-secure-store";
+import { useEffect, useState } from "react";
+import { Image, Pressable, Text, TextInput, View } from "react-native";
 
 export default function App() {
   const [rememberMe, setRememberMe] = useState(false);
@@ -95,8 +95,7 @@ export default function App() {
       // Initial route redirect upon successful login
       if (userRole === "admin" || userRole === "Admin") {
         router.replace("/admin/adminDashboard");
-      } 
-      else if (userRole === "restaurant" || userRole === "Restaurant") {
+      } else if (userRole === "restaurant" || userRole === "Restaurant") {
         try {
           const response = await fetch(
             "http://10.0.2.2:3000/api/restaurants/me/profile",
@@ -124,8 +123,7 @@ export default function App() {
               : "Could not check restaurant profile",
           );
         }
-      } 
-      else {
+      } else {
         router.replace("/home");
       }
     } catch (err) {

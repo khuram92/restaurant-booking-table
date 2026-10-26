@@ -368,9 +368,34 @@ export default function BookATable() {
             </View>
           ) : (
             <View className="mt-6 flex items-center">
-              <Text className="text-gray-600 font-semibold">
-                No Reviews Available
-              </Text>
+              {reviews.map((rev) => {
+                const customerName =
+                  rev.customer && typeof rev.customer === "object"
+                    ? `${rev.customer.firstName ?? ""} ${rev.customer.lastName ?? ""}`.trim()
+                    : "Anonymous Customer";
+
+                return (
+                  <View
+                    key={rev._id}
+                    className="mb-3 rounded-2xl bg-gray-50 p-4 border border-gray-100">
+                    <View className="flex-row items-center justify-between">
+                      <Text className="font-bold text-gray-900">
+                        {customerName || "Anonymous Customer"}
+                      </Text>
+                      <View className="flex-row items-center">
+                        
+                        <Text className="ml-1 text-sm font-semibold text-amber-600">
+                          {rev.rating}
+                        </Text>
+                        <Ionicons name="star" size={16} color="#F59E0B" />
+                      </View>
+                    </View>
+                    <Text className="mt-2 text-sm text-gray-700">
+                      {rev.comment}
+                    </Text>
+                  </View>
+                );
+              })}
             </View>
           )}
         </View>

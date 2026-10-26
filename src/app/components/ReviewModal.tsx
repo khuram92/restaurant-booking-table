@@ -46,6 +46,7 @@ export const ReviewModal = ({
 
     try {
       setSubmitting(true);
+      // Axios interceptor automatically handles the auth token securely from SecureStore
       await createOrUpdateReview({
         restaurantId,
         rating,

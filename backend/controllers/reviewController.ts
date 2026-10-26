@@ -35,7 +35,7 @@ export const getRestaurantReviews = async (req: Request, res: Response): Promise
     const reviews = await Review.find({ restaurant: restaurantId })
       .populate({
         path: "customer",
-        select: "firstName lastName email profileImage", 
+        select: "firstName lastName avatar", 
       })
       .sort({ createdAt: -1 });
 
@@ -51,7 +51,15 @@ export const createReview = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const userId = (req as any).user?._id; // Assumes your auth middleware attaches user
+    
+    const authUser = (req as any).user;
+    const userId = authUser?._id || authUser?.id || authUser?.userId;
+
+    if (!userId) {
+      res.status(401).json({ message: "Unauthorized: User ID missing from token" });
+      return;
+    }
+
     const { restaurantId, rating, comment, bookingId } = req.body;
 
     if (!rating || rating < 1 || rating > 5) {
@@ -65,9 +73,10 @@ export const createReview = async (
       return;
     }
 
+    // Pass explicit customer field into the update query as well
     const review = await Review.findOneAndUpdate(
       { restaurant: restaurantId, customer: userId },
-      { rating, comment, booking: bookingId },
+      { customer: userId, rating, comment, booking: bookingId },
       { new: true, upsert: true, setDefaultsOnInsert: true },
     );
 
