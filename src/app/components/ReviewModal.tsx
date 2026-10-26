@@ -125,7 +125,7 @@ export const ReviewModal = ({
             </View>
 
             
-            {/* <View className="mb-4">
+            <View className="mb-4">
               <Text className="mb-1 text-sm font-semibold text-gray-700">
                 Review / Comments
               </Text>
@@ -139,7 +139,7 @@ export const ReviewModal = ({
                 textAlignVertical="top"
                 className="rounded-xl border border-gray-300 p-3 text-base text-gray-900 bg-gray-50 min-h-[100px]"
               />
-            </View> */}
+            </View>
 
             
             {/* <View className="flex-row gap-3">
