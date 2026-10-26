@@ -1,12 +1,13 @@
-import mongoose, { Schema, Document, Model } from "mongoose";
+import mongoose, { Document, Schema } from "mongoose";
 
 export interface IReview extends Document {
   restaurant: mongoose.Types.ObjectId;
   customer: mongoose.Types.ObjectId;
-  booking: mongoose.Types.ObjectId;
-  rating: number;
-  comment?: string;
-  reply?: { text?: string; repliedAt?: Date };
+  booking?: mongoose.Types.ObjectId;
+  rating: number; // 1 to 5
+  comment: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 const reviewSchema = new Schema<IReview>(
@@ -15,29 +16,34 @@ const reviewSchema = new Schema<IReview>(
       type: Schema.Types.ObjectId,
       ref: "Restaurant",
       required: true,
+      index: true,
     },
-    customer: { type: Schema.Types.ObjectId, ref: "User", required: true },
-
+    customer: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     booking: {
       type: Schema.Types.ObjectId,
       ref: "Booking",
-      required: true,
-      unique: true,
+      required: false,
     },
-    rating: { type: Number, required: true, min: 1, max: 5 },
-    comment: { type: String, trim: true, maxlength: 1000 },
-    reply: {
-      text: { type: String, trim: true, maxlength: 1000 },
-      repliedAt: { type: Date },
+    rating: {
+      type: Number,
+      required: true,
+      min: 1,
+      max: 5,
+    },
+    comment: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 500,
     },
   },
   { timestamps: true },
 );
 
-// Newest reviews of a restaurant first
-reviewSchema.index({ restaurant: 1, createdAt: -1 });
-reviewSchema.index({ customer: 1, createdAt: -1 });
+reviewSchema.index({ restaurant: 1, customer: 1 }, { unique: true });
 
-const Review: Model<IReview> = mongoose.model<IReview>("Review", reviewSchema);
-
-export default Review;
+export const Review = mongoose.model<IReview>("Review", reviewSchema);

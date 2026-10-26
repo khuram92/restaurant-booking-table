@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import Restaurant from "../models/Restaurant.js";
 import { Review } from "../models/Review.js";
+import { AuthRequest } from "../middleware/authMiddleware.js";
 
 
 const updateRestaurantRatingStats = async (restaurantId: string) => {
@@ -46,14 +47,10 @@ export const getRestaurantReviews = async (req: Request, res: Response): Promise
 };
 
 
-export const createReview = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
+export const createReview = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    
-    const authUser = (req as any).user;
-    const userId = authUser?._id || authUser?.id || authUser?.userId;
+    // Directly grab userId from req.userId set by your 'protect' middleware
+    const userId = req.userId;
 
     if (!userId) {
       res.status(401).json({ message: "Unauthorized: User ID missing from token" });
@@ -73,7 +70,6 @@ export const createReview = async (
       return;
     }
 
-    // Pass explicit customer field into the update query as well
     const review = await Review.findOneAndUpdate(
       { restaurant: restaurantId, customer: userId },
       { customer: userId, rating, comment, booking: bookingId },
@@ -84,8 +80,6 @@ export const createReview = async (
 
     res.status(201).json({ message: "Review submitted successfully", review });
   } catch (error: any) {
-    res
-      .status(500)
-      .json({ message: error.message || "Failed to submit review" });
+    res.status(500).json({ message: error.message || "Failed to submit review" });
   }
 };

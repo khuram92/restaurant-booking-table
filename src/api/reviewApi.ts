@@ -36,6 +36,7 @@ const api = axios.create({
 
 api.interceptors.request.use(async (config) => {
   const token = await SecureStore.getItemAsync("authToken");
+  console.log("🔑 Token retrieved from SecureStore for review:", token ? "EXISTS ✅" : "MISSING ❌");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
