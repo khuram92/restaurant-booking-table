@@ -367,31 +367,70 @@ export default function BookATable() {
               </Text>
             </View>
           ) : (
-            <View className="mt-6 flex items-center">
+            <View className="mt-6">
               {reviews.map((rev) => {
                 const customerName =
                   rev.customer && typeof rev.customer === "object"
                     ? `${rev.customer.firstName ?? ""} ${rev.customer.lastName ?? ""}`.trim()
                     : "Anonymous Customer";
 
+                // Get customer initials for avatar fallback (e.g., "John Doe" -> "JD")
+                const initials =
+                  customerName !== "Anonymous Customer"
+                    ? customerName
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")
+                        .toUpperCase()
+                        .slice(0, 2)
+                    : "U";
+
+                
+                const formattedDate = rev.createdAt
+                  ? new Date(rev.createdAt).toLocaleDateString(undefined, {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })
+                  : null;
+
                 return (
                   <View
                     key={rev._id}
-                    className="mb-3 rounded-2xl bg-gray-50 p-4 border border-gray-100">
+                    className="mb-4 rounded-2xl bg-gray-200 p-4 border border-gray-100 shadow-sm shadow-gray-200 active:scale-[0.99] transition-all">
+                    {/* Top Row: Customer Info & Rating */}
                     <View className="flex-row items-center justify-between">
-                      <Text className="font-bold text-gray-900">
-                        {customerName || "Anonymous Customer"}
-                      </Text>
-                      <View className="flex-row items-center">
-                        
-                        <Text className="ml-1 text-sm font-semibold text-amber-600">
-                          {rev.rating}
+                      {/* Customer Avatar & Name */}
+                      <View className="flex-row items-center gap-3">
+                        <View className="h-10 w-10 items-center justify-center rounded-full bg-blue-100 border border-blue-200">
+                          <Text className="text-xs font-bold text-blue-700">
+                            {initials}
+                          </Text>
+                        </View>
+                        <View>
+                          <Text className="font-bold text-gray-900 text-base">
+                            {customerName}
+                          </Text>
+                          {formattedDate && (
+                            <Text className="text-xs text-gray-400 mt-0.5">
+                              {formattedDate}
+                            </Text>
+                          )}
+                        </View>
+                      </View>
+
+                      {/* Rating Pill Badge */}
+                      <View className="flex-row items-center bg-amber-50 px-2.5 py-1 rounded-full border border-amber-100">
+                        <Ionicons name="star" size={14} color="#D97706" />
+                        <Text className="ml-1 text-xs font-bold text-amber-700">
+                          {rev.rating}.0
                         </Text>
-                        <Ionicons name="star" size={16} color="#F59E0B" />
                       </View>
                     </View>
-                    <Text className="mt-2 text-sm text-gray-700">
-                      {rev.comment}
+
+                    {/* Review Comment Text */}
+                    <Text className="mt-3 text-sm leading-relaxed text-gray-600 font-normal">
+                      "{rev.comment}"
                     </Text>
                   </View>
                 );
