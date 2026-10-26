@@ -84,12 +84,7 @@ export const ReviewModal = ({
                   {restaurantName}
                 </Text>
               </View>
-              <Pressable
-                onPress={onClose}
-                disabled={submitting}
-                className="h-8 w-8 items-center justify-center rounded-full bg-gray-100 active:bg-gray-200">
-                <Ionicons name="close" size={18} color="#4B5563" />
-              </Pressable>
+              
             </View>
 
            
