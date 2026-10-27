@@ -193,52 +193,52 @@ export const getMyReviews = async (req: AuthRequest, res: Response) => {
 
 /* ------------------------------ Update ------------------------------ */
 
-// export const updateReview = async (req: AuthRequest, res: Response) => {
-//   try {
-//     const { id } = req.params;
-//     if (!mongoose.isValidObjectId(id)) {
-//       return res.status(400).json({ message: "Invalid review id" });
-//     }
+export const updateReview = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ message: "Invalid review id" });
+    }
 
-//     const { rating, comment } = req.body;
-//     if (rating === undefined && comment === undefined) {
-//       return res.status(400).json({ message: "Nothing to update" });
-//     }
+    const { rating, comment } = req.body;
+    if (rating === undefined && comment === undefined) {
+      return res.status(400).json({ message: "Nothing to update" });
+    }
 
-//     // Only the author can edit
-//     const review = await Review.findOne({ _id: id, customer: req.userId });
-//     if (!review) {
-//       return res.status(404).json({ message: "Review not found" });
-//     }
+    // Only the author can edit
+    const review = await Review.findOne({ _id: id, customer: req.userId });
+    if (!review) {
+      return res.status(404).json({ message: "Review not found" });
+    }
 
-//     if (rating !== undefined) {
-//       const stars = parseRating(rating);
-//       if (stars === null) {
-//         return res
-//           .status(400)
-//           .json({ message: "Rating must be a whole number from 1 to 5" });
-//       }
-//       review.rating = stars;
-//     }
+    if (rating !== undefined) {
+      const stars = parseRating(rating);
+      if (stars === null) {
+        return res
+          .status(400)
+          .json({ message: "Rating must be a whole number from 1 to 5" });
+      }
+      review.rating = stars;
+    }
 
-//     if (comment !== undefined) {
-//       if (badText(comment)) {
-//         return res.status(400).json({
-//           message: `Comment must be text of up to ${MAX_TEXT} characters`,
-//         });
-//       }
-//       review.comment = comment.trim(); // empty text clears it
-//     }
+    if (comment !== undefined) {
+      if (badText(comment)) {
+        return res.status(400).json({
+          message: `Comment must be text of up to ${MAX_TEXT} characters`,
+        });
+      }
+      review.comment = comment.trim(); // empty text clears it
+    }
 
-//     await review.save();
-//     await recalculateRestaurantRating(review.restaurant);
+    await review.save();
+    await recalculateRestaurantRating(review.restaurant);
 
-//     return res.status(200).json({ message: "Review updated", review });
-//   } catch (error) {
-//     console.error("Update review error:", error);
-//     return res.status(500).json({ message: "Something went wrong" });
-//   }
-// };
+    return res.status(200).json({ message: "Review updated", review });
+  } catch (error) {
+    console.error("Update review error:", error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
 
 // /* ------------------------------ Delete ------------------------------ */
 
