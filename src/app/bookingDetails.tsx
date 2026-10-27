@@ -435,7 +435,7 @@ const BookingDetails = () => {
                 />
                 <Text className="ml-2 text-lg font-bold text-white">
                   {myReview
-                    ? `Submited `
+                    ? "Submited"
                     : "Leave a Review"}
                 </Text>
               </Pressable>

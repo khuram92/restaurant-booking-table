@@ -54,7 +54,7 @@ export const ReviewModal = ({
   const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  // The modal stays mounted, so reset its fields every time it opens
+  
   useEffect(() => {
     if (!visible) return;
     setRating(existingReview?.rating ?? 5);
@@ -157,7 +157,7 @@ export const ReviewModal = ({
             <View className="mb-4 flex-row items-center justify-between border-b border-gray-100 pb-3">
               <View>
                 <Text className="text-xl font-bold text-gray-900">
-                  {isEditing ? "Edit Your Review" : "Rate Your Experience"}
+                  {isEditing ? "Your Review" : "Rate Your Experience"}
                 </Text>
                 <Text className="text-xs text-gray-400 mt-0.5">
                   {restaurantName}
@@ -232,9 +232,7 @@ export const ReviewModal = ({
                   </Text>
                 )}
               </Pressable>
-            </View>
-
-            {isEditing && (
+            </View>  
               <Pressable
                 onPress={handleDelete}
                 disabled={submitting}
@@ -243,7 +241,6 @@ export const ReviewModal = ({
                   Delete my review
                 </Text>
               </Pressable>
-            )}
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
