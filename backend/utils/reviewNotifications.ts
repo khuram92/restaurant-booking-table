@@ -37,19 +37,19 @@ export const notifyReviewCreated = async (review: ReviewInfo) => {
   }
 };
 
-// // The owner replied: tell the customer
-// export const notifyReviewReply = async (review: ReviewInfo) => {
-//   try {
-//     const restaurant = await Restaurant.findById(review.restaurant).select("name");
+// The owner replied: tell the customer
+export const notifyReviewReply = async (review: ReviewInfo) => {
+  try {
+    const restaurant = await Restaurant.findById(review.restaurant).select("name");
 
-//     await Notification.create({
-//       user: review.customer,
-//       type: "review_reply",
-//       title: "Restaurant Replied",
-//       message: `${restaurant?.name ?? "The restaurant"} replied to your review.`,
-//       booking: review.booking,
-//     });
-//   } catch (error) {
-//     console.error("Notification error (reply):", error);
-//   }
-// };
+    await Notification.create({
+      user: review.customer,
+      type: "review_reply",
+      title: "Restaurant Replied",
+      message: `${restaurant?.name ?? "The restaurant"} replied to your review.`,
+      booking: review.booking,
+    });
+  } catch (error) {
+    console.error("Notification error (reply):", error);
+  }
+};
