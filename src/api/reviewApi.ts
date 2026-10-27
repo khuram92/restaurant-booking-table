@@ -165,22 +165,22 @@ export const deleteReview = async (reviewId: string): Promise<void> => {
 
 // /* ------------------------------- Owner ------------------------------- */
 
-// // The restaurant's owner replies to a review. Empty text removes the reply.
-// export const replyToReview = async (
-//   reviewId: string,
-//   text: string,
-// ): Promise<Review> => {
-//   const headers = await getAuthHeaders();
+// The restaurant's owner replies to a review. Empty text removes the reply.
+export const replyToReview = async (
+  reviewId: string,
+  text: string,
+): Promise<Review> => {
+  const headers = await getAuthHeaders();
 
-//   const response = await fetch(`${API_URL}/reviews/${reviewId}/reply`, {
-//     method: "PUT",
-//     headers,
-//     body: JSON.stringify({ text }),
-//   });
+  const response = await fetch(`${API_URL}/reviews/${reviewId}/reply`, {
+    method: "PUT",
+    headers,
+    body: JSON.stringify({ text }),
+  });
 
-//   const data = await parseResponse<{ review: Review }>(
-//     response,
-//     "Could not save your reply",
-//   );
-//   return data.review;
-// };
+  const data = await parseResponse<{ review: Review }>(
+    response,
+    "Could not save your reply",
+  );
+  return data.review;
+};
