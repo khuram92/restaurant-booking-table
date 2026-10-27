@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -12,57 +12,126 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { createOrUpdateReview } from "../../api/reviewApi";
+import {
+  MAX_REVIEW_LENGTH,
+  createReview,
+  deleteReview,
+  updateReview,
+  type Review,
+} from "../../api/reviewApi";
+
+const RATING_LABELS: Record<number, string> = {
+  1: "Poor",
+  2: "Fair",
+  3: "Average",
+  4: "Good",
+  5: "Amazing!",
+};
 
 interface ReviewModalProps {
   visible: boolean;
   onClose: () => void;
-  restaurantId: string;
   restaurantName: string;
-  bookingId?: string;
-  onSuccess?: () => void;
+  bookingId: string; // the completed booking being reviewed
+  // pass an existing review to edit it instead of creating a new one
+  existingReview?: Pick<Review, "_id" | "rating" | "comment"> | null;
+  onSuccess?: (review: Review) => void;
+  onDeleted?: () => void;
 }
 
 export const ReviewModal = ({
   visible,
   onClose,
-  restaurantId,
   restaurantName,
   bookingId,
+  existingReview,
   onSuccess,
+  onDeleted,
 }: ReviewModalProps) => {
+  const isEditing = !!existingReview;
+
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
+  // The modal stays mounted, so reset its fields every time it opens
+  useEffect(() => {
+    if (!visible) return;
+    setRating(existingReview?.rating ?? 5);
+    setComment(existingReview?.comment ?? "");
+  }, [visible, existingReview?._id]);
+
   const handleSubmit = async () => {
-    if (!comment.trim()) {
-      Alert.alert(
-        "Error",
-        "Please write a short comment about your experience.",
-      );
-      return;
-    }
+    const text = comment.trim();
 
     try {
       setSubmitting(true);
-      // Axios interceptor automatically handles the auth token securely from SecureStore
-      await createOrUpdateReview({
-        restaurantId,
-        rating,
-        comment: comment.trim(),
-        bookingId,
-      });
-      Alert.alert("Success", "Review submitted successfully!");
-      setComment("");
-      setRating(5);
-      onSuccess?.();
+      let review: Review;
+
+      if (existingReview) {
+        // Send only what changed
+        const changes: Partial<{ rating: number; comment: string }> = {};
+        if (rating !== existingReview.rating) changes.rating = rating;
+        if (text !== (existingReview.comment ?? "").trim()) changes.comment = text;
+
+        if (Object.keys(changes).length === 0) {
+          onClose(); // nothing changed
+          return;
+        }
+        review = await updateReview(existingReview._id, changes);
+      } else {
+        review = await createReview({
+          bookingId,
+          rating,
+          comment: text || undefined,
+        });
+      }
+
+      Alert.alert(
+        "Thank you!",
+        isEditing ? "Your review was updated." : "Your review was submitted.",
+      );
+      onSuccess?.(review);
       onClose();
-    } catch (error: any) {
-      Alert.alert("Error", error.message || "Failed to submit review");
+    } catch (error) {
+      Alert.alert(
+        "Could not save review",
+        error instanceof Error ? error.message : "Something went wrong.",
+      );
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleDelete = () => {
+    if (!existingReview) return;
+
+    Alert.alert(
+      "Delete review?",
+      "Your rating will be removed from the restaurant.",
+      [
+        { text: "Keep", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              setSubmitting(true);
+              await deleteReview(existingReview._id);
+              onDeleted?.();
+              onClose();
+            } catch (error) {
+              Alert.alert(
+                "Could not delete review",
+                error instanceof Error ? error.message : "Something went wrong.",
+              );
+            } finally {
+              setSubmitting(false);
+            }
+          },
+        },
+      ],
+    );
   };
 
   return (
@@ -70,7 +139,9 @@ export const ReviewModal = ({
       visible={visible}
       transparent
       animationType="fade"
-      onRequestClose={onClose}>
+      onRequestClose={() => {
+        if (!submitting) onClose();
+      }}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         className="flex-1 bg-black/60 justify-center">
@@ -86,7 +157,7 @@ export const ReviewModal = ({
             <View className="mb-4 flex-row items-center justify-between border-b border-gray-100 pb-3">
               <View>
                 <Text className="text-xl font-bold text-gray-900">
-                  Rate Your Experience
+                  {isEditing ? "Edit Your Review" : "Rate Your Experience"}
                 </Text>
                 <Text className="text-xs text-gray-400 mt-0.5">
                   {restaurantName}
@@ -103,6 +174,9 @@ export const ReviewModal = ({
                   <Pressable
                     key={star}
                     onPress={() => setRating(star)}
+                    disabled={submitting}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${star} star${star > 1 ? "s" : ""}`}
                     className="p-1">
                     <Ionicons
                       name={star <= rating ? "star" : "star-outline"}
@@ -113,21 +187,13 @@ export const ReviewModal = ({
                 ))}
               </View>
               <Text className="mt-1 text-xs font-medium text-blue-700">
-                {rating === 5
-                  ? "Amazing!"
-                  : rating === 4
-                    ? "Good"
-                    : rating === 3
-                      ? "Average"
-                      : rating === 2
-                        ? "Average"
-                        : "Poor"}
+                {RATING_LABELS[rating]}
               </Text>
             </View>
 
             <View className="mb-4">
               <Text className="mb-1 text-sm font-semibold text-gray-700">
-                Review / Comments
+                Review / Comments (optional)
               </Text>
               <TextInput
                 value={comment}
@@ -136,9 +202,13 @@ export const ReviewModal = ({
                 placeholderTextColor="#9CA3AF"
                 multiline
                 numberOfLines={4}
+                maxLength={MAX_REVIEW_LENGTH}
                 textAlignVertical="top"
                 className="rounded-xl border border-gray-300 p-3 text-base text-gray-900 bg-gray-50 min-h-[100px]"
               />
+              <Text className="mt-1 self-end text-xs text-gray-400">
+                {comment.length}/{MAX_REVIEW_LENGTH}
+              </Text>
             </View>
 
             <View className="flex-row gap-3">
@@ -158,11 +228,22 @@ export const ReviewModal = ({
                   <ActivityIndicator size="small" color="white" />
                 ) : (
                   <Text className="font-semibold text-white">
-                    Submit Review
+                    {isEditing ? "Save Changes" : "Submit Review"}
                   </Text>
                 )}
               </Pressable>
             </View>
+
+            {isEditing && (
+              <Pressable
+                onPress={handleDelete}
+                disabled={submitting}
+                className="mt-4 items-center">
+                <Text className="text-sm font-semibold text-red-600">
+                  Delete my review
+                </Text>
+              </Pressable>
+            )}
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
