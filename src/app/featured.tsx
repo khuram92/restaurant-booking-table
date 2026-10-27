@@ -149,12 +149,12 @@ export default function FeaturedScreen() {
           );
         }}
         ListEmptyComponent={
-          <View className="items-center justify-center py-20">
-            <Ionicons name="star-outline" size={48} color="#9CA3AF" />
-            <Text className="mt-2 text-sm text-gray-400">
-              No featured restaurants available.
-            </Text>
-          </View>
+          // <View className="items-center justify-center py-20">
+          //   <Ionicons name="star-outline" size={48} color="#9CA3AF" />
+          //   <Text className="mt-2 text-sm text-gray-400">
+          //     No featured restaurants available.
+          //   </Text>
+          // </View>
         }
       />
     </View>
