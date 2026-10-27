@@ -1,14 +1,11 @@
 import type { Request, Response } from "express";
 import mongoose from "mongoose";
-import Review from "../models/Review.js";
+import type { AuthRequest } from "../middleware/authMiddleware.js";
 import Booking from "../models/Booking.js";
 import Restaurant from "../models/Restaurant.js";
-import type { AuthRequest } from "../middleware/authMiddleware.js";
+import Review from "../models/Review.js";
 import { recalculateRestaurantRating } from "../utils/ratings.js";
-import {
-  notifyReviewCreated,
-  notifyReviewReply,
-} from "../utils/reviewNotifications.js";
+import { notifyReviewCreated } from "../utils/reviewNotifications.js";
 
 const MAX_TEXT = 1000;
 
@@ -68,7 +65,10 @@ export const createReview = async (req: AuthRequest, res: Response) => {
     }
 
     // The booking must be the caller's own, and finished
-    const booking = await Booking.findOne({ _id: bookingId, customer: req.userId });
+    const booking = await Booking.findOne({
+      _id: bookingId,
+      customer: req.userId,
+    });
     if (!booking) {
       return res.status(404).json({ message: "Booking not found" });
     }
@@ -78,7 +78,9 @@ export const createReview = async (req: AuthRequest, res: Response) => {
         .json({ message: "You can only review a completed booking" });
     }
 
-    const restaurant = await Restaurant.findById(booking.restaurant).select("owner");
+    const restaurant = await Restaurant.findById(booking.restaurant).select(
+      "owner",
+    );
     if (!restaurant) {
       return res.status(404).json({ message: "Restaurant not found" });
     }
@@ -111,61 +113,69 @@ export const createReview = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// /* ------------------------------- Read ------------------------------- */
+/* ------------------------------- Read ------------------------------- */
 
-// // Public: a restaurant's reviews, with the average and a 1-5 star breakdown
-// export const getRestaurantReviews = async (req: Request, res: Response) => {
-//   try {
-//     const { restaurantId } = req.params;
-//     if (!mongoose.isValidObjectId(restaurantId)) {
-//       return res.status(400).json({ message: "Invalid restaurant id" });
-//     }
+// Public: a restaurant's reviews, with the average and a 1-5 star breakdown
+export const getRestaurantReviews = async (req: Request, res: Response) => {
+  try {
+    const restaurantId = Array.isArray(req.params.restaurantId)
+      ? (req.params.restaurantId[0] ?? "")
+      : req.params.restaurantId;
+    if (!mongoose.isValidObjectId(restaurantId)) {
+      return res.status(400).json({ message: "Invalid restaurant id" });
+    }
 
-//     const id = new mongoose.Types.ObjectId(restaurantId);
-//     const page = Math.max(1, parseInt(String(req.query.page ?? "1"), 10) || 1);
-//     const limit = Math.min(
-//       50,
-//       Math.max(1, parseInt(String(req.query.limit ?? "10"), 10) || 10),
-//     );
+    const id = new mongoose.Types.ObjectId(restaurantId);
+    const page = Math.max(1, parseInt(String(req.query.page ?? "1"), 10) || 1);
+    const limit = Math.min(
+      50,
+      Math.max(1, parseInt(String(req.query.limit ?? "10"), 10) || 10),
+    );
 
-//     const [reviews, rows] = await Promise.all([
-//       Review.find({ restaurant: id })
-//         .populate("customer", "firstName lastName avatar")
-//         .sort({ createdAt: -1 })
-//         .skip((page - 1) * limit)
-//         .limit(limit),
-//       Review.aggregate([
-//         { $match: { restaurant: id } },
-//         { $group: { _id: "$rating", count: { $sum: 1 } } },
-//       ]),
-//     ]);
+    const [reviews, rows] = await Promise.all([
+      Review.find({ restaurant: id })
+        .populate("customer", "firstName lastName avatar")
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit),
+      Review.aggregate([
+        { $match: { restaurant: id } },
+        { $group: { _id: "$rating", count: { $sum: 1 } } },
+      ]),
+    ]);
 
-//     const distribution: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-//     for (const row of rows as { _id: number; count: number }[]) {
-//       distribution[row._id] = row.count;
-//     }
+    const distribution: Record<number, number> = {
+      1: 0,
+      2: 0,
+      3: 0,
+      4: 0,
+      5: 0,
+    };
+    for (const row of rows as { _id: number; count: number }[]) {
+      distribution[row._id] = row.count;
+    }
 
-//     const total = Object.values(distribution).reduce((a, b) => a + b, 0);
-//     const weighted = Object.entries(distribution).reduce(
-//       (sum, [stars, n]) => sum + Number(stars) * n,
-//       0,
-//     );
+    const total = Object.values(distribution).reduce((a, b) => a + b, 0);
+    const weighted = Object.entries(distribution).reduce(
+      (sum, [stars, n]) => sum + Number(stars) * n,
+      0,
+    );
 
-//     return res.status(200).json({
-//       summary: {
-//         average: total ? Math.round((weighted / total) * 10) / 10 : 0,
-//         count: total,
-//         distribution,
-//       },
-//       reviews: reviews.map(toPublic),
-//       page,
-//       pages: Math.ceil(total / limit),
-//     });
-//   } catch (error) {
-//     console.error("Get restaurant reviews error:", error);
-//     return res.status(500).json({ message: "Something went wrong" });
-//   }
-// };
+    return res.status(200).json({
+      summary: {
+        average: total ? Math.round((weighted / total) * 10) / 10 : 0,
+        count: total,
+        distribution,
+      },
+      reviews: reviews.map(toPublic),
+      page,
+      pages: Math.ceil(total / limit),
+    });
+  } catch (error) {
+    console.error("Get restaurant reviews error:", error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
 
 // // The caller's own reviews. The app uses the booking ids to show "Rate" or "Rated"
 // export const getMyReviews = async (req: AuthRequest, res: Response) => {
