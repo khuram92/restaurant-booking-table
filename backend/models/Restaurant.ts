@@ -18,6 +18,7 @@ export interface IRestaurant extends Document {
   availableSeats: number;
   seatingTypes: string[];
   isActive: boolean;
+  isFeatured: boolean;
 }
 
 const restaurantSchema = new Schema<IRestaurant>(
@@ -36,6 +37,7 @@ const restaurantSchema = new Schema<IRestaurant>(
     phone: { type: String, trim: true },
     description: { type: String },
     images: { type: [String], default: [] },
+    isFeatured: { type: Boolean, default: false },
     openingTime: { type: String },
     closingTime: { type: String },
     rating: { type: Number, default: 0, min: 0, max: 5 },
