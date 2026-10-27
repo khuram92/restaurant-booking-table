@@ -82,17 +82,17 @@ export const setRestaurantActive = async (id: string, isActive: boolean) =>
     })
   ).restaurant;
 
-// export const setRestaurantFeatured = async (
-//   id: string,
-//   isFeatured: boolean,
-// ) => {
-//   return (
-//     await request<{ restaurant: AdminRestaurant }>(
-//       `restaurants/${id}/featured`,
-//       {
-//         method: "PATCH",
-//         body: { isFeatured },
-//       },
-//     )
-//   ).restaurant;
-// };
+export const setRestaurantFeatured = async (
+  id: string,
+  isFeatured: boolean,
+) => {
+  return (
+    await request<{ restaurant: AdminRestaurant }>(
+      `restaurants/${id}/featured`,
+      {
+        method: "PATCH",
+        body: { isFeatured },
+      },
+    )
+  ).restaurant;
+};
