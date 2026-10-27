@@ -144,24 +144,24 @@ export const updateReview = async (
     body: JSON.stringify(changes),
   });
 
-//   const data = await parseResponse<{ review: Review }>(
-//     response,
-//     "Could not update your review",
-//   );
-//   return data.review;
-// };
+  const data = await parseResponse<{ review: Review }>(
+    response,
+    "Could not update your review",
+  );
+  return data.review;
+};
 
-// // The author, or an admin, deletes a review
-// export const deleteReview = async (reviewId: string): Promise<void> => {
-//   const headers = await getAuthHeaders();
+// The author, or an admin, deletes a review
+export const deleteReview = async (reviewId: string): Promise<void> => {
+  const headers = await getAuthHeaders();
 
-//   const response = await fetch(`${API_URL}/reviews/${reviewId}`, {
-//     method: "DELETE",
-//     headers,
-//   });
+  const response = await fetch(`${API_URL}/reviews/${reviewId}`, {
+    method: "DELETE",
+    headers,
+  });
 
-//   await parseResponse(response, "Could not delete the review");
-// };
+  await parseResponse(response, "Could not delete the review");
+};
 
 // /* ------------------------------- Owner ------------------------------- */
 
