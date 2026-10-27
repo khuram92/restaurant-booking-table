@@ -127,7 +127,7 @@ export const setRestaurantActive = async (req: AuthRequest, res: Response) => {
   }
 };
 
-const toggleFeatured = async (req: AuthRequest, res: Response) => {
+export const toggleFeatured = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
 
