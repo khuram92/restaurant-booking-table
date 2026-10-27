@@ -430,7 +430,7 @@ export default function Home() {
               </View>
 
               {/* Horizontal Scroll of Featured Restaurants (Limited to 3) */}
-              <FlatList
+              {/* <FlatList
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 data={featuredRestaurants.slice(0, 3)}
@@ -439,7 +439,7 @@ export default function Home() {
                 renderItem={({ item }) => (
                   <FeaturedHorizontalCard item={item} />
                 )}
-              />
+              /> */}
 
               {/* Categories */}
               <View className="my-4 flex-row justify-between">
