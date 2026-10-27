@@ -36,7 +36,6 @@ export type Review = {
   _id: string;
   booking: string;
   customer?: string;
-  // a plain id, or the populated restaurant (from getMyReviews)
   restaurant: string | { _id: string; name?: string; city?: string; images?: string[] };
   rating: number;
   comment?: string;

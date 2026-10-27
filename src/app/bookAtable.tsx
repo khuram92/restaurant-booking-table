@@ -23,12 +23,20 @@ import {
   resolveImageUrl,
   Restaurant,
 } from "../api/restaurantApi";
-import { getRestaurantReviews, type Review } from "../api/reviewApi";
+import { getRestaurantReviews, type PublicReview } from "../api/reviewApi";
 
 const TABS = ["Overview", "Menu", "Reviews"] as const;
 type Tab = (typeof TABS)[number];
 
 const TOKEN_KEY = "authToken";
+
+const initialsOf = (name: string) =>
+  name
+    .split(/\s+/)
+    .map((part) => part.charAt(0))
+    .join("")
+    .toUpperCase()
+    .slice(0, 2) || "U";
 
 export default function BookATable() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -39,7 +47,7 @@ export default function BookATable() {
   const [activeTab, setActiveTab] = useState<Tab>("Overview");
   const [isFavorite, setIsFavorite] = useState(false);
   const [isAboutExpanded, setIsAboutExpanded] = useState(false);
-  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviews, setReviews] = useState<PublicReview[]>([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
 
   useEffect(() => {
@@ -83,7 +91,7 @@ export default function BookATable() {
   useEffect(() => {
     if (restaurant) {
       getRestaurantReviews(restaurant._id)
-        .then((data) => setReviews(data))
+        .then((data) => setReviews(data.reviews))
         .catch((err) => console.log("Failed to load reviews:", err))
         .finally(() => setLoadingReviews(false));
     }
@@ -369,23 +377,9 @@ export default function BookATable() {
           ) : (
             <View className="mt-6">
               {reviews.map((rev) => {
-                const customerName =
-                  rev.customer && typeof rev.customer === "object"
-                    ? `${rev.customer.firstName ?? ""} ${rev.customer.lastName ?? ""}`.trim()
-                    : "Anonymous Customer";
+                const customerName = rev.customer?.name || "Customer";
+                const avatar = rev.customer?.avatar;
 
-                // Get customer initials for avatar fallback (e.g., "John Doe" -> "JD")
-                const initials =
-                  customerName !== "Anonymous Customer"
-                    ? customerName
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")
-                        .toUpperCase()
-                        .slice(0, 2)
-                    : "U";
-
-                
                 const formattedDate = rev.createdAt
                   ? new Date(rev.createdAt).toLocaleDateString(undefined, {
                       month: "short",
@@ -402,11 +396,18 @@ export default function BookATable() {
                     <View className="flex-row items-center justify-between">
                       {/* Customer Avatar & Name */}
                       <View className="flex-row items-center gap-3">
-                        <View className="h-10 w-10 items-center justify-center rounded-full bg-blue-100 border border-blue-200">
-                          <Text className="text-xs font-bold text-blue-700">
-                            {initials}
-                          </Text>
-                        </View>
+                        {avatar ? (
+                          <Image
+                            source={{ uri: avatar }}
+                            className="h-10 w-10 rounded-full border border-blue-200"
+                          />
+                        ) : (
+                          <View className="h-10 w-10 items-center justify-center rounded-full bg-blue-100 border border-blue-200">
+                            <Text className="text-xs font-bold text-blue-700">
+                              {initialsOf(customerName)}
+                            </Text>
+                          </View>
+                        )}
                         <View>
                           <Text className="font-bold text-gray-900 text-base">
                             {customerName}
@@ -428,10 +429,31 @@ export default function BookATable() {
                       </View>
                     </View>
 
-                    {/* Review Comment Text */}
-                    <Text className="mt-3 text-sm leading-relaxed text-gray-600 font-normal">
-                      "{rev.comment}"
-                    </Text>
+                    {/* Review Comment Text (the comment is optional) */}
+                    {!!rev.comment && (
+                      <Text className="mt-3 text-sm leading-relaxed text-gray-600 font-normal">
+                        "{rev.comment}"
+                      </Text>
+                    )}
+
+                    {/* The restaurant's reply, if it has answered */}
+                    {rev.reply && (
+                      <View className="mt-3 rounded-xl border border-blue-100 bg-white p-3">
+                        <View className="flex-row items-center">
+                          <Ionicons
+                            name="return-down-forward"
+                            size={14}
+                            color="#2563EB"
+                          />
+                          <Text className="ml-1 text-xs font-bold text-blue-700">
+                            Response from the restaurant
+                          </Text>
+                        </View>
+                        <Text className="mt-1 text-sm text-gray-600">
+                          {rev.reply.text}
+                        </Text>
+                      </View>
+                    )}
                   </View>
                 );
               })}
