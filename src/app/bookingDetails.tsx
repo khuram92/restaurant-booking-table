@@ -12,24 +12,23 @@ import {
 } from "react-native";
 import { cancelBooking, getMyBookings, type Booking } from "../api/bookingApi";
 import { getRestaurantById, type Restaurant } from "../api/restaurantApi";
-import { getRestaurantReviews } from "../api/reviewApi";
+import { getMyReviews, type Review } from "../api/reviewApi";
 import { getBookingCode } from "../utils/booking";
 import { ReviewModal } from "./components/ReviewModal";
 
 type IconName = keyof typeof Ionicons.glyphMap;
 
-const STATUS_CONFIG: Record<
-  Booking["status"],
-  {
-    icon: IconName;
-    title: string;
-    subtitle: string;
-    pillLabel: string;
-    pillClass: string;
-    pillTextClass: string;
-    canCancel: boolean;
-  }
-> = {
+type StatusConfig = {
+  icon: IconName;
+  title: string;
+  subtitle: string;
+  pillLabel: string;
+  pillClass: string;
+  pillTextClass: string;
+  canCancel: boolean;
+};
+
+const STATUS_CONFIG: Record<Booking["status"], StatusConfig> = {
   pending: {
     icon: "time-outline",
     title: "Awaiting Confirmation",
@@ -79,11 +78,25 @@ const STATUS_CONFIG: Record<
   },
 };
 
+// Used if the backend ever sends a status this screen doesn't know
+const FALLBACK_STATUS: StatusConfig = {
+  icon: "help-circle-outline",
+  title: "Booking",
+  subtitle: "We couldn't read this booking's status.\nPull down to refresh.",
+  pillLabel: "Unknown",
+  pillClass: "bg-gray-100",
+  pillTextClass: "text-gray-600",
+  canCancel: false,
+};
+
+const POLL_MS = 10000;
+
 const DashedDivider = () => (
   <View className="mx-6 h-px overflow-hidden">
     <View className="h-2 border border-dashed border-gray-500" />
   </View>
 );
+
 const InfoColumn = ({
   icon,
   label,
@@ -111,6 +124,7 @@ const InfoColumn = ({
     </Text>
   </View>
 );
+
 const getRestaurantRef = (booking: Booking | null) => {
   const ref = (booking as any)?.restaurant;
   if (!ref) return { id: undefined, name: undefined };
@@ -129,8 +143,10 @@ const BookingDetails = () => {
   const [error, setError] = useState("");
   const [cancelling, setCancelling] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [reviewModalVisible, setReviewModalVisible] = useState(false);
-  const [hasReviewed, setHasReviewed] = useState(false);
+
+  // The customer's own review of this booking (null = not reviewed yet)
+  const [myReview, setMyReview] = useState<Review | null>(null);
+  const [showReview, setShowReview] = useState(false);
 
   const loadBooking = useCallback(async () => {
     try {
@@ -142,30 +158,41 @@ const BookingDetails = () => {
       const found = bookings.find((b) => b._id === id);
 
       if (!found) {
-        throw new Error("Booking not found");
+        // Deleted or not yours: don't keep showing stale data
+        setBooking(null);
+        setError("Booking not found");
+        return;
       }
 
       setBooking(found);
+      setError("");
     } catch (err) {
+      // A failed refresh keeps the booking already on screen.
+      // Only a failed first load ends up on the error screen.
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setLoading(false);
     }
   }, [id]);
 
+  // Load whenever the screen is shown
   useFocusEffect(
     useCallback(() => {
-      loadBooking();
+      void loadBooking();
     }, [loadBooking]),
   );
 
-  // While the booking is pending, check again every 10 seconds
-  useEffect(() => {
-    if (booking?.status !== "pending") return;
+  // While the screen is visible and the booking can still change
+  // (pending -> confirmed/declined, confirmed -> completed), check every 10 seconds
+  const status = booking?.status;
+  useFocusEffect(
+    useCallback(() => {
+      if (status !== "pending" && status !== "confirmed") return;
 
-    const interval = setInterval(loadBooking, 10000);
-    return () => clearInterval(interval);
-  }, [booking?.status, loadBooking]);
+      const interval = setInterval(() => void loadBooking(), POLL_MS);
+      return () => clearInterval(interval);
+    }, [status, loadBooking]),
+  );
 
   const { id: restaurantId, name: populatedName } = getRestaurantRef(booking);
 
@@ -185,22 +212,30 @@ const BookingDetails = () => {
     };
   }, [restaurantId]);
 
-  // 2. Check if the user has already left a review for this completed booking
+  // Has the customer already reviewed this completed booking?
+  const bookingId = booking?._id;
+  const isCompleted = booking?.status === "completed";
+
   useEffect(() => {
-    if (booking?.status === "completed" && restaurantId) {
-      getRestaurantReviews(restaurantId)
-        .then((reviews) => {
-          const alreadyReviewed = reviews.some(
-            (r) =>
-              r.booking === booking._id ||
-              (typeof r.booking === "object" &&
-                (r.booking as any)?._id === booking._id),
-          );
-          if (alreadyReviewed) setHasReviewed(true);
-        })
-        .catch((err) => console.log("Failed to check review status:", err));
+    if (!bookingId || !isCompleted) {
+      setMyReview(null);
+      return;
     }
-  }, [booking?._id, booking?.status, restaurantId]);
+
+    let active = true;
+
+    getMyReviews()
+      .then((reviews) => {
+        if (active) {
+          setMyReview(reviews.find((r) => r.booking === bookingId) ?? null);
+        }
+      })
+      .catch((err) => console.log("Failed to check review status:", err));
+
+    return () => {
+      active = false; // ignore a late response after leaving the page
+    };
+  }, [bookingId, isCompleted]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -242,22 +277,30 @@ const BookingDetails = () => {
     );
   }
 
-  if (error || !booking) {
+  if (!booking) {
     return (
       <View className="flex-1 items-center justify-center bg-white px-6">
         <Text className="text-center text-lg font-semibold text-gray-900">
           {error || "Booking not found"}
         </Text>
         <Pressable
+          onPress={() => {
+            setLoading(true);
+            void loadBooking();
+          }}
+          className="mt-6 rounded-full border border-blue-700 px-10 py-4">
+          <Text className="font-bold text-blue-700">Try Again</Text>
+        </Pressable>
+        <Pressable
           onPress={() => router.replace("/home")}
-          className="mt-6 rounded-full bg-blue-700 px-10 py-4">
+          className="mt-3 rounded-full bg-blue-700 px-10 py-4">
           <Text className="font-bold text-white">Go Home</Text>
         </Pressable>
       </View>
     );
   }
 
-  const config = STATUS_CONFIG[booking.status];
+  const config = STATUS_CONFIG[booking.status] ?? FALLBACK_STATUS;
   const formattedDate = new Date(booking.date).toLocaleDateString("en-US", {
     weekday: "short",
     month: "short",
@@ -380,20 +423,20 @@ const BookingDetails = () => {
           <View className="mt-6 w-full">
             {booking.status === "completed" && (
               <Pressable
-                onPress={() => !hasReviewed && setReviewModalVisible(true)}
-                disabled={hasReviewed}
-                className={`mb-3 flex-row items-center justify-center rounded-full py-4 shadow-sm ${
-                  hasReviewed
-                    ? "bg-green-600 opacity-90"
-                    : "bg-amber-700 active:opacity-90"
+                onPress={() => setShowReview(true)}
+                accessibilityRole="button"
+                className={`mb-3 flex-row items-center justify-center rounded-full py-4 shadow-sm active:opacity-90 ${
+                  myReview ? "bg-green-600" : "bg-amber-700"
                 }`}>
                 <Ionicons
-                  name={hasReviewed ? "checkmark-circle" : "star"}
+                  name={myReview ? "checkmark-circle" : "star"}
                   size={20}
                   color="white"
                 />
                 <Text className="ml-2 text-lg font-bold text-white">
-                  {hasReviewed ? "Review Submitted" : "Leave a Review"}
+                  {myReview
+                    ? `Your Review (${myReview.rating}/5) · Edit`
+                    : "Leave a Review"}
                 </Text>
               </Pressable>
             )}
@@ -433,19 +476,15 @@ const BookingDetails = () => {
         </View>
       </ScrollView>
 
-      {restaurantId && (
-        <ReviewModal
-          visible={reviewModalVisible}
-          onClose={() => setReviewModalVisible(false)}
-          restaurantId={restaurantId}
-          restaurantName={restaurantName}
-          bookingId={booking._id}
-          onSuccess={() => {
-            setHasReviewed(true);
-            loadBooking();
-          }}
-        />
-      )}
+      <ReviewModal
+        visible={showReview}
+        onClose={() => setShowReview(false)}
+        restaurantName={restaurantName}
+        bookingId={booking._id}
+        existingReview={myReview}
+        onSuccess={(review) => setMyReview(review)}
+        onDeleted={() => setMyReview(null)}
+      />
     </>
   );
 };
