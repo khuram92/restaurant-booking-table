@@ -1,11 +1,11 @@
 import { Response } from "express";
 import mongoose from "mongoose";
-import User from "../models/User.js";
-import Restaurant from "../models/Restaurant.js";
-import Booking from "../models/Booking.js";
 import { AuthRequest } from "../middleware/authMiddleware.js";
+import Booking from "../models/Booking.js";
+import Restaurant from "../models/Restaurant.js";
+import User from "../models/User.js";
 
-const LIMIT = 200; 
+const LIMIT = 200;
 
 export const getAdminStats = async (_req: AuthRequest, res: Response) => {
   try {
@@ -102,7 +102,9 @@ export const setRestaurantActive = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ message: "Invalid restaurant id" });
     }
     if (typeof isActive !== "boolean") {
-      return res.status(400).json({ message: "isActive must be true or false" });
+      return res
+        .status(400)
+        .json({ message: "isActive must be true or false" });
     }
 
     const restaurant = await Restaurant.findByIdAndUpdate(
@@ -122,5 +124,36 @@ export const setRestaurantActive = async (req: AuthRequest, res: Response) => {
   } catch (error) {
     console.error("Set restaurant active error:", error);
     return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+const toggleFeatured = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const restaurant = await Restaurant.findById(id);
+
+    if (!restaurant) {
+      return res.status(404).json({
+        success: false,
+        message: "Restaurant not found",
+      });
+    }
+
+    // Toggle boolean value
+    restaurant.isFeatured = !restaurant.isFeatured;
+    await restaurant.save();
+
+    return res.status(200).json({
+      success: true,
+      message: `Restaurant is now ${restaurant.isFeatured ? "Featured" : "Unfeatured"}`,
+      data: restaurant,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
   }
 };
