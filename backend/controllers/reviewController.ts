@@ -44,8 +44,6 @@ const toPublic = (r: any) => {
   };
 };
 
-/* ------------------------------ Create ------------------------------ */
-
 export const createReview = async (req: AuthRequest, res: Response) => {
   try {
     const { bookingId, rating, comment } = req.body;
@@ -115,8 +113,6 @@ export const createReview = async (req: AuthRequest, res: Response) => {
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
-
-/* ------------------------------- Read ------------------------------- */
 
 // Public: a restaurant's reviews, with the average and a 1-5 star breakdown
 export const getRestaurantReviews = async (req: Request, res: Response) => {
@@ -194,8 +190,6 @@ export const getMyReviews = async (req: AuthRequest, res: Response) => {
   }
 };
 
-/* ------------------------------ Update ------------------------------ */
-
 export const updateReview = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
@@ -243,8 +237,6 @@ export const updateReview = async (req: AuthRequest, res: Response) => {
   }
 };
 
-/* ------------------------------ Delete ------------------------------ */
-
 export const deleteReview = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
@@ -271,8 +263,6 @@ export const deleteReview = async (req: AuthRequest, res: Response) => {
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
-
-/* ------------------------------- Reply ------------------------------ */
 
 // The restaurant's owner replies to a review. Empty text removes the reply.
 export const replyToReview = async (req: AuthRequest, res: Response) => {
