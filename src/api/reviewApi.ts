@@ -91,26 +91,26 @@ export const getRestaurantReviews = async (
 
 // /* ------------------------------ Customer ------------------------------ */
 
-// // Review a completed booking
-// export const createReview = async (input: {
-//   bookingId: string;
-//   rating: number;
-//   comment?: string;
-// }): Promise<Review> => {
-//   const headers = await getAuthHeaders();
+// Review a completed booking
+export const createReview = async (input: {
+  bookingId: string;
+  rating: number;
+  comment?: string;
+}): Promise<Review> => {
+  const headers = await getAuthHeaders();
 
-//   const response = await fetch(`${API_URL}/reviews`, {
-//     method: "POST",
-//     headers,
-//     body: JSON.stringify(input),
-//   });
+  const response = await fetch(`${API_URL}/reviews`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(input),
+  });
 
-//   const data = await parseResponse<{ review: Review }>(
-//     response,
-//     "Could not submit your review",
-//   );
-//   return data.review;
-// };
+  const data = await parseResponse<{ review: Review }>(
+    response,
+    "Could not submit your review",
+  );
+  return data.review;
+};
 
 // // All reviews the logged-in customer has written
 // export const getMyReviews = async (): Promise<Review[]> => {
