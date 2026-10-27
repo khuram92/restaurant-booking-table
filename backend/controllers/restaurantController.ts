@@ -233,3 +233,21 @@ export const deleteRestaurant = async (req: AuthRequest, res: Response) => {
     return res.status(500).json({ message: "Error deleting restaurant" });
   }
 };
+
+const getFeaturedRestaurants = async (req: AuthRequest, res: Response) => {
+  try {
+    const restaurants = await Restaurant.find({ isFeatured: true, isActive: true });
+    return res.status(200).json({
+      success: true,
+      restaurants,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : "Error fetching featured restaurants",
+    });
+  }
+};

@@ -146,7 +146,7 @@ export default function Home() {
     {
       label: "Featured",
       icon: "star",
-      onPress: () => router.push("/listRestaurants"),
+      onPress: () => router.push("/components/FeaturedRestaurantList"),
     },
     {
       label: "Discounts",
@@ -349,7 +349,7 @@ export default function Home() {
                 <Text className="font-bold text-blue-500 text-xl">
                   Featured Restaurant
                 </Text>
-
+                
                 <Link href="/listRestaurants" asChild>
                   <Pressable className="flex-row items-center">
                     <Text className="mr-1 text-blue-500 text-lg">See All</Text>
