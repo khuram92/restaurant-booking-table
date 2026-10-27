@@ -22,6 +22,7 @@ export type NewRestaurant = {
   seatingTypes: string[];
   reviewCount?: number;
   numReviews?: number;
+  isFeatured: boolean;
 };
 export const createRestaurant = async (
   data: NewRestaurant,
@@ -110,4 +111,10 @@ export const resolveImageUrl = (url?: string): string | undefined => {
   }
 
   return url.replace(/^http:\/\//i, "https://");
+};
+export const toggleFeaturedRestaurant = async (
+  id: string,
+): Promise<Restaurant> => {
+  const response = await API.patch(`/restaurants/${id}/featured`);
+  return response.data.restaurant;
 };
