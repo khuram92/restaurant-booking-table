@@ -240,34 +240,34 @@ export const updateReview = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// /* ------------------------------ Delete ------------------------------ */
+/* ------------------------------ Delete ------------------------------ */
 
-// export const deleteReview = async (req: AuthRequest, res: Response) => {
-//   try {
-//     const { id } = req.params;
-//     if (!mongoose.isValidObjectId(id)) {
-//       return res.status(400).json({ message: "Invalid review id" });
-//     }
+export const deleteReview = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ message: "Invalid review id" });
+    }
 
-//     const review = await Review.findById(id);
-//     if (!review) {
-//       return res.status(404).json({ message: "Review not found" });
-//     }
+    const review = await Review.findById(id);
+    if (!review) {
+      return res.status(404).json({ message: "Review not found" });
+    }
 
-//     // The author, or an admin
-//     if (review.customer.toString() !== req.userId && req.role !== "admin") {
-//       return res.status(403).json({ message: "Not allowed" });
-//     }
+    // The author, or an admin
+    if (review.customer.toString() !== req.userId && req.role !== "admin") {
+      return res.status(403).json({ message: "Not allowed" });
+    }
 
-//     await review.deleteOne();
-//     await recalculateRestaurantRating(review.restaurant);
+    await review.deleteOne();
+    await recalculateRestaurantRating(review.restaurant);
 
-//     return res.status(200).json({ message: "Review deleted" });
-//   } catch (error) {
-//     console.error("Delete review error:", error);
-//     return res.status(500).json({ message: "Something went wrong" });
-//   }
-// };
+    return res.status(200).json({ message: "Review deleted" });
+  } catch (error) {
+    console.error("Delete review error:", error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
 
 // /* ------------------------------- Reply ------------------------------ */
 
