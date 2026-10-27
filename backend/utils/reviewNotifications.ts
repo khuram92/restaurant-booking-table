@@ -12,30 +12,30 @@ type ReviewInfo = {
   rating: number;
 };
 
-// // A customer reviewed: tell the restaurant's owner
-// export const notifyReviewCreated = async (review: ReviewInfo) => {
-//   try {
-//     const [restaurant, customer] = await Promise.all([
-//       Restaurant.findById(review.restaurant).select("name owner"),
-//       User.findById(review.customer).select("firstName lastName"),
-//     ]);
-//     if (!restaurant?.owner) return;
 
-//     const who =
-//       `${customer?.firstName ?? ""} ${customer?.lastName ?? ""}`.trim() ||
-//       "A customer";
+export const notifyReviewCreated = async (review: ReviewInfo) => {
+  try {
+    const [restaurant, customer] = await Promise.all([
+      Restaurant.findById(review.restaurant).select("name owner"),
+      User.findById(review.customer).select("firstName lastName"),
+    ]);
+    if (!restaurant?.owner) return;
 
-//     await Notification.create({
-//       user: restaurant.owner,
-//       type: "review_new",
-//       title: "New Review",
-//       message: `${who} rated ${restaurant.name} ${review.rating}/5.`,
-//       booking: review.booking,
-//     });
-//   } catch (error) {
-//     console.error("Notification error (review):", error);
-//   }
-// };
+    const who =
+      `${customer?.firstName ?? ""} ${customer?.lastName ?? ""}`.trim() ||
+      "A customer";
+
+    await Notification.create({
+      user: restaurant.owner,
+      type: "review_new",
+      title: "New Review",
+      message: `${who} rated ${restaurant.name} ${review.rating}/5.`,
+      booking: review.booking,
+    });
+  } catch (error) {
+    console.error("Notification error (review):", error);
+  }
+};
 
 // // The owner replied: tell the customer
 // export const notifyReviewReply = async (review: ReviewInfo) => {
