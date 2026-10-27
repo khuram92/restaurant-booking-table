@@ -126,7 +126,7 @@ export default function FeaturedScreen() {
               </View>
 
               {/* Details */}
-              {/* <View className="p-4">
+              <View className="p-4">
                 <View className="flex-row items-center justify-between">
                   <Text
                     numberOfLines={1}
@@ -139,7 +139,7 @@ export default function FeaturedScreen() {
                       {(item.rating ?? 0).toFixed(1)}
                     </Text>
                   </View>
-                </View> */}
+                </View>
 
                 <Text numberOfLines={1} className="mt-1 text-xs text-gray-500">
                   {[item.cuisines, location].filter(Boolean).join(" • ")}
