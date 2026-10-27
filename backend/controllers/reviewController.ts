@@ -46,70 +46,70 @@ const toPublic = (r: any) => {
 
 /* ------------------------------ Create ------------------------------ */
 
-// export const createReview = async (req: AuthRequest, res: Response) => {
-//   try {
-//     const { bookingId, rating, comment } = req.body;
+export const createReview = async (req: AuthRequest, res: Response) => {
+  try {
+    const { bookingId, rating, comment } = req.body;
 
-//     if (!bookingId || !mongoose.isValidObjectId(bookingId)) {
-//       return res.status(400).json({ message: "Invalid booking id" });
-//     }
+    if (!bookingId || !mongoose.isValidObjectId(bookingId)) {
+      return res.status(400).json({ message: "Invalid booking id" });
+    }
 
-//     const stars = parseRating(rating);
-//     if (stars === null) {
-//       return res
-//         .status(400)
-//         .json({ message: "Rating must be a whole number from 1 to 5" });
-//     }
+    const stars = parseRating(rating);
+    if (stars === null) {
+      return res
+        .status(400)
+        .json({ message: "Rating must be a whole number from 1 to 5" });
+    }
 
-//     if (comment !== undefined && badText(comment)) {
-//       return res.status(400).json({
-//         message: `Comment must be text of up to ${MAX_TEXT} characters`,
-//       });
-//     }
+    if (comment !== undefined && badText(comment)) {
+      return res.status(400).json({
+        message: `Comment must be text of up to ${MAX_TEXT} characters`,
+      });
+    }
 
-//     // The booking must be the caller's own, and finished
-//     const booking = await Booking.findOne({ _id: bookingId, customer: req.userId });
-//     if (!booking) {
-//       return res.status(404).json({ message: "Booking not found" });
-//     }
-//     if (booking.status !== "completed") {
-//       return res
-//         .status(400)
-//         .json({ message: "You can only review a completed booking" });
-//     }
+    // The booking must be the caller's own, and finished
+    const booking = await Booking.findOne({ _id: bookingId, customer: req.userId });
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+    if (booking.status !== "completed") {
+      return res
+        .status(400)
+        .json({ message: "You can only review a completed booking" });
+    }
 
-//     const restaurant = await Restaurant.findById(booking.restaurant).select("owner");
-//     if (!restaurant) {
-//       return res.status(404).json({ message: "Restaurant not found" });
-//     }
-//     if (restaurant.owner?.toString() === req.userId) {
-//       return res
-//         .status(400)
-//         .json({ message: "You can't review your own restaurant" });
-//     }
+    const restaurant = await Restaurant.findById(booking.restaurant).select("owner");
+    if (!restaurant) {
+      return res.status(404).json({ message: "Restaurant not found" });
+    }
+    if (restaurant.owner?.toString() === req.userId) {
+      return res
+        .status(400)
+        .json({ message: "You can't review your own restaurant" });
+    }
 
-//     const review = await Review.create({
-//       restaurant: booking.restaurant,
-//       customer: req.userId,
-//       booking: booking._id,
-//       rating: stars,
-//       comment: comment?.trim() || undefined,
-//     });
+    const review = await Review.create({
+      restaurant: booking.restaurant,
+      customer: req.userId,
+      booking: booking._id,
+      rating: stars,
+      comment: comment?.trim() || undefined,
+    });
 
-//     await recalculateRestaurantRating(booking.restaurant);
-//     void notifyReviewCreated(review);
+    await recalculateRestaurantRating(booking.restaurant);
+    void notifyReviewCreated(review);
 
-//     return res.status(201).json({ message: "Review added", review });
-//   } catch (error: any) {
-//     if (error?.code === 11000) {
-//       return res
-//         .status(409)
-//         .json({ message: "You have already reviewed this booking" });
-//     }
-//     console.error("Create review error:", error);
-//     return res.status(500).json({ message: "Something went wrong" });
-//   }
-// };
+    return res.status(201).json({ message: "Review added", review });
+  } catch (error: any) {
+    if (error?.code === 11000) {
+      return res
+        .status(409)
+        .json({ message: "You have already reviewed this booking" });
+    }
+    console.error("Create review error:", error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
 
 // /* ------------------------------- Read ------------------------------- */
 
