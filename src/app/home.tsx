@@ -1,4 +1,7 @@
-import { getAllRestaurants } from "@/api/restaurantApi";
+import {
+  fetchFeaturedRestaurants,
+  getAllRestaurants,
+} from "@/api/restaurantApi";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Link, router, useFocusEffect } from "expo-router";
 import * as SecureStore from "expo-secure-store";
@@ -35,6 +38,7 @@ type Restaurant = {
   rating: number;
   reviewCount: number;
   distance?: string;
+  isFeatured?: boolean;
 };
 
 type Profile = { lastName?: string; address?: string; avatar?: string };
@@ -134,6 +138,63 @@ const RestaurantCard = ({
   );
 };
 
+const FeaturedHorizontalCard = ({ item }: { item: Restaurant }) => {
+  const [imageFailed, setImageFailed] = useState(false);
+  const imageUrl = resolveImageUrl(item.images?.[0]);
+
+  return (
+    <Pressable
+      onPress={() =>
+        router.push({
+          pathname: "/bookAtable",
+          params: { id: item._id },
+        })
+      }
+      className="relative w-48 overflow-hidden rounded-2xl bg-white border border-gray-100 shadow-sm">
+      <View className="absolute top-0 right-0 z-10 h-20 w-20 overflow-hidden pointer-events-none">
+        <View className="absolute top-4 -right-8 w-28 rotate-45 bg-red-400 py-0.5 items-center justify-center shadow-md">
+          <Text className="text-[9px] font-black uppercase  text-white">
+            FEATURED
+          </Text>
+        </View>
+      </View>
+
+      <View className="h-20 w-full items-center justify-center bg-blue-50 overflow-hidden">
+        {imageUrl && !imageFailed ? (
+          <Image
+            source={{ uri: imageUrl }}
+            className="h-full w-full"
+            resizeMode="cover"
+            onError={() => setImageFailed(true)}
+          />
+        ) : (
+          <Text className="text-4xl font-bold text-blue-600">
+            {item.name?.trim().charAt(0).toUpperCase() || "?"}
+          </Text>
+        )}
+      </View>
+      <View className="p-2.5 flex-row justify-between">
+        <View className="flex-1 pr-1">
+          <Text numberOfLines={1} className="font-bold text-gray-900 text-base">
+            {item.name}
+          </Text>
+          <Text numberOfLines={1} className="text-xs text-blue-600 mt-0.5">
+            {item.cuisines || "Various"}
+          </Text>
+        </View>
+        <View className="flex items-center justify-center mt-1">
+          <View className="flex-row items-center">
+            <Ionicons name="star" size={12} color="#F59E0B" />
+            <Text className="text-xs font-semibold text-gray-700 ml-1">
+              {(item.rating || 0).toFixed(1)}
+            </Text>
+          </View>
+        </View>
+      </View>
+    </Pressable>
+  );
+};
+
 export default function Home() {
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState<"Nearby" | "All">("Nearby");
@@ -160,6 +221,9 @@ export default function Home() {
     },
   ];
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+  const [featuredRestaurants, setFeaturedRestaurants] = useState<Restaurant[]>(
+    [],
+  );
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -194,8 +258,14 @@ export default function Home() {
   const loadData = useCallback(async () => {
     try {
       const token = await getStoredToken();
-      const restaurantsData = await getAllRestaurants();
+
+      const [restaurantsData, featuredData] = await Promise.all([
+        getAllRestaurants(),
+        fetchFeaturedRestaurants(),
+      ]);
+
       setRestaurants(restaurantsData);
+      setFeaturedRestaurants(featuredData);
 
       if (token) {
         const userFavorites = await getFavorites(token);
@@ -221,7 +291,7 @@ export default function Home() {
     setRefreshing(true);
     try {
       await loadData();
-      await loadProfile(); // Refresh profile data too
+      await loadProfile();
     } finally {
       setRefreshing(false);
     }
@@ -283,7 +353,7 @@ export default function Home() {
   }
 
   return (
-    <View className="flex-1 bg-white ">
+    <View className="flex-1 bg-white">
       <View className="flex-1 px-2 pt-16">
         {/* Header Profile Info */}
         <View className="flex-row items-start">
@@ -322,7 +392,7 @@ export default function Home() {
             <NotificationBell
               color="#2563EB"
               size={22}
-              containerClassName="h-11 w-11 items-center justify-center rounded-full "
+              containerClassName="h-11 w-11 items-center justify-center rounded-full"
             />
           </View>
         </View>
@@ -335,6 +405,7 @@ export default function Home() {
             placeholder="Search"
           />
         </View>
+
         <FlatList
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -344,13 +415,13 @@ export default function Home() {
           showsVerticalScrollIndicator={false}
           ListHeaderComponent={
             <>
-              {/* Featured Section */}
+              {/* Featured Section Header */}
               <View className="flex-row items-center justify-between mt-4">
                 <Text className="font-bold text-blue-500 text-xl">
                   Featured Restaurant
                 </Text>
-                
-                <Link href="/listRestaurants" asChild>
+
+                <Link href="/featured" asChild>
                   <Pressable className="flex-row items-center">
                     <Text className="mr-1 text-blue-500 text-lg">See All</Text>
                     <Ionicons name="arrow-forward" size={20} color="blue" />
@@ -358,8 +429,20 @@ export default function Home() {
                 </Link>
               </View>
 
+              {/* Horizontal Scroll of Featured Restaurants (Limited to 3) */}
+              <FlatList
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                data={featuredRestaurants.slice(0, 3)}
+                keyExtractor={(item) => `featured-home-${item._id}`}
+                contentContainerStyle={{ paddingVertical: 12, gap: 12 }}
+                renderItem={({ item }) => (
+                  <FeaturedHorizontalCard item={item} />
+                )}
+              />
+
               {/* Categories */}
-              <View className="my-6 flex-row justify-between">
+              <View className="my-4 flex-row justify-between">
                 {categories.map(({ label, icon, onPress }) => (
                   <Pressable
                     key={label}
