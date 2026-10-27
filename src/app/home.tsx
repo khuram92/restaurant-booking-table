@@ -440,7 +440,6 @@ export default function Home() {
                   <FeaturedHorizontalCard item={item} />
                 )}
               />
-
               {/* Categories */}
               <View className="my-4 flex-row justify-between">
                 {categories.map(({ label, icon, onPress }) => (
