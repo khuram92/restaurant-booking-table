@@ -184,6 +184,7 @@ export const updateRestaurant = async (req: AuthRequest, res: Response) => {
       "floorNumbers",
       "availableSeats",
       "seatingTypes",
+      "isFeatured",
     ];
 
     const updates: Record<string, unknown> = {};
@@ -239,7 +240,7 @@ export const getFeaturedRestaurants = async (req: AuthRequest, res: Response) =>
   try {
     const restaurants = await Restaurant.find({
       isFeatured: true,
-      isActive: true,
+      $or: [{ isActive: true }, { isActive: { $exists: false } }],
     });
     return res.status(200).json({
       success: true,
@@ -248,10 +249,7 @@ export const getFeaturedRestaurants = async (req: AuthRequest, res: Response) =>
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message:
-        error instanceof Error
-          ? error.message
-          : "Error fetching featured restaurants",
+      message: error instanceof Error ? error.message : "Error fetching featured restaurants",
     });
   }
 };

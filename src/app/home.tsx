@@ -146,7 +146,7 @@ export default function Home() {
     {
       label: "Featured",
       icon: "star",
-      onPress: () => router.push("/components/FeaturedRestaurantList"),
+      onPress: () => router.push("/featured"),
     },
     {
       label: "Discounts",
