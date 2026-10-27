@@ -9,7 +9,7 @@ import notifictionRoutes from "./routes/notificationRoutes.js";
 import restaurantRoutes from "./routes/restaurantRouters.js";
 
 import favoriteRoutes from "./routes/favoriteRoutes.js";
-import { reviewRoutes } from "./routes/reviewRoutes.js";
+import reviewRoutes from "./routes/reviewRoutes.js";
 
 const app = express();
 
