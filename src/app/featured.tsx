@@ -107,7 +107,7 @@ export default function FeaturedScreen() {
               </View>
 
               {/* Image */}
-              {/* <View className="h-44 w-full bg-gray-200">
+              <View className="h-44 w-full bg-gray-200">
                 {imageUrl ? (
                   <Image
                     source={{ uri: imageUrl }}
@@ -123,7 +123,7 @@ export default function FeaturedScreen() {
                     />
                   </View>
                 )}
-              </View> */}
+              </View>
 
               {/* Details */}
               <View className="p-4">
