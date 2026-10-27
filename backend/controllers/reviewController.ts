@@ -177,21 +177,21 @@ export const getRestaurantReviews = async (req: Request, res: Response) => {
   }
 };
 
-// // The caller's own reviews. The app uses the booking ids to show "Rate" or "Rated"
-// export const getMyReviews = async (req: AuthRequest, res: Response) => {
-//   try {
-//     const reviews = await Review.find({ customer: req.userId })
-//       .populate("restaurant", "name city images")
-//       .sort({ createdAt: -1 });
+// The caller's own reviews. The app uses the booking ids to show "Rate" or "Rated"
+export const getMyReviews = async (req: AuthRequest, res: Response) => {
+  try {
+    const reviews = await Review.find({ customer: req.userId })
+      .populate("restaurant", "name city images")
+      .sort({ createdAt: -1 });
 
-//     return res.status(200).json({ reviews });
-//   } catch (error) {
-//     console.error("Get my reviews error:", error);
-//     return res.status(500).json({ message: "Something went wrong" });
-//   }
-// };
+    return res.status(200).json({ reviews });
+  } catch (error) {
+    console.error("Get my reviews error:", error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
 
-// /* ------------------------------ Update ------------------------------ */
+/* ------------------------------ Update ------------------------------ */
 
 // export const updateReview = async (req: AuthRequest, res: Response) => {
 //   try {
