@@ -198,8 +198,8 @@ const ProfileContent = ({ showFoodInterest = true }: Props) => {
   return (
     <View className="flex-1 pt-16 justify-between bg-white ">
       <ScrollView className="px-4  mb-2">
-        <View className="flex items-center mt-8 bg-white border border-gray-200 rounded-2xl">
-          <View className="flex mt-4">
+        <View className="flex items-center mt-6 bg-white border border-gray-300 rounded-2xl">
+          <View className="flex mt-14">
             <AvatarPicker
               uri={profile?.avatar}
               onUploaded={async (url) => {
@@ -268,7 +268,7 @@ const ProfileContent = ({ showFoodInterest = true }: Props) => {
           </View>
         )}
 
-        <View className="mt-4 border-1 bg-orange-500 rounded-full justify-center flex ">
+        <View className="mt-4 border-1 bg-amber-400 rounded-full justify-center flex ">
           <Button onPress={openUpdateModal}>
             <Text className="text-xl font-bold text-white">Edit profile </Text>
           </Button>
@@ -388,7 +388,7 @@ const ProfileContent = ({ showFoodInterest = true }: Props) => {
             </ScrollView>
           </KeyboardAvoidingView>
         </Modal>
-        <View className="mt-4 border-1 bg-red-400 rounded-full justify-center flex ">
+        <View className="mt-4 border-1 bg-green-600 rounded-full justify-center flex ">
           <Button onPress={handleLogout}>
             <Text className="text-xl font-bold text-white">Logout </Text>
           </Button>
