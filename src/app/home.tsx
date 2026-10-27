@@ -433,7 +433,7 @@ export default function Home() {
               <FlatList
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                data={featuredRestaurants.slice(0, 3)}
+                data={featuredRestaurants.slice(0, 4)}
                 keyExtractor={(item) => `featured-home-${item._id}`}
                 contentContainerStyle={{ paddingVertical: 12, gap: 12 }}
                 renderItem={({ item }) => (
