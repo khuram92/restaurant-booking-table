@@ -5,7 +5,10 @@ import Booking from "../models/Booking.js";
 import Restaurant from "../models/Restaurant.js";
 import Review from "../models/Review.js";
 import { recalculateRestaurantRating } from "../utils/ratings.js";
-import { notifyReviewCreated } from "../utils/reviewNotifications.js";
+import {
+  notifyReviewCreated,
+  notifyReviewReply,
+} from "../utils/reviewNotifications.js";
 
 const MAX_TEXT = 1000;
 
@@ -269,53 +272,53 @@ export const deleteReview = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// /* ------------------------------- Reply ------------------------------ */
+/* ------------------------------- Reply ------------------------------ */
 
-// // The restaurant's owner replies to a review. Empty text removes the reply.
-// export const replyToReview = async (req: AuthRequest, res: Response) => {
-//   try {
-//     const { id } = req.params;
-//     if (!mongoose.isValidObjectId(id)) {
-//       return res.status(400).json({ message: "Invalid review id" });
-//     }
+// The restaurant's owner replies to a review. Empty text removes the reply.
+export const replyToReview = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ message: "Invalid review id" });
+    }
 
-//     const { text } = req.body;
-//     if (text !== undefined && badText(text)) {
-//       return res.status(400).json({
-//         message: `Reply must be text of up to ${MAX_TEXT} characters`,
-//       });
-//     }
-//     const reply = typeof text === "string" ? text.trim() : "";
+    const { text } = req.body;
+    if (text !== undefined && badText(text)) {
+      return res.status(400).json({
+        message: `Reply must be text of up to ${MAX_TEXT} characters`,
+      });
+    }
+    const reply = typeof text === "string" ? text.trim() : "";
 
-//     const review = await Review.findById(id);
-//     if (!review) {
-//       return res.status(404).json({ message: "Review not found" });
-//     }
+    const review = await Review.findById(id);
+    if (!review) {
+      return res.status(404).json({ message: "Review not found" });
+    }
 
-//     // Only the owner of the reviewed restaurant
-//     const restaurant = await Restaurant.findOne({
-//       _id: review.restaurant,
-//       owner: req.userId,
-//     });
-//     if (!restaurant) {
-//       return res.status(403).json({ message: "Not allowed" });
-//     }
+    // Only the owner of the reviewed restaurant
+    const restaurant = await Restaurant.findOne({
+      _id: review.restaurant,
+      owner: req.userId,
+    });
+    if (!restaurant) {
+      return res.status(403).json({ message: "Not allowed" });
+    }
 
-//     if (reply) {
-//       review.reply = { text: reply, repliedAt: new Date() };
-//     } else {
-//       review.set("reply", undefined);
-//     }
-//     await review.save();
+    if (reply) {
+      review.reply = { text: reply, repliedAt: new Date() };
+    } else {
+      review.set("reply", undefined);
+    }
+    await review.save();
 
-//     if (reply) void notifyReviewReply(review);
+    if (reply) void notifyReviewReply(review);
 
-//     return res.status(200).json({
-//       message: reply ? "Reply saved" : "Reply removed",
-//       review,
-//     });
-//   } catch (error) {
-//     console.error("Reply to review error:", error);
-//     return res.status(500).json({ message: "Something went wrong" });
-//   }
-// };
+    return res.status(200).json({
+      message: reply ? "Reply saved" : "Reply removed",
+      review,
+    });
+  } catch (error) {
+    console.error("Reply to review error:", error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
