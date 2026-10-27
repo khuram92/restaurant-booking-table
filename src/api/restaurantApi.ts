@@ -6,6 +6,7 @@ const API_URL = "http://10.0.2.2:3000/api";
 const API = axios.create({
   baseURL: API_URL,
 });
+
 export type NewRestaurant = {
   name: string;
   cuisines: string;
@@ -24,49 +25,7 @@ export type NewRestaurant = {
   numReviews?: number;
   isFeatured: boolean;
 };
-export const createRestaurant = async (
-  data: NewRestaurant,
-): Promise<Restaurant> => {
-  const token = await SecureStore.getItemAsync("authToken");
-  if (!token) throw new Error("You must be logged in");
 
-  try {
-    const response = await API.post("/restaurants", data, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return response.data.restaurant;
-  } catch (error: any) {
-    throw new Error(
-      error?.response?.data?.message || "Could not create restaurant",
-    );
-  }
-};
-export const getMyRestaurant = async (): Promise<Restaurant | null> => {
-  const token = await SecureStore.getItemAsync("authToken");
-  if (!token) throw new Error("You must be logged in");
-
-  try {
-    const response = await API.get("/restaurants/mine", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    return response.data.restaurant;
-  } catch (error: any) {
-    const status = error?.response?.status;
-    const message = error?.response?.data?.message;
-
-    // Only the controller's own "none found" reply means "no restaurant".
-    // A 404 from a wrong URL has no such message, so it is treated as an error.
-    if (
-      status === 404 &&
-      typeof message === "string" &&
-      /no restaurant/i.test(message)
-    ) {
-      return null;
-    }
-
-    throw new Error(message || "Could not load your restaurant");
-  }
-};
 export interface Restaurant {
   _id: string;
   name: string;
@@ -84,7 +43,53 @@ export interface Restaurant {
   floorNumbers: string[];
   availableSeats: number;
   seatingTypes: string[];
+  isFeatured?: boolean;
 }
+
+export type FeaturedRestaurant = Restaurant;
+
+export const createRestaurant = async (
+  data: NewRestaurant,
+): Promise<Restaurant> => {
+  const token = await SecureStore.getItemAsync("authToken");
+  if (!token) throw new Error("You must be logged in");
+
+  try {
+    const response = await API.post("/restaurants", data, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data.restaurant;
+  } catch (error: any) {
+    throw new Error(
+      error?.response?.data?.message || "Could not create restaurant",
+    );
+  }
+};
+
+export const getMyRestaurant = async (): Promise<Restaurant | null> => {
+  const token = await SecureStore.getItemAsync("authToken");
+  if (!token) throw new Error("You must be logged in");
+
+  try {
+    const response = await API.get("/restaurants/mine", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data.restaurant;
+  } catch (error: any) {
+    const status = error?.response?.status;
+    const message = error?.response?.data?.message;
+
+    if (
+      status === 404 &&
+      typeof message === "string" &&
+      /no restaurant/i.test(message)
+    ) {
+      return null;
+    }
+
+    throw new Error(message || "Could not load your restaurant");
+  }
+};
 
 export const getRestaurantById = async (
   restaurantId: string,
@@ -112,9 +117,36 @@ export const resolveImageUrl = (url?: string): string | undefined => {
 
   return url.replace(/^http:\/\//i, "https://");
 };
+
 export const toggleFeaturedRestaurant = async (
   id: string,
 ): Promise<Restaurant> => {
-  const response = await API.patch(`/restaurants/${id}/featured`);
-  return response.data.restaurant;
+  const token = await SecureStore.getItemAsync("authToken");
+  if (!token) throw new Error("You must be logged in");
+
+  try {
+    const response = await API.patch(
+      `/restaurants/${id}/featured`,
+      {},
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
+    return response.data.restaurant;
+  } catch (error: any) {
+    throw new Error(
+      error?.response?.data?.message || "Could not update featured status",
+    );
+  }
+};
+
+export const fetchFeaturedRestaurants = async (): Promise<FeaturedRestaurant[]> => {
+  try {
+    const response = await API.get("/restaurants/featured");
+    return response.data.restaurants;
+  } catch (error: any) {
+    throw new Error(
+      error?.response?.data?.message || "Failed to fetch featured restaurants",
+    );
+  }
 };
