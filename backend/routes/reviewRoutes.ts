@@ -11,10 +11,8 @@ import { authorize, protect } from "../middleware/authMiddleware.js";
 
 const router = Router();
 
-// Public: anyone can read a restaurant's reviews
 router.get("/restaurant/:restaurantId", getRestaurantReviews);
 
-// Everything below needs a login
 router.use(protect);
 
 router.get("/mine", getMyReviews);
