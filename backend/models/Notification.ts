@@ -7,7 +7,9 @@ export type NotificationType =
   | "booking_rejected"
   | "booking_cancelled"
   | "booking_updated" 
-  | "booking_completed";
+  | "booking_completed"
+  | "review_new"
+  | "review_reply";
 
 export interface INotification extends Document {
   user: mongoose.Types.ObjectId;
