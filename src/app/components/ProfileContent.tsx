@@ -4,7 +4,6 @@ import * as SecureStore from "expo-secure-store";
 import { useCallback, useState } from "react";
 import {
   Alert,
-  Image,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -199,25 +198,25 @@ const ProfileContent = ({ showFoodInterest = true }: Props) => {
   return (
     <View className="flex-1 pt-16 justify-between bg-white ">
       <ScrollView className="px-4  mb-2">
-        <View className="flex items-center mt-8 bg-gray-400 rounded-2xl">
+        <View className="flex items-center mt-8 bg-white border border-gray-200 rounded-2xl">
           <View className="flex mt-4">
-                  <AvatarPicker
-                    uri={profile?.avatar}
-                    onUploaded={async (url) => {
-                      const token = await SecureStore.getItemAsync("authToken");
-                      if (!token) return;
-                      await updateMe(token, { avatar: url });
-                      await loadProfile();
-                    }}
-                  />
-                </View>
+            <AvatarPicker
+              uri={profile?.avatar}
+              onUploaded={async (url) => {
+                const token = await SecureStore.getItemAsync("authToken");
+                if (!token) return;
+                await updateMe(token, { avatar: url });
+                await loadProfile();
+              }}
+            />
+          </View>
 
           <View className="flex items-center mt-6">
             <Text className="text-2xl font-bold text-blue-700">
               {profile?.lastName ?? "there"}
             </Text>
 
-            <View className="flex-row items-center mt-2">
+            <View className="flex-row items-center mt-4 mb-6">
               <Text numberOfLines={3} className=" text-blue-700 text-base">
                 {profile?.address || "Address not provided"}
               </Text>
@@ -225,36 +224,36 @@ const ProfileContent = ({ showFoodInterest = true }: Props) => {
           </View>
         </View>
 
-        <View className="flex  mt-4 bg-gray-100 rounded-2xl px-4 py-4">
+        <View className="flex  mt-4 bg-white border border-gray-200 rounded-2xl px-4 py-4">
           <Text className="text-blue-600 font-bold text-xl ">
             Personal Information
           </Text>
           <View className="flex mt-8">
-            <View className="border-1 bg-gray-300 rounded-full h-12  p-2 flex justify-center">
-              <Text className="text-lg ml-4 text-blue-500 font-semibold ">
+            <View className="border-1 bg-white border border-gray-300  rounded-full h-12  p-2 flex justify-center">
+              <Text className="text-lg ml-4 text-blue-500 font-medium  ">
                 {profile?.phone}
               </Text>
             </View>
           </View>
           <View className="flex mt-4">
-            <View className="border-1 bg-gray-300 rounded-full h-12  p-2 flex justify-center">
-              <Text className="text-lg ml-4 text-blue-500 font-semibold ">
+            <View className="border-1 bg-white border border-gray-300 rounded-full h-12  p-2 flex justify-center">
+              <Text className="text-lg ml-4 text-blue-500 font-medium ">
                 {profile?.firstName} {profile?.lastName}
               </Text>
             </View>
           </View>
           <View className="flex mt-4">
-            <View className="border-1 bg-gray-300 rounded-full h-12  p-2 flex justify-center">
-              <Text className="text-lg ml-4 text-blue-500 font-semibold ">
+            <View className="border-1 bg-white border border-gray-300 rounded-full h-12  p-2 flex justify-center">
+              <Text className="text-lg ml-4 text-blue-500 font-medium  ">
                 {profile?.email}
               </Text>
             </View>
           </View>
           <View className="flex mt-4">
-            <View className="border-1 bg-gray-300 rounded-xl h-28  p-2 flex ">
+            <View className="border-1 bg-white border border-gray-300 rounded-xl h-28  p-2 flex ">
               <Text
                 numberOfLines={3}
-                className="text-lg ml-2  text-blue-500 font-semibold">
+                className="text-lg ml-2  text-blue-500 font-medium ">
                 {profile?.address || "Not Provided"}
               </Text>
             </View>
@@ -310,7 +309,6 @@ const ProfileContent = ({ showFoodInterest = true }: Props) => {
                     <Ionicons name="close" size={18} color="#4B5563" />
                   </Pressable>
                 </View>
-                
 
                 {/* Inputs */}
                 <TextInput

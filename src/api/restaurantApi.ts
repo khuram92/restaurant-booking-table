@@ -118,14 +118,15 @@ export const resolveImageUrl = (url?: string): string | undefined => {
   return url.replace(/^http:\/\//i, "https://");
 };
 
-export const fetchFeaturedRestaurants = async (): Promise<FeaturedRestaurant[]> => {
-  console.log("-> Attempting to fetch featured restaurants from:", `${API_URL}/restaurants/featured`);
+export const fetchFeaturedRestaurants = async (): Promise<
+  FeaturedRestaurant[]
+> => {
   try {
     const response = await API.get("/restaurants/featured");
-    console.log("<- Successfully fetched:", response.data);
+
     return response.data.restaurants;
   } catch (error: any) {
-    console.log("❌ Fetch Featured Error details:", error?.message, error?.config?.url);
+  
     throw new Error(
       error?.response?.data?.message || "Failed to fetch featured restaurants",
     );
