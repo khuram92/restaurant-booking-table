@@ -125,24 +125,24 @@ export const getMyReviews = async (): Promise<Review[]> => {
   return data.reviews;
 };
 
-// // The same list keyed by booking id, to show "Rate" or "Rated" on each booking
-// export const getMyReviewsByBooking = async (): Promise<Map<string, Review>> => {
-//   const reviews = await getMyReviews();
-//   return new Map(reviews.map((r) => [r.booking, r]));
-// };
+// The same list keyed by booking id, to show "Rate" or "Rated" on each booking
+export const getMyReviewsByBooking = async (): Promise<Map<string, Review>> => {
+  const reviews = await getMyReviews();
+  return new Map(reviews.map((r) => [r.booking, r]));
+};
 
-// // Change the stars and/or the comment (an empty comment clears it)
-// export const updateReview = async (
-//   reviewId: string,
-//   changes: Partial<{ rating: number; comment: string }>,
-// ): Promise<Review> => {
-//   const headers = await getAuthHeaders();
+// Change the stars and/or the comment (an empty comment clears it)
+export const updateReview = async (
+  reviewId: string,
+  changes: Partial<{ rating: number; comment: string }>,
+): Promise<Review> => {
+  const headers = await getAuthHeaders();
 
-//   const response = await fetch(`${API_URL}/reviews/${reviewId}`, {
-//     method: "PATCH",
-//     headers,
-//     body: JSON.stringify(changes),
-//   });
+  const response = await fetch(`${API_URL}/reviews/${reviewId}`, {
+    method: "PATCH",
+    headers,
+    body: JSON.stringify(changes),
+  });
 
 //   const data = await parseResponse<{ review: Review }>(
 //     response,
