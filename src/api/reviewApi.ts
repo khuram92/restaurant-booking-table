@@ -112,18 +112,18 @@ export const createReview = async (input: {
   return data.review;
 };
 
-// // All reviews the logged-in customer has written
-// export const getMyReviews = async (): Promise<Review[]> => {
-//   const headers = await getAuthHeaders();
+// All reviews the logged-in customer has written
+export const getMyReviews = async (): Promise<Review[]> => {
+  const headers = await getAuthHeaders();
 
-//   const response = await fetch(`${API_URL}/reviews/mine`, { headers });
+  const response = await fetch(`${API_URL}/reviews/mine`, { headers });
 
-//   const data = await parseResponse<{ reviews: Review[] }>(
-//     response,
-//     "Could not load your reviews",
-//   );
-//   return data.reviews;
-// };
+  const data = await parseResponse<{ reviews: Review[] }>(
+    response,
+    "Could not load your reviews",
+  );
+  return data.reviews;
+};
 
 // // The same list keyed by booking id, to show "Rate" or "Rated" on each booking
 // export const getMyReviewsByBooking = async (): Promise<Map<string, Review>> => {
