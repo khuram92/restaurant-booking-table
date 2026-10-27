@@ -76,18 +76,18 @@ const parseResponse = async <T>(
 
 /* ------------------------------- Public ------------------------------- */
 
-// // A restaurant's reviews with its average and star breakdown. No login needed.
-// export const getRestaurantReviews = async (
-//   restaurantId: string,
-//   page = 1,
-//   limit = 10,
-// ): Promise<RestaurantReviews> => {
-//   const response = await fetch(
-//     `${API_URL}/reviews/restaurant/${restaurantId}?page=${page}&limit=${limit}`,
-//   );
+// A restaurant's reviews with its average and star breakdown. No login needed.
+export const getRestaurantReviews = async (
+  restaurantId: string,
+  page = 1,
+  limit = 10,
+): Promise<RestaurantReviews> => {
+  const response = await fetch(
+    `${API_URL}/reviews/restaurant/${restaurantId}?page=${page}&limit=${limit}`,
+  );
 
-//   return parseResponse<RestaurantReviews>(response, "Could not load reviews");
-// };
+  return parseResponse<RestaurantReviews>(response, "Could not load reviews");
+};
 
 // /* ------------------------------ Customer ------------------------------ */
 
