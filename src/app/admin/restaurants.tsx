@@ -16,16 +16,18 @@ import * as SecureStore from "expo-secure-store";
 import {
   getAdminRestaurants,
   setRestaurantActive,
+  setRestaurantFeatured, // Make sure to export this function in your adminApi
   type AdminRestaurant,
 } from "../../api/adminApi";
 
-type Filter = "all" | "active" | "disabled";
+type Filter = "all" | "active" | "disabled" | "featured";
 type Sort = "newest" | "oldest";
 
 const FILTERS: { key: Filter; label: string }[] = [
   { key: "all", label: "All" },
   { key: "active", label: "Active" },
   { key: "disabled", label: "Disabled" },
+  { key: "featured", label: "Featured" },
 ];
 
 const SEEN_KEY = "adminRestaurantsLastSeen";
@@ -33,6 +35,10 @@ const POLL_MS = 15000;
 
 const isActiveOf = (r: AdminRestaurant) =>
   (r as AdminRestaurant & { isActive?: boolean }).isActive !== false;
+
+const isFeaturedOf = (r: AdminRestaurant) =>
+  !!(r as AdminRestaurant & { isFeatured?: boolean }).isFeatured;
+
 const createdMs = (r: AdminRestaurant) =>
   r.createdAt ? new Date(r.createdAt).getTime() || 0 : 0;
 
@@ -60,15 +66,20 @@ const formatDate = (value?: string) => {
 const RestaurantCard = ({
   item,
   isNew,
-  busy,
-  onToggle,
+  busyActive,
+  busyFeatured,
+  onToggleActive,
+  onToggleFeatured,
 }: {
   item: AdminRestaurant;
   isNew: boolean;
-  busy: boolean;
-  onToggle: (item: AdminRestaurant, next: boolean) => void;
+  busyActive: boolean;
+  busyFeatured: boolean;
+  onToggleActive: (item: AdminRestaurant, next: boolean) => void;
+  onToggleFeatured: (item: AdminRestaurant) => void;
 }) => {
   const active = isActiveOf(item);
+  const featured = isFeaturedOf(item);
   const location = [item.city, item.province].filter(Boolean).join(", ");
   const registered = formatDate(item.createdAt);
 
@@ -101,13 +112,34 @@ const RestaurantCard = ({
           </Text>
         </View>
 
+        {/* Featured Toggle Button */}
+        <Pressable
+          onPress={() => onToggleFeatured(item)}
+          disabled={busyFeatured}
+          accessibilityRole="button"
+          accessibilityLabel="Toggle featured restaurant"
+          className={`mr-3 items-center justify-center rounded-xl p-2 ${
+            featured ? "bg-amber-100" : "bg-gray-100"
+          }`}>
+          {busyFeatured ? (
+            <ActivityIndicator size="small" color="#D97706" />
+          ) : (
+            <Ionicons
+              name={featured ? "star" : "star-outline"}
+              size={20}
+              color={featured ? "#D97706" : "#9CA3AF"}
+            />
+          )}
+        </Pressable>
+
+        {/* Active Toggle Switch */}
         <View className="items-center">
-          {busy ? (
+          {busyActive ? (
             <ActivityIndicator size="small" color="#2563EB" />
           ) : (
             <Switch
               value={active}
-              onValueChange={(next) => onToggle(item, next)}
+              onValueChange={(next) => onToggleActive(item, next)}
               trackColor={{ false: "#d1d5db", true: "#86efac" }}
               thumbColor={active ? "#16a34a" : "#f3f4f6"}
             />
@@ -149,11 +181,13 @@ const Restaurants = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
-  const [busyId, setBusyId] = useState<string | null>(null);
+  
+  // Track specific toggling states
+  const [busyActiveId, setBusyActiveId] = useState<string | null>(null);
+  const [busyFeaturedId, setBusyFeaturedId] = useState<string | null>(null);
 
-  // Restaurants registered after this time count as "new" for this visit
   const [baseline, setBaseline] = useState<number | null>(null);
-  const togglingRef = useRef(false); // pauses background refresh mid-toggle
+  const togglingRef = useRef(false);
 
   const load = useCallback(async (silent = false) => {
     try {
@@ -184,7 +218,6 @@ const Restaurants = () => {
         await load();
       })();
 
-      // Check for newly registered restaurants while the screen is open
       const interval = setInterval(() => {
         if (!togglingRef.current) void load(true);
       }, POLL_MS);
@@ -192,7 +225,6 @@ const Restaurants = () => {
       return () => {
         active = false;
         clearInterval(interval);
-        // Leaving the page counts as having seen everything so far
         SecureStore.setItemAsync(SEEN_KEY, String(Date.now())).catch(() => {});
       };
     }, [load]),
@@ -220,6 +252,7 @@ const Restaurants = () => {
     [baseline],
   );
 
+  // Active status toggle handler
   const applyActive = async (r: AdminRestaurant, next: boolean) => {
     const setFlag = (value: boolean) =>
       setRestaurants((cur) =>
@@ -227,24 +260,24 @@ const Restaurants = () => {
       );
 
     togglingRef.current = true;
-    setBusyId(r._id);
-    setFlag(next); // optimistic
+    setBusyActiveId(r._id);
+    setFlag(next); // Optimistic UI update
 
     try {
       await setRestaurantActive(r._id, next);
     } catch (e: unknown) {
-      setFlag(!next); // rollback
+      setFlag(!next); // Rollback
       Alert.alert(
         "Error",
-        e instanceof Error ? e.message : "Could not update the restaurant.",
+        e instanceof Error ? e.message : "Could not update the restaurant status.",
       );
     } finally {
       togglingRef.current = false;
-      setBusyId(null);
+      setBusyActiveId(null);
     }
   };
 
-  const handleToggle = (r: AdminRestaurant, next: boolean) => {
+  const handleToggleActive = (r: AdminRestaurant, next: boolean) => {
     if (next) {
       void applyActive(r, true);
       return;
@@ -264,6 +297,33 @@ const Restaurants = () => {
     );
   };
 
+  // Featured status toggle handler
+  const handleToggleFeatured = async (r: AdminRestaurant) => {
+    const nextValue = !isFeaturedOf(r);
+
+    const setFlag = (value: boolean) =>
+      setRestaurants((cur) =>
+        cur.map((x) => (x._id === r._id ? { ...x, isFeatured: value } : x)),
+      );
+
+    togglingRef.current = true;
+    setBusyFeaturedId(r._id);
+    setFlag(nextValue); // Optimistic UI update
+
+    try {
+      await setRestaurantFeatured(r._id, nextValue);
+    } catch (e: unknown) {
+      setFlag(!nextValue); // Rollback
+      Alert.alert(
+        "Error",
+        e instanceof Error ? e.message : "Could not update featured status.",
+      );
+    } finally {
+      togglingRef.current = false;
+      setBusyFeaturedId(null);
+    }
+  };
+
   const newCount = useMemo(
     () => restaurants.filter(isNew).length,
     [restaurants, isNew],
@@ -274,18 +334,18 @@ const Restaurants = () => {
       all: restaurants.length,
       active: restaurants.filter(isActiveOf).length,
       disabled: restaurants.filter((r) => !isActiveOf(r)).length,
+      featured: restaurants.filter(isFeaturedOf).length,
     }),
     [restaurants],
   );
 
   const visible = useMemo(() => {
-    const filtered = restaurants.filter((r) =>
-      filter === "all"
-        ? true
-        : filter === "active"
-          ? isActiveOf(r)
-          : !isActiveOf(r),
-    );
+    const filtered = restaurants.filter((r) => {
+      if (filter === "active") return isActiveOf(r);
+      if (filter === "disabled") return !isActiveOf(r);
+      if (filter === "featured") return isFeaturedOf(r);
+      return true;
+    });
 
     return [...filtered].sort((a, b) =>
       sort === "newest"
@@ -304,7 +364,6 @@ const Restaurants = () => {
 
   return (
     <View className="flex-1 bg-gray-50 pt-16">
-      
       <View className="mb-4 flex-row items-center px-4">
         <Pressable
           onPress={goBack}
@@ -314,7 +373,9 @@ const Restaurants = () => {
           className="mr-3 h-10 w-10 items-center justify-center rounded-full bg-white">
           <Ionicons name="arrow-back" size={22} color="#2563EB" />
         </Pressable>
-        <Text className="text-2xl ml-24 font-bold text-blue-900">Restaurants</Text>
+        <Text className="text-2xl font-bold text-blue-900 flex-1 text-center mr-10">
+          Restaurants
+        </Text>
         {newCount > 0 && (
           <View className="ml-2 min-w-[24px] items-center rounded-full bg-red-500 px-2 py-0.5">
             <Text className="text-xs font-bold text-white">{newCount}</Text>
@@ -322,7 +383,6 @@ const Restaurants = () => {
         )}
       </View>
 
-      
       {newCount > 0 && (
         <View className="mx-4 mb-3 flex-row items-center rounded-xl bg-orange-50 p-3">
           <Ionicons name="notifications" size={20} color="#F97316" />
@@ -336,7 +396,6 @@ const Restaurants = () => {
         </View>
       )}
 
-   
       <View className="mb-3 flex-row items-center">
         <ScrollView
           horizontal
@@ -401,13 +460,15 @@ const Restaurants = () => {
       <FlatList
         data={visible}
         keyExtractor={(item) => item._id}
-        extraData={[busyId, baseline]}
+        extraData={[busyActiveId, busyFeaturedId, baseline]}
         renderItem={({ item }) => (
           <RestaurantCard
             item={item}
             isNew={isNew(item)}
-            busy={busyId === item._id}
-            onToggle={handleToggle}
+            busyActive={busyActiveId === item._id}
+            busyFeatured={busyFeaturedId === item._id}
+            onToggleActive={handleToggleActive}
+            onToggleFeatured={handleToggleFeatured}
           />
         )}
         showsVerticalScrollIndicator={false}

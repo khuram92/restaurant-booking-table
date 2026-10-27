@@ -33,7 +33,9 @@ export type AdminRestaurant = {
   province?: string;
   rating?: number;
   reviewCount?: number;
-  owner?: string | { _id: string; firstName?: string; lastName?: string; email?: string };
+  owner?:
+    | string
+    | { _id: string; firstName?: string; lastName?: string; email?: string };
   createdAt?: string;
 };
 
@@ -66,7 +68,8 @@ export const getAdminUsers = async () =>
   (await request<{ users: AdminUser[] }>("users")).users;
 
 export const getAdminRestaurants = async () =>
-  (await request<{ restaurants: AdminRestaurant[] }>("restaurants")).restaurants;
+  (await request<{ restaurants: AdminRestaurant[] }>("restaurants"))
+    .restaurants;
 
 export const getAdminBookings = async () =>
   (await request<{ bookings: Booking[] }>("bookings")).bookings;
@@ -78,3 +81,18 @@ export const setRestaurantActive = async (id: string, isActive: boolean) =>
       body: { isActive },
     })
   ).restaurant;
+
+// export const setRestaurantFeatured = async (
+//   id: string,
+//   isFeatured: boolean,
+// ) => {
+//   return (
+//     await request<{ restaurant: AdminRestaurant }>(
+//       `restaurants/${id}/featured`,
+//       {
+//         method: "PATCH",
+//         body: { isFeatured },
+//       },
+//     )
+//   ).restaurant;
+// };

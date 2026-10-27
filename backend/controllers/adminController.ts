@@ -150,10 +150,7 @@ export const toggleFeatured = async (req: AuthRequest, res: Response) => {
       data: restaurant,
     });
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "Server Error",
-      error: error instanceof Error ? error.message : "Unknown error",
-    });
+    console.error("Set restaurant is Featured :", error);
+    return res.status(500).json({ message: "Something went wrong" });
   }
 };
