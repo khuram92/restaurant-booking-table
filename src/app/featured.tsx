@@ -92,7 +92,7 @@ export default function FeaturedScreen() {
               onPress={() =>
                 router.push({
                   pathname: "/bookAtable",
-                  params: { id: item._id }, 
+                  params: { id: item._id },
                 })
               }
               className="relative mb-4 overflow-hidden rounded-2xl bg-white shadow-sm active:opacity-95"
