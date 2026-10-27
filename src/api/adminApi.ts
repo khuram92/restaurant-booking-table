@@ -86,13 +86,21 @@ export const setRestaurantFeatured = async (
   id: string,
   isFeatured: boolean,
 ) => {
-  return (
-    await request<{ restaurant: AdminRestaurant }>(
+  try {
+    const res = await request<{ restaurant: AdminRestaurant }>(
       `restaurants/${id}/featured`,
       {
         method: "PATCH",
         body: { isFeatured },
       },
-    )
-  ).restaurant;
+    );
+    return res.restaurant;
+  } catch (error: any) {
+    console.log("FEATURED ERROR DETAILS:", {
+      status: error?.status || error?.response?.status,
+      data: error?.data || error?.response?.data,
+      message: error?.message,
+    });
+    throw error;
+  }
 };

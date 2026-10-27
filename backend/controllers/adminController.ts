@@ -130,6 +130,7 @@ export const setRestaurantActive = async (req: AuthRequest, res: Response) => {
 export const toggleFeatured = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
+    const { isFeatured } = req.body; // Get the target state from frontend
 
     const restaurant = await Restaurant.findById(id);
 
@@ -140,14 +141,14 @@ export const toggleFeatured = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    // Toggle boolean value
-    restaurant.isFeatured = !restaurant.isFeatured;
+    // Use the provided isFeatured value if available, otherwise toggle it
+    restaurant.isFeatured = isFeatured !== undefined ? isFeatured : !restaurant.isFeatured;
     await restaurant.save();
 
     return res.status(200).json({
       success: true,
       message: `Restaurant is now ${restaurant.isFeatured ? "Featured" : "Unfeatured"}`,
-      data: restaurant,
+      restaurant, // Match frontend expectation
     });
   } catch (error) {
     console.error("Set restaurant is Featured :", error);

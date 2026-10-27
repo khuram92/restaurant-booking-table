@@ -19,6 +19,5 @@ router.get("/users", getAllUsers);
 router.get("/restaurants", getAllRestaurants);
 router.get("/bookings", getAllBookings);
 router.patch("/restaurants/:id/active", setRestaurantActive);
-router.patch("/:id/featured", toggleFeatured);
-
+router.patch('/restaurants/:id/featured', toggleFeatured);
 export default router;
