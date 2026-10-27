@@ -3,6 +3,7 @@ import {
   createRestaurant,
   deleteRestaurant,
   getAllRestaurants,
+  getFeaturedRestaurants,
   getMyRestaurant,
   getRestaurantById,
   updateRestaurant,
@@ -14,7 +15,7 @@ router.get("/mine", protect, authorize("restaurant", "admin"), getMyRestaurant);
 // Public Routes
 router.get("/", getAllRestaurants);
 router.get("/:id", getRestaurantById);
-
+router.get("/featured", getFeaturedRestaurants);
 // Admin / Owner protected routes
 router.post("/", protect, authorize("restaurant", "admin"), createRestaurant);
 router.put("/:id", protect, authorize("restaurant", "admin"), updateRestaurant);

@@ -1,6 +1,6 @@
 import type { Response } from "express";
-import Restaurant from "../models/Restaurant.js";
 import type { AuthRequest } from "../middleware/authMiddleware.js";
+import Restaurant from "../models/Restaurant.js";
 
 export const createRestaurant = async (req: AuthRequest, res: Response) => {
   try {
@@ -191,11 +191,10 @@ export const updateRestaurant = async (req: AuthRequest, res: Response) => {
       if (req.body[key] !== undefined) updates[key] = req.body[key];
     }
 
-    
     const updatedRestaurant = await Restaurant.findByIdAndUpdate(
       id,
       { $set: updates },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     return res.status(200).json({
@@ -204,7 +203,9 @@ export const updateRestaurant = async (req: AuthRequest, res: Response) => {
     });
   } catch (error) {
     console.error("Update Restaurant Error:", error);
-    return res.status(500).json({ message: "Error updating restaurant details" });
+    return res
+      .status(500)
+      .json({ message: "Error updating restaurant details" });
   }
 };
 
@@ -234,9 +235,12 @@ export const deleteRestaurant = async (req: AuthRequest, res: Response) => {
   }
 };
 
-const getFeaturedRestaurants = async (req: AuthRequest, res: Response) => {
+export const getFeaturedRestaurants = async (req: AuthRequest, res: Response) => {
   try {
-    const restaurants = await Restaurant.find({ isFeatured: true, isActive: true });
+    const restaurants = await Restaurant.find({
+      isFeatured: true,
+      isActive: true,
+    });
     return res.status(200).json({
       success: true,
       restaurants,
