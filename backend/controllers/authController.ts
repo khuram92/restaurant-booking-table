@@ -10,19 +10,9 @@ import {
   PAKISTANI_PHONE_REGEX,
   PASSWORD_MESSAGE,
   PASSWORD_REGEX,
-  PROFILE_IMAGE_FOLDER,
-  isCloudinaryAsset,
   normalizePhone,
   parseDob,
 } from "../utils/validation.js";
-
-
-
-
-
-
-
-
 
 const createToken = (userId: string, role: string) => {
   const secret = process.env.JWT_SECRET;
@@ -55,7 +45,7 @@ export const signup = async (req: Request, res: Response) => {
     }
 
     if (typeof password !== "string" || !PASSWORD_REGEX.test(password)) {
-       return res.status(400).json({ message: PASSWORD_MESSAGE });
+      return res.status(400).json({ message: PASSWORD_MESSAGE });
     }
 
     if (!["customer", "restaurant", "admin"].includes(requestedRole)) {
