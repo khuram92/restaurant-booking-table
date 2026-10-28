@@ -1,7 +1,7 @@
 import * as SecureStore from "expo-secure-store";
 import type { Booking } from "./bookingApi";
 
-const API_URL = "http://10.0.2.2:3000/api";
+import { API_URL, fetchWithTimeout } from "./config";
 
 export type AdminStats = {
   users: { total: number; customers: number; owners: number };
@@ -12,6 +12,7 @@ export type AdminStats = {
     confirmed: number;
     rejected: number;
     cancelled: number;
+    completed: number;
   };
 };
 
@@ -48,7 +49,7 @@ async function request<T>(
   const token = await SecureStore.getItemAsync("authToken");
   if (!token) throw new Error("You must be logged in");
 
-  const response = await fetch(`${API_URL}/admin/${path}`, {
+  const response = await fetchWithTimeout(`${API_URL}/admin/${path}`, {
     method: options.method ?? "GET",
     headers: {
       "Content-Type": "application/json",
@@ -84,25 +85,10 @@ export const setRestaurantActive = async (id: string, isActive: boolean) =>
     })
   ).restaurant;
 
-export const setRestaurantFeatured = async (
-  id: string,
-  isFeatured: boolean,
-) => {
-  try {
-    const res = await request<{ restaurant: AdminRestaurant }>(
-      `restaurants/${id}/featured`,
-      {
-        method: "PATCH",
-        body: { isFeatured },
-      },
-    );
-    return res.restaurant;
-  } catch (error: any) {
-    console.log("FEATURED ERROR DETAILS:", {
-      status: error?.status || error?.response?.status,
-      data: error?.data || error?.response?.data,
-      message: error?.message,
-    });
-    throw error;
-  }
-};
+export const setRestaurantFeatured = async (id: string, isFeatured: boolean) =>
+  (
+    await request<{ restaurant: AdminRestaurant }>(`restaurants/${id}/featured`, {
+      method: "PATCH",
+      body: { isFeatured },
+    })
+  ).restaurant;
