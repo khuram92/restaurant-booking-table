@@ -260,7 +260,7 @@ const ListBookings = () => {
           horizontal
           showsHorizontalScrollIndicator={false}
           style={{ flexGrow: 0 }}
-          className="p-3">
+          className="m-4 ">
           {FILTERS.map(({ key, label }) => {
             const active = filter === key;
             return (
@@ -269,15 +269,13 @@ const ListBookings = () => {
                 onPress={() => setFilter(key)}
                 accessibilityRole="button"
                 accessibilityState={{ selected: active }}
-                className={`mr-2 flex-row  justify-between rounded-full border px-4 py-1 ${
+                className={`mr-2 flex-row rounded-full h-8 mb-2 justify-between border p-1 ${
                   active
                     ? "border-blue-700 bg-blue-700"
                     : "border-gray-300 bg-white"
                 }`}>
                 <Text
-                  className={`text-base font-semibold ${
-                    active ? "text-white" : "text-gray-700"
-                  }`}>
+                  className={`px-2 ${active ? "text-white" : "text-gray-700"}`}>
                   {label}
                 </Text>
               </Pressable>

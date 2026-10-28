@@ -5,7 +5,7 @@ import { Link, router } from "expo-router";
 import { useState } from "react";
 import { Alert, Image, Pressable, Text, TextInput, View } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
-import { forgotPassword, verifyOtp, resetPassword } from "../api/authApi";
+import { forgotPassword, resetPassword, verifyOtp } from "../api/authApi";
 
 type Step = "email" | "otp" | "password";
 
@@ -17,7 +17,6 @@ export default function ForgotPassword() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Show/Hide password toggles
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -31,7 +30,10 @@ export default function ForgotPassword() {
     try {
       setLoading(true);
       await forgotPassword(email.trim());
-      Alert.alert("Success", "A 6-digit verification code has been sent to your email.");
+      Alert.alert(
+        "Success",
+        "A 6-digit verification code has been sent to your email.",
+      );
       setStep("otp");
     } catch (error: any) {
       Alert.alert("Error", error.message || "Failed to send OTP.");
@@ -50,7 +52,10 @@ export default function ForgotPassword() {
     try {
       setLoading(true);
       await verifyOtp({ email: email.trim(), otp: otp.trim() });
-      Alert.alert("Success", "Code verified successfully! Please enter your new password.");
+      Alert.alert(
+        "Success",
+        "Code verified successfully! Please enter your new password.",
+      );
       setStep("password");
     } catch (error: any) {
       Alert.alert("Error", error.message || "Invalid or expired OTP code.");
@@ -67,17 +72,21 @@ export default function ForgotPassword() {
     }
 
     // Check for at least 8 characters, numbers, and special characters
-    const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>])[a-zA-Z0-9!@#$%^&*(),.?":{}|<>]{8,}$/;
+    const passwordRegex =
+      /^(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>])[a-zA-Z0-9!@#$%^&*(),.?":{}|<>]{8,}$/;
     if (!passwordRegex.test(newPassword)) {
       Alert.alert(
         "Weak Password",
-        "Password must be at least 8 characters long and include numbers and special characters."
+        "Password must be at least 8 characters long and include numbers and special characters.",
       );
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      Alert.alert("Error", "New passwords do not match. Please check and try again.");
+      Alert.alert(
+        "Error",
+        "New passwords do not match. Please check and try again.",
+      );
       return;
     }
 
@@ -92,7 +101,7 @@ export default function ForgotPassword() {
       Alert.alert(
         "Success",
         "Your password has been reset successfully! Please log in.",
-        [{ text: "Log In", onPress: () => router.replace("/") }]
+        [{ text: "Log In", onPress: () => router.replace("/") }],
       );
     } catch (error: any) {
       Alert.alert("Error", error.message || "Failed to reset password.");
@@ -134,15 +143,20 @@ export default function ForgotPassword() {
               {step === "password" && "New Password"}
             </Text>
             <Text className="text-gray-500 mb-6 text-sm leading-relaxed">
-              {step === "email" && "Enter your registered email address and we'll send you a 6-digit verification code."}
-              {step === "otp" && `We've sent a 6-digit code to ${email}. Enter it below to proceed.`}
-              {step === "password" && "Enter your new password below (min 8 chars, numbers & symbols) and confirm it."}
+              {step === "email" &&
+                "Enter your registered email address and we'll send you a 6-digit verification code."}
+              {step === "otp" &&
+                `We've sent a 6-digit code to ${email}. Enter it below to proceed.`}
+              {step === "password" &&
+                "Enter your new password below (min 8 chars, numbers & symbols) and confirm it."}
             </Text>
 
             {/* STEP 1: EMAIL INPUT */}
             {step === "email" && (
               <>
-                <Text className="text-sm font-semibold mb-2 text-gray-700">Email</Text>
+                <Text className="text-sm font-semibold mb-2 text-gray-700">
+                  Email
+                </Text>
                 <TextInput
                   placeholder="you@example.com"
                   keyboardType="email-address"
@@ -170,7 +184,9 @@ export default function ForgotPassword() {
             {/* STEP 2: OTP VERIFICATION */}
             {step === "otp" && (
               <>
-                <Text className="text-sm font-semibold mb-2 text-gray-700">6-Digit OTP Code</Text>
+                <Text className="text-sm font-semibold mb-2 text-gray-700">
+                  6-Digit OTP Code
+                </Text>
                 <TextInput
                   placeholder="123456"
                   keyboardType="number-pad"
@@ -206,7 +222,9 @@ export default function ForgotPassword() {
             {/* STEP 3: NEW PASSWORD & CONFIRM PASSWORD */}
             {step === "password" && (
               <>
-                <Text className="text-sm font-semibold mb-2 text-gray-700">New Password</Text>
+                <Text className="text-sm font-semibold mb-2 text-gray-700">
+                  New Password
+                </Text>
                 <View className="flex-row items-center border border-gray-300 rounded-lg bg-gray-50 mb-4 px-4">
                   <TextInput
                     placeholder="Min 8 chars, numbers & symbols"
@@ -215,7 +233,8 @@ export default function ForgotPassword() {
                     onChangeText={setNewPassword}
                     className="flex-1 py-3 text-gray-900"
                   />
-                  <Pressable onPress={() => setShowNewPassword(!showNewPassword)}>
+                  <Pressable
+                    onPress={() => setShowNewPassword(!showNewPassword)}>
                     <Ionicons
                       name={showNewPassword ? "eye-off-outline" : "eye-outline"}
                       size={20}
@@ -224,7 +243,9 @@ export default function ForgotPassword() {
                   </Pressable>
                 </View>
 
-                <Text className="text-sm font-semibold mb-2 text-gray-700">Confirm New Password</Text>
+                <Text className="text-sm font-semibold mb-2 text-gray-700">
+                  Confirm New Password
+                </Text>
                 <View className="flex-row items-center border border-gray-300 rounded-lg bg-gray-50 mb-6 px-4">
                   <TextInput
                     placeholder="Re-enter new password"
@@ -233,9 +254,14 @@ export default function ForgotPassword() {
                     onChangeText={setConfirmPassword}
                     className="flex-1 py-3 text-gray-900"
                   />
-                  <Pressable onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+                  <Pressable
+                    onPress={() =>
+                      setShowConfirmPassword(!showConfirmPassword)
+                    }>
                     <Ionicons
-                      name={showConfirmPassword ? "eye-off-outline" : "eye-outline"}
+                      name={
+                        showConfirmPassword ? "eye-off-outline" : "eye-outline"
+                      }
                       size={20}
                       color="gray"
                     />
