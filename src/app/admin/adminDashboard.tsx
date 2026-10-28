@@ -31,6 +31,7 @@ type Tab = "bookings" | "restaurants" | "users";
 const STATUS_STYLES: Record<string, { label: string; className: string }> = {
   pending: { label: "Pending", className: "bg-yellow-100 text-yellow-700" },
   confirmed: { label: "Confirmed", className: "bg-green-100 text-green-700" },
+  completed: { label: "Completed", className: "bg-blue-100 text-blue-700" },
   rejected: { label: "Rejected", className: "bg-red-100 text-red-700" },
   cancelled: { label: "Cancelled", className: "bg-gray-200 text-gray-600" },
 };
@@ -221,7 +222,8 @@ const AdminDashboard = () => {
         getAdminBookings(),
         getAdminRestaurants(),
         getAdminUsers(),
-        getMyRestaurant(),
+        // An admin may or may not own a restaurant: never let this break the dashboard
+        getMyRestaurant().catch(() => null),
       ]);
 
       setStats(s);
@@ -311,9 +313,10 @@ const AdminDashboard = () => {
   }
 
   const tabs: { key: Tab; label: string; count: number }[] = [
-    { key: "bookings", label: "Bookings", count: bookings.length },
-    { key: "restaurants", label: "Restaurants", count: restaurants.length },
-    { key: "users", label: "Users", count: users.length },
+    // Real totals from the stats (the lists below only hold the newest 200)
+    { key: "bookings", label: "Bookings", count: stats?.bookings.total ?? bookings.length },
+    { key: "restaurants", label: "Restaurants", count: stats?.restaurants ?? restaurants.length },
+    { key: "users", label: "Users", count: stats?.users.total ?? users.length },
   ];
 
   const header = (
