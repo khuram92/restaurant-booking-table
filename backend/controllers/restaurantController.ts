@@ -1,7 +1,9 @@
 import type { Response } from "express";
+import mongoose from "mongoose";
 import type { AuthRequest } from "../middleware/authMiddleware.js";
 import Restaurant from "../models/Restaurant.js";
-
+import { deleteRestaurantCascade } from "../utils/cascade.js";
+import { getParam } from "../utils/validation.js";
 export const createRestaurant = async (req: AuthRequest, res: Response) => {
   try {
     const {
@@ -212,7 +214,10 @@ export const updateRestaurant = async (req: AuthRequest, res: Response) => {
 
 export const deleteRestaurant = async (req: AuthRequest, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = getParam(req.params.id);
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ message: "Invalid restaurant id" });
+    }
 
     const restaurant = await Restaurant.findById(id);
 
@@ -227,7 +232,8 @@ export const deleteRestaurant = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    await Restaurant.findByIdAndDelete(id);
+    // Removes its bookings, reviews and favorites too, then the restaurant.
+    await deleteRestaurantCascade(restaurant._id);
 
     return res.status(200).json({ message: "Restaurant removed successfully" });
   } catch (error) {
@@ -236,7 +242,10 @@ export const deleteRestaurant = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export const getFeaturedRestaurants = async (req: AuthRequest, res: Response) => {
+export const getFeaturedRestaurants = async (
+  req: AuthRequest,
+  res: Response,
+) => {
   try {
     const restaurants = await Restaurant.find({
       isFeatured: true,
@@ -249,7 +258,10 @@ export const getFeaturedRestaurants = async (req: AuthRequest, res: Response) =>
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: error instanceof Error ? error.message : "Error fetching featured restaurants",
+      message:
+        error instanceof Error
+          ? error.message
+          : "Error fetching featured restaurants",
     });
   }
 };

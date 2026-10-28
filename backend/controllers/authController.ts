@@ -285,9 +285,6 @@ export const deleteAccount = async (req: AuthRequest, res: Response) => {
         });
       }
     }
- 
-    // Bookings, reviews (ratings recalculated) and notifications.
-    // Favorites live on the user document, so they go with it.
     await deleteUserCascade(user._id);
     await user.deleteOne();
  
