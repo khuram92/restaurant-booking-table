@@ -11,18 +11,6 @@ import {
   notifyBookingDecision,
 } from "../utils/bookingNotifications.js";
 
-const escapeHtml = (value: unknown): string =>
-  String(value ?? "").replace(
-    /[&<>"']/g,
-    (c) =>
-      ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#39;",
-      })[c] as string,
-  );
 
 export const createBooking = async (req: AuthRequest, res: Response) => {
   try {
