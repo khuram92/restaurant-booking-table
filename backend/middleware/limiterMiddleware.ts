@@ -14,3 +14,11 @@ export const signupLimiter = rateLimit({
   legacyHeaders: false,
   message: { message: "Too many signup attempts. Please try again later." },
 });
+
+export const uploadLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 40, // 40 upload signatures / hour / IP
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  message: { message: "Too many upload requests. Please try again later." },
+});
