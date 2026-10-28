@@ -1,6 +1,5 @@
 import * as SecureStore from "expo-secure-store";
 import type { Booking } from "./bookingApi";
-
 import { API_URL, fetchWithTimeout } from "./config";
 
 export type AdminStats = {
@@ -34,8 +33,8 @@ export type AdminRestaurant = {
   province?: string;
   rating?: number;
   reviewCount?: number;
-  isFeatured?: boolean; // Added
-  isActive?: boolean;   // Added
+  isFeatured?: boolean;
+  isActive?: boolean;
   owner?:
     | string
     | { _id: string; firstName?: string; lastName?: string; email?: string };
@@ -64,18 +63,44 @@ async function request<T>(
   return data as T;
 }
 
+const PAGE_SIZE = 200; // the server's maximum per request
+
+type PagedResponse = { pages?: number } & Record<string, unknown>;
+
+/**
+ * The admin endpoints return at most 200 rows per request. This keeps asking
+ * for the next page until everything is loaded (or maxPages is reached), so
+ * lists are never silently cut off at 200.
+ */
+async function fetchAllPages<T>(
+  path: "users" | "restaurants" | "bookings",
+  maxPages = 10, // up to 2,000 rows; raise it if you ever need more
+): Promise<T[]> {
+  const all: T[] = [];
+
+  for (let page = 1; page <= maxPages; page++) {
+    const res = await request<PagedResponse>(
+      `${path}?page=${page}&limit=${PAGE_SIZE}`,
+    );
+
+    const rows = res[path];
+    if (Array.isArray(rows)) all.push(...(rows as T[]));
+
+    if (page >= (res.pages ?? 1)) break;
+  }
+
+  return all;
+}
+
 export const getAdminStats = async () =>
   (await request<{ stats: AdminStats }>("stats")).stats;
 
-export const getAdminUsers = async () =>
-  (await request<{ users: AdminUser[] }>("users")).users;
+export const getAdminUsers = () => fetchAllPages<AdminUser>("users");
 
-export const getAdminRestaurants = async () =>
-  (await request<{ restaurants: AdminRestaurant[] }>("restaurants"))
-    .restaurants;
+export const getAdminRestaurants = () =>
+  fetchAllPages<AdminRestaurant>("restaurants");
 
-export const getAdminBookings = async () =>
-  (await request<{ bookings: Booking[] }>("bookings")).bookings;
+export const getAdminBookings = () => fetchAllPages<Booking>("bookings");
 
 export const setRestaurantActive = async (id: string, isActive: boolean) =>
   (
