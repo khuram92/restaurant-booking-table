@@ -51,7 +51,7 @@ export const getUploadSignature = (req: AuthRequest, res: Response) => {
 
   // Cloudinary only accepts an upload whose parameters match this signature
   const signature = cloudinary.utils.api_sign_request(params, CLOUDINARY_API_SECRET);
-
+  
   return res.status(200).json({
     cloudName: CLOUDINARY_CLOUD_NAME,
     apiKey: CLOUDINARY_API_KEY,

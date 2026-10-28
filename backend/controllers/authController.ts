@@ -268,7 +268,7 @@ export const updateAccount = async (req: AuthRequest, res: Response) => {
       const prefix = `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/`;
 
       if (avatar === "") {
-        user.avatar = undefined; // remove the photo
+        user.set("avatar", undefined);
       } else if (typeof avatar !== "string" || !avatar.startsWith(prefix)) {
         return res.status(400).json({ message: "Invalid profile image" });
       } else {
@@ -281,7 +281,6 @@ export const updateAccount = async (req: AuthRequest, res: Response) => {
     const { password: _password, ...safeUser } = user.toObject();
     return res.status(200).json({ message: "Account updated", user: safeUser });
   } catch (error: any) {
-
     if (error?.code === 11000) {
       const field = Object.keys(error.keyPattern ?? {})[0] ?? "field";
       return res

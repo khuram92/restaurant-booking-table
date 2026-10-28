@@ -21,7 +21,7 @@ export default function AvatarPicker({
       allowsEditing: true,
       aspect: [1, 1],
       quality: 0.7,
-    }); 
+    });
     if (result.canceled) return;
 
     const asset = result.assets[0];
@@ -31,10 +31,9 @@ export default function AvatarPicker({
       const url = await uploadImage(asset.uri, "profiles");
       await onUploaded(url);
     } catch (error) {
-      Alert.alert(
-        "Could not update photo",
-        error instanceof Error ? error.message : "Something went wrong.",
-      );
+      const message = error instanceof Error ? error.message : String(error);
+      console.error("Avatar upload error:", error);
+      Alert.alert("Could not update photo", message);
     } finally {
       setUploading(false);
     }

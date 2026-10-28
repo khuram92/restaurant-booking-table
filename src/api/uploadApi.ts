@@ -1,5 +1,5 @@
-import * as SecureStore from "expo-secure-store";
 import { File } from "expo-file-system";
+import * as SecureStore from "expo-secure-store";
 import { fetch } from "expo/fetch";
 
 const API_URL = "http://10.0.2.2:3000/api";
@@ -27,6 +27,7 @@ const getSignature = async (type: UploadType): Promise<Signature> => {
   });
 
   const data = await response.json().catch(() => ({}));
+
   if (!response.ok) {
     throw new Error(data.message || "Could not start the upload");
   }
@@ -58,8 +59,9 @@ export const uploadImage = async (
   );
 
   const data = await response.json().catch(() => ({}));
+
   if (!response.ok) {
-    throw new Error(data?.error?.message || "Upload failed");
+    throw new Error(data.error?.message || "Upload failed");
   }
 
   if (!data.secure_url) {

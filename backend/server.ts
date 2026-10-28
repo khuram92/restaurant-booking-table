@@ -7,7 +7,7 @@ import authRoutes from "./routes/authRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
 import notifictionRoutes from "./routes/notificationRoutes.js";
 import restaurantRoutes from "./routes/restaurantRouters.js";
-
+import uploadRoutes from "./routes/uploadRoutes.js"
 import favoriteRoutes from "./routes/favoriteRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
 
@@ -25,7 +25,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/restaurants", restaurantRoutes);
 app.use("/api/favorites", favoriteRoutes);
-
+app.use("/api/uploads", uploadRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/notifications", notifictionRoutes);
 app.use("/api/reviews", reviewRoutes);
