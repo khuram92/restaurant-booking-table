@@ -7,22 +7,29 @@ type UploadConfig = {
   params: (userId: string) => Record<string, string | number | boolean>;
 };
 
+// Part of the signature, so Cloudinary rejects any other file type.
+const ALLOWED_FORMATS = "jpg,jpeg,png,webp";
+
 const UPLOAD_TYPES = new Map<string, UploadConfig>([
   [
     "restaurants",
     {
       roles: ["restaurant", "admin"],
-      params: () => ({ folder: "tablebooking/restaurants" }),
+      params: () => ({
+        folder: "tablebooking/restaurants",
+        allowed_formats: ALLOWED_FORMATS,
+      }),
     },
   ],
   [
     "profiles",
     {
       roles: ["customer", "restaurant", "admin"],
-      
       params: (userId) => ({
         public_id: `tablebooking/profiles/${userId}`,
         overwrite: true,
+        invalidate: true, // refresh the CDN copy when a user replaces their photo
+        allowed_formats: ALLOWED_FORMATS,
       }),
     },
   ],
@@ -41,7 +48,9 @@ export const getUploadSignature = (req: AuthRequest, res: Response) => {
     return res.status(400).json({ message: "Invalid upload type" });
   }
   if (!req.userId || !req.role || !config.roles.includes(req.role)) {
-    return res.status(403).json({ message: "You can't upload this kind of image" });
+    return res
+      .status(403)
+      .json({ message: "You can't upload this kind of image" });
   }
 
   const params = {
@@ -50,12 +59,15 @@ export const getUploadSignature = (req: AuthRequest, res: Response) => {
   };
 
   // Cloudinary only accepts an upload whose parameters match this signature
-  const signature = cloudinary.utils.api_sign_request(params, CLOUDINARY_API_SECRET);
-  
+  const signature = cloudinary.utils.api_sign_request(
+    params,
+    CLOUDINARY_API_SECRET,
+  );
+
   return res.status(200).json({
     cloudName: CLOUDINARY_CLOUD_NAME,
     apiKey: CLOUDINARY_API_KEY,
     signature,
-    params, 
+    params,
   });
 };

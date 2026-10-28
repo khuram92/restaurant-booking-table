@@ -1,4 +1,4 @@
-import "dotenv/config"; // so MONGO_URI is set no matter what order files are imported in
+import "dotenv/config";
 import mongoose from "mongoose";
 
 let listenersAttached = false;
@@ -6,8 +6,6 @@ let listenersAttached = false;
 const attachListeners = () => {
   if (listenersAttached) return;
   listenersAttached = true;
-
-  // After the first connect, drops and errors would otherwise go unnoticed.
   mongoose.connection.on("error", (error) =>
     console.error("MongoDB error:", error),
   );
@@ -35,11 +33,9 @@ const connectDB = async () => {
     if (!mongoURI) {
       throw new Error("MONGO_URI is not defined in .env");
     }
-
     attachListeners();
-
     await mongoose.connect(mongoURI, {
-      serverSelectionTimeoutMS: 10_000, // fail fast on a wrong URI / blocked IP
+      serverSelectionTimeoutMS: 10_000,
       maxPoolSize: 10,
     });
 
