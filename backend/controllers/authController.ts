@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import type { Request, Response } from "express";
+import crypto from "node:crypto";
 import jwt from "jsonwebtoken";
 import type { AuthRequest } from "../middleware/authMiddleware.js";
 import Booking from "../models/Booking.js";
@@ -14,6 +15,7 @@ import {
   parseDob,
 } from "../utils/validation.js";
 import { deleteUserCascade } from "../utils/cascade.js";
+import { sendEmail } from "../utils/mailer.js";
 
 const createToken = (userId: string, role: string) => {
   const secret = process.env.JWT_SECRET;
@@ -292,5 +294,60 @@ export const deleteAccount = async (req: AuthRequest, res: Response) => {
   } catch (error) {
     console.error("Delete account error:", error);
     return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+
+export const forgotPassword = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      res.status(400).json({ message: "Please provide an email address." });
+      return;
+    }
+
+    const user = await User.findOne({ email: email.toLowerCase() });
+    if (!user) {
+      res.status(404).json({ message: "No account found with this email address." });
+      return;
+    }
+
+    // Generate random 6-digit OTP (100000 - 999999)
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Hash the OTP before saving to DB for security
+    const hashedOtp = crypto.createHash("sha256").update(otp).digest("hex");
+
+    // Expiry set for 10 minutes from now
+    user.resetOtp = hashedOtp;
+    user.resetOtpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
+    await user.save();
+
+    // Use your existing sendEmail helper
+    const emailSent = await sendEmail({
+      to: user.email,
+      subject: "Password Reset OTP Code",
+      html: `
+        <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+          <h2>Password Reset Request</h2>
+          <p>Your 6-digit Verification Code is:</p>
+          <h1 style="font-size: 36px; letter-spacing: 5px; color: #2563EB;">${otp}</h1>
+          <p>This code will expire in <strong>10 minutes</strong>.</p>
+          <p>If you did not request this, please ignore this email.</p>
+        </div>
+      `,
+      text: `Your password reset code is: ${otp}. It expires in 10 minutes.`,
+    });
+
+    if (!emailSent) {
+      res.status(500).json({ message: "Failed to send OTP email. Please try again later." });
+      return;
+    }
+
+    res.status(200).json({ message: "OTP sent successfully to your email." });
+  } catch (error: any) {
+    console.error("Forgot Password Error:", error);
+    res.status(500).json({ message: error.message || "Failed to process forgot password request." });
   }
 };
