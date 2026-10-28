@@ -38,7 +38,7 @@ export const signupUser = (userData: {
   password: string;
 }) => request("signup", { method: "POST", body: userData });
 
-export const loginUser = (credentials: { email: string; password: string, }) =>
+export const loginUser = (credentials: { email: string; password: string }) =>
   request("login", { method: "POST", body: credentials });
 
 export const getMe = (token: string) =>
@@ -58,4 +58,24 @@ export const deleteMe = (token: string, password: string) =>
     method: "DELETE",
     body: { password },
     token,
+  });
+
+// --- NEW PASSWORD RESET FUNCTIONS ---
+
+export const forgotPassword = (email: string) =>
+  request<{ message: string }>("forgot-password", {
+    method: "POST",
+    body: { email },
+  });
+
+export const verifyOtp = (data: { email: string; otp: string }) =>
+  request<{ message: string }>("verify-otp", {
+    method: "POST",
+    body: data,
+  });
+
+export const resetPassword = (data: { email: string; otp: string; newPassword: string }) =>
+  request<{ message: string }>("reset-password", {
+    method: "POST",
+    body: data,
   });
