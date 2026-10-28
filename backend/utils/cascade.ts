@@ -11,26 +11,26 @@ import { recalculateRestaurantRating } from "./ratings.js";
  
 const toId = (id: unknown) => new mongoose.Types.ObjectId(String(id));
  
-// export const deleteRestaurantCascade = async (restaurantId: unknown) => {
-//   const id = toId(restaurantId);
+export const deleteRestaurantCascade = async (restaurantId: unknown) => {
+  const id = toId(restaurantId);
  
-//   const bookingIds = (await Booking.find({ restaurant: id }).select("_id")).map(
-//     (b) => b._id,
-//   );
+  const bookingIds = (await Booking.find({ restaurant: id }).select("_id")).map(
+    (b) => b._id,
+  );
  
-//   await Promise.all([
-//     // Notifications (owner + customers) that point at these bookings
-//     bookingIds.length
-//       ? Notification.deleteMany({ booking: { $in: bookingIds } })
-//       : Promise.resolve(),
-//     Booking.deleteMany({ restaurant: id }),
-//     Review.deleteMany({ restaurant: id }),
-//     User.updateMany({ favorites: id }, { $pull: { favorites: id } }),
-//   ]);
+  await Promise.all([
+    // Notifications (owner + customers) that point at these bookings
+    bookingIds.length
+      ? Notification.deleteMany({ booking: { $in: bookingIds } })
+      : Promise.resolve(),
+    Booking.deleteMany({ restaurant: id }),
+    Review.deleteMany({ restaurant: id }),
+    User.updateMany({ favorites: id }, { $pull: { favorites: id } }),
+  ]);
  
-//   // Delete the restaurant last so a failed cleanup can simply be retried.
-//   await Restaurant.findByIdAndDelete(id);
-// };
+  // Delete the restaurant last so a failed cleanup can simply be retried.
+  await Restaurant.findByIdAndDelete(id);
+};
  
 // export const deleteUserCascade = async (userId: unknown) => {
 //   const uid = toId(userId);
