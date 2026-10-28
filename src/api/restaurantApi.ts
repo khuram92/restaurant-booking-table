@@ -1,10 +1,11 @@
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 
-const API_URL = "http://10.0.2.2:3000/api";
+import { API_URL, REQUEST_TIMEOUT_MS } from "./config";
 
 const API = axios.create({
   baseURL: API_URL,
+  timeout: REQUEST_TIMEOUT_MS,
 });
 
 export type NewRestaurant = {
@@ -23,7 +24,7 @@ export type NewRestaurant = {
   seatingTypes: string[];
   reviewCount?: number;
   numReviews?: number;
-  isFeatured: boolean;
+  isFeatured?: boolean; // ignored by the server: only admins can feature a restaurant
 };
 
 export interface Restaurant {
@@ -44,6 +45,7 @@ export interface Restaurant {
   availableSeats: number;
   seatingTypes: string[];
   isFeatured?: boolean;
+  isActive?: boolean;
 }
 
 export type FeaturedRestaurant = Restaurant;
@@ -98,9 +100,50 @@ export const getRestaurantById = async (
   return response.data.restaurant;
 };
 
-export const getAllRestaurants = async (): Promise<Restaurant[]> => {
-  const response = await API.get("/restaurants");
-  return response.data.restaurants;
+export type RestaurantQuery = {
+  city?: string;
+  search?: string;
+  page?: number;
+  limit?: number; // server maximum is 100
+};
+
+export type RestaurantPage = {
+  restaurants: Restaurant[];
+  total: number;
+  page: number;
+  pages: number;
+};
+
+// One page of results. Use page / pages to load more (e.g. infinite scroll).
+export const getRestaurantsPage = async (
+  query: RestaurantQuery = {},
+): Promise<RestaurantPage> => {
+  const { data } = await API.get("/restaurants", { params: query });
+  return {
+    restaurants: data.restaurants,
+    total: data.total ?? data.restaurants.length,
+    page: data.page ?? 1,
+    pages: data.pages ?? 1,
+  };
+};
+
+// First page only (up to 50 restaurants). Use getRestaurantsPage for more.
+export const getAllRestaurants = async (
+  query: RestaurantQuery = {},
+): Promise<Restaurant[]> => (await getRestaurantsPage(query)).restaurants;
+
+// Every restaurant, fetched page by page (100 per request, at most maxPages requests)
+export const getEveryRestaurant = async (
+  query: Omit<RestaurantQuery, "page" | "limit"> = {},
+  maxPages = 10,
+): Promise<Restaurant[]> => {
+  const all: Restaurant[] = [];
+  for (let page = 1; page <= maxPages; page++) {
+    const result = await getRestaurantsPage({ ...query, page, limit: 100 });
+    all.push(...result.restaurants);
+    if (page >= result.pages) break;
+  }
+  return all;
 };
 
 export const resolveImageUrl = (url?: string): string | undefined => {
