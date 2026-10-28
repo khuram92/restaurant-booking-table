@@ -3,33 +3,30 @@ import mongoose from "mongoose";
 import type { AuthRequest } from "../middleware/authMiddleware.js";
 import Restaurant from "../models/Restaurant.js";
 import { deleteRestaurantCascade } from "../utils/cascade.js";
-import { getParam, sanitizeRestaurantInput } from "../utils/validation.js";
+import {
+  escapeRegex,
+  getParam,
+  parsePaging,
+  sanitizeRestaurantInput,
+} from "../utils/validation.js";
+
 export const createRestaurant = async (req: AuthRequest, res: Response) => {
   try {
-    const {
-      name,
-      cuisines,
-      city,
-      province,
-      address,
-      phone,
-      description,
-      images,
-      openingTime,
-      closingTime,
-      floorNumbers,
-      availableSeats,
-      seatingTypes,
-    } = req.body;
-
-    if (!name) {
-      return res.status(400).json({ message: "Restaurant name is required" });
-    }
-
     const ownerId = req.userId;
 
     if (!ownerId) {
       return res.status(401).json({ message: "Not authorized" });
+    }
+    // The route also enforces this with authorize("restaurant", "admin")
+    if (req.role !== "restaurant" && req.role !== "admin") {
+      return res
+        .status(403)
+        .json({ message: "Only restaurant or admin accounts can create a restaurant" });
+    }
+
+    const result = sanitizeRestaurantInput(req.body ?? {}, true);
+    if ("error" in result) {
+      return res.status(400).json({ message: result.error });
     }
 
     const existingRestaurant = await Restaurant.findOne({ owner: ownerId });
@@ -41,20 +38,12 @@ export const createRestaurant = async (req: AuthRequest, res: Response) => {
     }
 
     const newRestaurant = new Restaurant({
+      images: [],
+      floorNumbers: [],
+      seatingTypes: [],
+      availableSeats: 0,
+      ...result.data,
       owner: ownerId,
-      name: name.trim(),
-      cuisines,
-      city,
-      province,
-      address,
-      phone,
-      description,
-      images: images || [],
-      openingTime,
-      closingTime,
-      floorNumbers: floorNumbers || [],
-      availableSeats: availableSeats ?? 0,
-      seatingTypes: seatingTypes || [],
     });
 
     await newRestaurant.save();
@@ -84,21 +73,34 @@ export const getAllRestaurants = async (req: AuthRequest, res: Response) => {
 
     const query: Record<string, any> = { isActive: { $ne: false } };
 
-    if (city) {
-      query.city = { $regex: new RegExp(city as string, "i") };
+    // Only accept plain strings (?city=a&city=b is an array) and escape them.
+    if (typeof city === "string" && city.trim()) {
+      query.city = {
+        $regex: escapeRegex(city.trim().slice(0, 100)),
+        $options: "i",
+      };
     }
 
-    if (search) {
+    if (typeof search === "string" && search.trim()) {
+      const pattern = escapeRegex(search.trim().slice(0, 100));
       query.$or = [
-        { name: { $regex: new RegExp(search as string, "i") } },
-        { cuisines: { $regex: new RegExp(search as string, "i") } },
+        { name: { $regex: pattern, $options: "i" } },
+        { cuisines: { $regex: pattern, $options: "i" } },
       ];
     }
 
-    const restaurants = await Restaurant.find(query).sort({ rating: -1 });
+    const { page, limit, skip } = parsePaging(req.query, 50, 100);
+
+    const [restaurants, total] = await Promise.all([
+      Restaurant.find(query).sort({ rating: -1, _id: 1 }).skip(skip).limit(limit),
+      Restaurant.countDocuments(query),
+    ]);
 
     return res.status(200).json({
       count: restaurants.length,
+      total,
+      page,
+      pages: Math.ceil(total / limit),
       restaurants,
     });
   } catch (error) {
@@ -109,25 +111,38 @@ export const getAllRestaurants = async (req: AuthRequest, res: Response) => {
 
 export const getRestaurantById = async (req: AuthRequest, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = getParam(req.params.id);
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ message: "Invalid restaurant id" });
+    }
 
     const restaurant = await Restaurant.findById(id).populate(
       "owner",
-      "name email phone ",
+      "firstName lastName email phone",
     );
 
     if (!restaurant) {
       return res.status(404).json({ message: "Restaurant not found" });
     }
-    if (
-      restaurant.isActive === false &&
-      req.role !== "admin" &&
-      String((restaurant.owner as any)?._id ?? restaurant.owner) !== req.userId
-    ) {
+
+    const ownerId = String((restaurant.owner as any)?._id ?? restaurant.owner);
+    const isPrivileged = req.role === "admin" || ownerId === req.userId;
+
+    if (restaurant.isActive === false && !isPrivileged) {
       return res.status(404).json({ message: "Restaurant not found" });
     }
 
-    return res.status(200).json({ restaurant });
+    const data: any = restaurant.toJSON();
+    // Public visitors only see the owner's name, never their email or phone.
+    if (!isPrivileged && data.owner && typeof data.owner === "object") {
+      data.owner = {
+        _id: data.owner._id,
+        firstName: data.owner.firstName,
+        lastName: data.owner.lastName,
+      };
+    }
+
+    return res.status(200).json({ restaurant: data });
   } catch (error) {
     console.error("Get Restaurant By ID Error:", error);
     return res
@@ -176,11 +191,7 @@ export const updateRestaurant = async (req: AuthRequest, res: Response) => {
     }
 
     const body = req.body ?? {};
-    const result = sanitizeRestaurantInput(
-      body,
-      false,
-      restaurant.images ?? [],
-    );
+    const result = sanitizeRestaurantInput(body, false, restaurant.images ?? []);
     if ("error" in result) {
       return res.status(400).json({ message: result.error });
     }

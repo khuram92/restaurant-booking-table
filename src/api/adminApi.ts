@@ -34,8 +34,8 @@ export type AdminRestaurant = {
   province?: string;
   rating?: number;
   reviewCount?: number;
-  isFeatured?: boolean; // Added
-  isActive?: boolean;   // Added
+  isFeatured?: boolean;
+  isActive?: boolean;   
   owner?:
     | string
     | { _id: string; firstName?: string; lastName?: string; email?: string };
