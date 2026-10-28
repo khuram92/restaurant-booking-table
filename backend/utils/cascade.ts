@@ -32,26 +32,26 @@ export const deleteRestaurantCascade = async (restaurantId: unknown) => {
   await Restaurant.findByIdAndDelete(id);
 };
  
-// export const deleteUserCascade = async (userId: unknown) => {
-//   const uid = toId(userId);
+export const deleteUserCascade = async (userId: unknown) => {
+  const uid = toId(userId);
  
-//   const [reviews, bookings] = await Promise.all([
-//     Review.find({ customer: uid }).select("restaurant"),
-//     Booking.find({ customer: uid }).select("_id"),
-//   ]);
-//   const affectedRestaurants = [...new Set(reviews.map((r) => String(r.restaurant)))];
-//   const bookingIds = bookings.map((b) => b._id);
+  const [reviews, bookings] = await Promise.all([
+    Review.find({ customer: uid }).select("restaurant"),
+    Booking.find({ customer: uid }).select("_id"),
+  ]);
+  const affectedRestaurants = [...new Set(reviews.map((r) => String(r.restaurant)))];
+  const bookingIds = bookings.map((b) => b._id);
  
-//   await Promise.all([
-//     // The user's own notifications, plus owners' notifications about their bookings
-//     Notification.deleteMany({
-//       $or: [{ user: uid }, { booking: { $in: bookingIds } }],
-//     }),
-//     Booking.deleteMany({ customer: uid }),
-//     Review.deleteMany({ customer: uid }),
-//   ]);
+  await Promise.all([
+    // The user's own notifications, plus owners' notifications about their bookings
+    Notification.deleteMany({
+      $or: [{ user: uid }, { booking: { $in: bookingIds } }],
+    }),
+    Booking.deleteMany({ customer: uid }),
+    Review.deleteMany({ customer: uid }),
+  ]);
  
-//   for (const restaurantId of affectedRestaurants) {
-//     await recalculateRestaurantRating(toId(restaurantId));
-//   }
-// };
+  for (const restaurantId of affectedRestaurants) {
+    await recalculateRestaurantRating(toId(restaurantId));
+  }
+};
