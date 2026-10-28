@@ -22,7 +22,7 @@ const reviewSchema = new Schema<IReview>(
       type: Schema.Types.ObjectId,
       ref: "Booking",
       required: true,
-      unique: true,
+      
     },
     rating: { type: Number, required: true, min: 1, max: 5 },
     comment: { type: String, trim: true, maxlength: 1000 },
@@ -37,7 +37,7 @@ const reviewSchema = new Schema<IReview>(
 // Newest reviews of a restaurant first
 reviewSchema.index({ restaurant: 1, createdAt: -1 });
 reviewSchema.index({ customer: 1, createdAt: -1 });
-
+reviewSchema.index({ customer: 1, booking: 1 }, { unique: true });
 const Review: Model<IReview> = mongoose.model<IReview>("Review", reviewSchema);
 
 export default Review;

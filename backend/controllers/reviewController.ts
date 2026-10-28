@@ -104,14 +104,18 @@ export const createReview = async (req: AuthRequest, res: Response) => {
 
     return res.status(201).json({ message: "Review added", review });
   } catch (error: any) {
-    if (error?.code === 11000) {
+  if (error?.code === 11000) {
+    if (error.keyPattern && "booking" in error.keyPattern) {
       return res
         .status(409)
         .json({ message: "You have already reviewed this booking" });
     }
+    console.error("Unexpected duplicate key on reviews:", error.keyPattern);
+  } else {
     console.error("Create review error:", error);
-    return res.status(500).json({ message: "Something went wrong" });
   }
+  return res.status(500).json({ message: "Something went wrong" });
+}
 };
 
 // Public: a restaurant's reviews, with the average and a 1-5 star breakdown
