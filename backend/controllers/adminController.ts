@@ -4,8 +4,11 @@ import { AuthRequest } from "../middleware/authMiddleware.js";
 import Booking from "../models/Booking.js";
 import Restaurant from "../models/Restaurant.js";
 import User from "../models/User.js";
+import { getParam, parsePaging } from "../utils/validation.js";
 
-const LIMIT = 200;
+// Same cap as before (200) but now pageable: ?page=2&limit=50
+const DEFAULT_LIMIT = 200;
+const MAX_LIMIT = 200;
 
 export const getAdminStats = async (_req: AuthRequest, res: Response) => {
   try {
@@ -19,6 +22,7 @@ export const getAdminStats = async (_req: AuthRequest, res: Response) => {
       confirmed,
       rejected,
       cancelled,
+      completed,
     ] = await Promise.all([
       User.countDocuments(),
       User.countDocuments({ role: "customer" }),
@@ -29,6 +33,7 @@ export const getAdminStats = async (_req: AuthRequest, res: Response) => {
       Booking.countDocuments({ status: "confirmed" }),
       Booking.countDocuments({ status: "rejected" }),
       Booking.countDocuments({ status: "cancelled" }),
+      Booking.countDocuments({ status: "completed" }),
     ]);
 
     return res.status(200).json({
@@ -41,6 +46,7 @@ export const getAdminStats = async (_req: AuthRequest, res: Response) => {
           confirmed,
           rejected,
           cancelled,
+          completed,
         },
       },
     });
@@ -50,43 +56,67 @@ export const getAdminStats = async (_req: AuthRequest, res: Response) => {
   }
 };
 
-export const getAllUsers = async (_req: AuthRequest, res: Response) => {
+export const getAllUsers = async (req: AuthRequest, res: Response) => {
   try {
-    const users = await User.find()
-      .select("-password")
-      .sort({ createdAt: -1 })
-      .limit(LIMIT);
+    const { page, limit, skip } = parsePaging(req.query, DEFAULT_LIMIT, MAX_LIMIT);
 
-    return res.status(200).json({ users });
+    const [users, total] = await Promise.all([
+      User.find()
+        .select("-password")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      User.countDocuments(),
+    ]);
+
+    return res
+      .status(200)
+      .json({ users, total, page, pages: Math.ceil(total / limit) });
   } catch (error) {
     console.error("Admin users error:", error);
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
 
-export const getAllRestaurants = async (_req: AuthRequest, res: Response) => {
+export const getAllRestaurants = async (req: AuthRequest, res: Response) => {
   try {
-    const restaurants = await Restaurant.find()
-      .populate("owner", "firstName lastName email")
-      .sort({ createdAt: -1 })
-      .limit(LIMIT);
+    const { page, limit, skip } = parsePaging(req.query, DEFAULT_LIMIT, MAX_LIMIT);
 
-    return res.status(200).json({ restaurants });
+    const [restaurants, total] = await Promise.all([
+      Restaurant.find()
+        .populate("owner", "firstName lastName email")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Restaurant.countDocuments(),
+    ]);
+
+    return res
+      .status(200)
+      .json({ restaurants, total, page, pages: Math.ceil(total / limit) });
   } catch (error) {
     console.error("Admin restaurants error:", error);
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
 
-export const getAllBookings = async (_req: AuthRequest, res: Response) => {
+export const getAllBookings = async (req: AuthRequest, res: Response) => {
   try {
-    const bookings = await Booking.find()
-      .populate("customer", "firstName lastName phone")
-      .populate("restaurant", "name city")
-      .sort({ createdAt: -1 })
-      .limit(LIMIT);
+    const { page, limit, skip } = parsePaging(req.query, DEFAULT_LIMIT, MAX_LIMIT);
 
-    return res.status(200).json({ bookings });
+    const [bookings, total] = await Promise.all([
+      Booking.find()
+        .populate("customer", "firstName lastName phone")
+        .populate("restaurant", "name city")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Booking.countDocuments(),
+    ]);
+
+    return res
+      .status(200)
+      .json({ bookings, total, page, pages: Math.ceil(total / limit) });
   } catch (error) {
     console.error("Admin bookings error:", error);
     return res.status(500).json({ message: "Something went wrong" });
@@ -95,8 +125,8 @@ export const getAllBookings = async (_req: AuthRequest, res: Response) => {
 
 export const setRestaurantActive = async (req: AuthRequest, res: Response) => {
   try {
-    const { id } = req.params;
-    const { isActive } = req.body;
+    const id = getParam(req.params.id);
+    const { isActive } = req.body ?? {};
 
     if (!mongoose.isValidObjectId(id)) {
       return res.status(400).json({ message: "Invalid restaurant id" });
@@ -129,8 +159,19 @@ export const setRestaurantActive = async (req: AuthRequest, res: Response) => {
 
 export const toggleFeatured = async (req: AuthRequest, res: Response) => {
   try {
-    const { id } = req.params;
-    const { isFeatured } = req.body; // Get the target state from frontend
+    const id = getParam(req.params.id);
+    const { isFeatured } = req.body ?? {}; // target state from the frontend
+
+    if (!mongoose.isValidObjectId(id)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid restaurant id" });
+    }
+    if (isFeatured !== undefined && typeof isFeatured !== "boolean") {
+      return res
+        .status(400)
+        .json({ success: false, message: "isFeatured must be true or false" });
+    }
 
     const restaurant = await Restaurant.findById(id);
 
@@ -141,17 +182,20 @@ export const toggleFeatured = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    // Use the provided isFeatured value if available, otherwise toggle it
-    restaurant.isFeatured = isFeatured !== undefined ? isFeatured : !restaurant.isFeatured;
+    // Use the provided value if there is one, otherwise flip it
+    restaurant.isFeatured =
+      isFeatured !== undefined ? isFeatured : !restaurant.isFeatured;
     await restaurant.save();
 
     return res.status(200).json({
       success: true,
       message: `Restaurant is now ${restaurant.isFeatured ? "Featured" : "Unfeatured"}`,
-      restaurant, // Match frontend expectation
+      restaurant,
     });
   } catch (error) {
-    console.error("Set restaurant is Featured :", error);
-    return res.status(500).json({ message: "Something went wrong" });
+    console.error("Toggle featured error:", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Something went wrong" });
   }
 };
