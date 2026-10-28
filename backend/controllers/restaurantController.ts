@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import type { AuthRequest } from "../middleware/authMiddleware.js";
 import Restaurant from "../models/Restaurant.js";
 import { deleteRestaurantCascade } from "../utils/cascade.js";
-import { getParam } from "../utils/validation.js";
+import { getParam, sanitizeRestaurantInput } from "../utils/validation.js";
 export const createRestaurant = async (req: AuthRequest, res: Response) => {
   try {
     const {
@@ -157,7 +157,10 @@ export const getMyRestaurant = async (req: AuthRequest, res: Response) => {
 
 export const updateRestaurant = async (req: AuthRequest, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = getParam(req.params.id);
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ message: "Invalid restaurant id" });
+    }
 
     const restaurant = await Restaurant.findById(id);
 
@@ -172,26 +175,29 @@ export const updateRestaurant = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    const allowed = [
-      "name",
-      "cuisines",
-      "city",
-      "province",
-      "address",
-      "phone",
-      "description",
-      "images",
-      "openingTime",
-      "closingTime",
-      "floorNumbers",
-      "availableSeats",
-      "seatingTypes",
-      "isFeatured",
-    ];
+    const body = req.body ?? {};
+    const result = sanitizeRestaurantInput(
+      body,
+      false,
+      restaurant.images ?? [],
+    );
+    if ("error" in result) {
+      return res.status(400).json({ message: result.error });
+    }
+    const updates = result.data;
 
-    const updates: Record<string, unknown> = {};
-    for (const key of allowed) {
-      if (req.body[key] !== undefined) updates[key] = req.body[key];
+    // Only admins can feature a restaurant. For owners the field is ignored.
+    if (req.role === "admin" && body.isFeatured !== undefined) {
+      if (typeof body.isFeatured !== "boolean") {
+        return res
+          .status(400)
+          .json({ message: "isFeatured must be true or false" });
+      }
+      updates.isFeatured = body.isFeatured;
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({ message: "Nothing to update" });
     }
 
     const updatedRestaurant = await Restaurant.findByIdAndUpdate(

@@ -1,5 +1,3 @@
-
-
 export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export const PAKISTANI_PHONE_REGEX = /^03\d{9}$/;
 export const PASSWORD_REGEX =
@@ -12,7 +10,8 @@ export const getParam = (value: string | string[] | undefined): string =>
   Array.isArray(value) ? (value[0] ?? "") : (value ?? "");
 
 /** Escape user input before putting it in a RegExp / $regex. */
-export const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+export const escapeRegex = (s: string) =>
+  s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 export const normalizePhone = (value: unknown) => {
   const phone = String(value ?? "").trim();
@@ -58,7 +57,10 @@ export const parsePaging = (
   const page = Math.max(1, parseInt(String(query.page ?? "1"), 10) || 1);
   const limit = Math.min(
     maxLimit,
-    Math.max(1, parseInt(String(query.limit ?? defaultLimit), 10) || defaultLimit),
+    Math.max(
+      1,
+      parseInt(String(query.limit ?? defaultLimit), 10) || defaultLimit,
+    ),
   );
   return { page, limit, skip: (page - 1) * limit };
 };
@@ -81,7 +83,8 @@ export const isCloudinaryAsset = (
   } catch {
     return false;
   }
-  if (url.protocol !== "https:" || url.hostname !== "res.cloudinary.com") return false;
+  if (url.protocol !== "https:" || url.hostname !== "res.cloudinary.com")
+    return false;
 
   const base = `/${cloud}/image/upload/`;
   if (!url.pathname.startsWith(base)) return false;
@@ -113,11 +116,12 @@ const TEXT_LIMITS: Record<string, number> = {
 const isTextList = (v: unknown, maxItems: number, maxLen: number) =>
   Array.isArray(v) &&
   v.length <= maxItems &&
-  v.every((x) => typeof x === "string" && x.trim().length > 0 && x.length <= maxLen);
+  v.every(
+    (x) => typeof x === "string" && x.trim().length > 0 && x.length <= maxLen,
+  );
 
 export type RestaurantInputResult =
-  | { error: string }
-  | { data: Record<string, unknown> };
+  { error: string } | { data: Record<string, unknown> };
 
 /**
  * Validates and cleans restaurant fields from a request body.
@@ -182,14 +186,22 @@ export const sanitizeRestaurantInput = (
           (typeof x === "number" && Number.isFinite(x)) ||
           (typeof x === "string" && x.trim().length > 0 && x.length <= 20),
       );
-    if (!ok) return { error: "Floor numbers must be a list of up to 50 values" };
+    if (!ok)
+      return { error: "Floor numbers must be a list of up to 50 values" };
     data.floorNumbers = f.map((x) => String(x).trim()); // model stores strings
   }
 
   if (body.availableSeats !== undefined) {
     const n = Number(body.availableSeats);
-    if (body.availableSeats === "" || !Number.isInteger(n) || n < 0 || n > 10000) {
-      return { error: "Available seats must be a whole number from 0 to 10000" };
+    if (
+      body.availableSeats === "" ||
+      !Number.isInteger(n) ||
+      n < 0 ||
+      n > 10000
+    ) {
+      return {
+        error: "Available seats must be a whole number from 0 to 10000",
+      };
     }
     data.availableSeats = n;
   }
@@ -205,7 +217,10 @@ export const sanitizeRestaurantInput = (
           (typeof u === "string" && existingImages.includes(u)),
       )
     ) {
-      return { error: "Images must be up to 10 images, and new ones must be uploaded through the app" };
+      return {
+        error:
+          "Images must be up to 10 images, and new ones must be uploaded through the app",
+      };
     }
     data.images = imgs;
   }
