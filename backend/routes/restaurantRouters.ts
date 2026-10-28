@@ -24,7 +24,6 @@ router.get("/", getAllRestaurants);
 
 router.get("/:id", optionalAuth, getRestaurantById);
 
-
 router.post("/", protect, authorize("restaurant", "admin"), createRestaurant);
 
 router.put("/:id", protect, authorize("restaurant", "admin"), updateRestaurant);
