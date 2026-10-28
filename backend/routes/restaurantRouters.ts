@@ -8,16 +8,25 @@ import {
   getRestaurantById,
   updateRestaurant,
 } from "../controllers/restaurantController.js";
-import { authorize, protect } from "../middleware/authMiddleware.js";
+import {
+  authorize,
+  optionalAuth,
+  protect,
+} from "../middleware/authMiddleware.js";
+
 const router = Router();
-// Owner-specific protected route (Must come before /:id in Express execution)
+
 router.get("/mine", protect, authorize("restaurant", "admin"), getMyRestaurant);
-// Public Routes
+
+// Public routes
 router.get("/featured", getFeaturedRestaurants);
 router.get("/", getAllRestaurants);
-router.get("/:id", getRestaurantById);
-// Admin / Owner protected routes
+
+router.get("/:id", optionalAuth, getRestaurantById);
+
+
 router.post("/", protect, authorize("restaurant", "admin"), createRestaurant);
+
 router.put("/:id", protect, authorize("restaurant", "admin"), updateRestaurant);
 router.delete(
   "/:id",
