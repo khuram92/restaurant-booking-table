@@ -28,10 +28,10 @@ const bookingSchema = new Schema<IBooking>(
     },
     date: { type: Date, required: true },
     time: { type: String, required: true },
-    guests: { type: Number, required: true },
+    guests: { type: Number, required: true, min: 1, max: 50 },
     seatingType: { type: String, required: true },
-    request: { type: String },
-    floor: { type: String },
+    request: { type: String, maxlength: 500 },
+    floor: { type: String }, // enforced in createBooking; older bookings may lack it
 
     status: {
       type: String,
@@ -41,6 +41,11 @@ const bookingSchema = new Schema<IBooking>(
   },
   { timestamps: true },
 );
+
+// "My bookings" (getMyBookings)
+bookingSchema.index({ customer: 1, date: -1, createdAt: -1 });
+// Owner lists, status filters, and the per-slot seat count in createBooking
+bookingSchema.index({ restaurant: 1, date: 1, time: 1, status: 1 });
 
 const Booking: Model<IBooking> = mongoose.model<IBooking>(
   "Booking",
