@@ -13,6 +13,7 @@ import {
   normalizePhone,
   parseDob,
 } from "../utils/validation.js";
+import { deleteUserCascade } from "../utils/cascade.js";
 
 const createToken = (userId: string, role: string) => {
   const secret = process.env.JWT_SECRET;
@@ -260,22 +261,22 @@ export const updateAccount = async (req: AuthRequest, res: Response) => {
 export const deleteAccount = async (req: AuthRequest, res: Response) => {
   try {
     const { password } = req.body;
-
-    if (!password) {
+ 
+    if (!password || typeof password !== "string") {
       return res
         .status(400)
         .json({ message: "Password is required to delete your account" });
     }
-
+ 
     const user = await User.findById(req.userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-
+ 
     if (!(await user.comparePassword(password))) {
       return res.status(401).json({ message: "Incorrect password" });
     }
-
+ 
     if (user.role === "restaurant") {
       const owned = await Restaurant.countDocuments({ owner: user._id });
       if (owned > 0) {
@@ -284,10 +285,12 @@ export const deleteAccount = async (req: AuthRequest, res: Response) => {
         });
       }
     }
-
-    await Booking.deleteMany({ customer: user._id });
+ 
+    // Bookings, reviews (ratings recalculated) and notifications.
+    // Favorites live on the user document, so they go with it.
+    await deleteUserCascade(user._id);
     await user.deleteOne();
-
+ 
     return res.status(200).json({ message: "Account deleted" });
   } catch (error) {
     console.error("Delete account error:", error);
