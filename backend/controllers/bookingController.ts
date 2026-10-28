@@ -10,29 +10,70 @@ import {
   notifyBookingCreated,
   notifyBookingDecision,
 } from "../utils/bookingNotifications.js";
+import {
+  getBookingStart,
+  getCalendarDay,
+  getDayRange,
+  isWithinOpeningHours,
+  parseTimeToMinutes,
+  toDayStart,
+} from "../utils/bookingTime.js";
+import { getParam } from "../utils/validation.js";
 
+const MAX_GUESTS = 500;
+const MAX_REQUEST_LENGTH = 1000;
 
 export const createBooking = async (req: AuthRequest, res: Response) => {
   try {
     const { restaurantId, date, time, guests, seatingType, request, floor } =
       req.body;
 
-    if (!date || !time || !guests || !seatingType || !floor) {
+    // floor can legitimately be 0 (ground floor), so don't use !floor
+    const hasFloor =
+      floor !== undefined && floor !== null && String(floor).trim() !== "";
+
+    if (!date || !time || !guests || !seatingType || !hasFloor) {
       return res.status(400).json({
-        message: "Date, time, guests,floor, and seating type are required",
+        message: "Date, time, guests, floor, and seating type are required",
       });
     }
+    if (typeof date !== "string" || typeof time !== "string") {
+      return res.status(400).json({ message: "Invalid date or time" });
+    }
+    if (parseTimeToMinutes(time) === null) {
+      return res
+        .status(400)
+        .json({ message: "Time must look like 19:30 or 7:30 PM" });
+    }
+    if (typeof seatingType !== "string" || !seatingType.trim()) {
+      return res.status(400).json({ message: "Invalid seating type" });
+    }
+    if (
+      request !== undefined &&
+      (typeof request !== "string" || request.length > MAX_REQUEST_LENGTH)
+    ) {
+      return res.status(400).json({
+        message: `Request must be text of up to ${MAX_REQUEST_LENGTH} characters`,
+      });
+    }
+
     const guestCount = Number(guests);
     if (!Number.isInteger(guestCount) || guestCount < 1) {
       return res
         .status(400)
         .json({ message: "Guests must be a whole number of at least 1" });
     }
+    if (guestCount > MAX_GUESTS) {
+      return res
+        .status(400)
+        .json({ message: `Guests can't be more than ${MAX_GUESTS}` });
+    }
 
-    const bookingDate = new Date(date);
-    if (Number.isNaN(bookingDate.getTime())) {
+    const day = getCalendarDay(date);
+    if (!day) {
       return res.status(400).json({ message: "Invalid date" });
     }
+
     if (!restaurantId || !mongoose.isValidObjectId(restaurantId)) {
       return res.status(400).json({ message: "Invalid restaurant id" });
     }
@@ -46,28 +87,101 @@ export const createBooking = async (req: AuthRequest, res: Response) => {
         .status(400)
         .json({ message: "This restaurant is not accepting bookings" });
     }
-    if (restaurant.availableSeats && guestCount > restaurant.availableSeats) {
+
+    // Opening hours
+    if (
+      !isWithinOpeningHours(
+        time,
+        restaurant.openingTime,
+        restaurant.closingTime,
+      )
+    ) {
+      return res.status(400).json({
+        message: `Restaurant is open ${restaurant.openingTime} to ${restaurant.closingTime}`,
+      });
+    }
+
+    // Must be in the future (after-midnight slots count as the next day)
+    const start = getBookingStart(date, time, {
+      opening: restaurant.openingTime,
+      closing: restaurant.closingTime,
+    });
+    if (!start || start.getTime() <= Date.now()) {
       return res
         .status(400)
-        .json({ message: `Only ${restaurant.availableSeats} seats available` });
+        .json({ message: "Booking must be for a future date and time" });
+    }
+
+    // Floor and seating type must be ones this restaurant actually offers
+    const floors = ((restaurant.floorNumbers as unknown[]) ?? []).map(String);
+    if (floors.length && !floors.includes(String(floor))) {
+      return res
+        .status(400)
+        .json({ message: "Invalid floor for this restaurant" });
+    }
+    const seatings = ((restaurant.seatingTypes as unknown[]) ?? []).map((s) =>
+      String(s).toLowerCase(),
+    );
+    if (
+      seatings.length &&
+      !seatings.includes(seatingType.trim().toLowerCase())
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Invalid seating type for this restaurant" });
+    }
+
+    // Per time-slot capacity (0 / unset availableSeats = no limit, as before)
+    const bookingDate = toDayStart(day);
+    const bookingTime = time.trim();
+
+    if (restaurant.availableSeats) {
+      if (guestCount > restaurant.availableSeats) {
+        return res.status(400).json({
+          message: `Only ${restaurant.availableSeats} seats available`,
+        });
+      }
+
+      const { from, to } = getDayRange(day);
+      const [taken] = await Booking.aggregate([
+        {
+          $match: {
+            restaurant: restaurant._id,
+            date: { $gte: from, $lt: to },
+            time: bookingTime,
+            status: { $in: ["pending", "confirmed"] },
+          },
+        },
+        { $group: { _id: null, guests: { $sum: "$guests" } } },
+      ]);
+
+      const remaining = restaurant.availableSeats - (taken?.guests ?? 0);
+      if (guestCount > remaining) {
+        return res.status(400).json({
+          message:
+            remaining > 0
+              ? `Only ${remaining} seats left for this time`
+              : "This time is fully booked",
+        });
+      }
     }
 
     const booking = await Booking.create({
       customer: req.userId,
       restaurant: restaurant._id,
       date: bookingDate,
-      time,
+      time: bookingTime,
       guests: guestCount,
-      seatingType,
-      floor,
-      request,
+      seatingType: seatingType.trim(),
+      floor: String(floor).trim(),
+      request: request?.trim() || undefined,
     });
     void notifyBookingCreated({
       _id: booking._id,
       customer: req.userId as string,
       restaurant: restaurant._id,
       date: bookingDate,
-      time,
+      time: bookingTime,
       guests: guestCount,
     });
     const populated = await booking.populate(
@@ -103,9 +217,33 @@ export const getMyBookings = async (req: AuthRequest, res: Response) => {
   }
 };
 
+// One of the logged-in customer's own bookings
+export const getBookingById = async (req: AuthRequest, res: Response) => {
+  try {
+    const id = getParam(req.params.id);
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ message: "Invalid booking id" });
+    }
+
+    const booking = await Booking.findOne({
+      _id: id,
+      customer: req.userId,
+    }).populate("restaurant", "name city province images address phone");
+
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    return res.status(200).json({ booking });
+  } catch (error) {
+    console.error("Fetch booking error:", error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
 export const cancelBooking = async (req: AuthRequest, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = getParam(req.params.id);
 
     if (!mongoose.isValidObjectId(id)) {
       return res.status(400).json({ message: "Invalid booking id" });
@@ -132,6 +270,7 @@ export const cancelBooking = async (req: AuthRequest, res: Response) => {
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
+
 // All bookings for restaurants owned by the logged-in user
 export const getRestaurantBookings = async (
   req: AuthRequest,
@@ -145,7 +284,13 @@ export const getRestaurantBookings = async (
       restaurant: { $in: restaurantIds },
     };
 
-    const allowed = ["pending", "confirmed", "rejected", "cancelled"];
+    const allowed = [
+      "pending",
+      "confirmed",
+      "rejected",
+      "cancelled",
+      "completed",
+    ];
     if (
       typeof req.query.status === "string" &&
       allowed.includes(req.query.status)
@@ -154,7 +299,7 @@ export const getRestaurantBookings = async (
     }
 
     const bookings = await Booking.find(filter)
-      .populate("customer", "firstName lastName phone") // adjust to your User fields
+      .populate("customer", "firstName lastName phone")
       .populate("restaurant", "name")
       .sort({ date: 1, createdAt: -1 });
 
@@ -164,6 +309,7 @@ export const getRestaurantBookings = async (
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
+
 const OWNER_STATUSES = ["confirmed", "rejected", "completed"];
 
 // What an owner may move a booking to, from its current status
@@ -174,8 +320,8 @@ const OWNER_TRANSITIONS: Record<string, string[]> = {
 
 export const updateBookingStatus = async (req: AuthRequest, res: Response) => {
   try {
-    const { id } = req.params;
-    const { status } = req.body;
+    const id = getParam(req.params.id);
+    const { status } = req.body ?? {};
 
     if (!mongoose.isValidObjectId(id)) {
       return res.status(400).json({ message: "Invalid booking id" });
@@ -206,6 +352,19 @@ export const updateBookingStatus = async (req: AuthRequest, res: Response) => {
       });
     }
 
+    // A meal that hasn't happened yet can't be completed (it would unlock reviews).
+    if (status === "completed") {
+      const start = getBookingStart(booking.date, booking.time, {
+        opening: restaurant.openingTime,
+        closing: restaurant.closingTime,
+      });
+      if (start && start.getTime() > Date.now()) {
+        return res.status(400).json({
+          message: "A booking can't be completed before its start time",
+        });
+      }
+    }
+
     booking.status = status;
     await booking.save();
 
@@ -218,10 +377,10 @@ export const updateBookingStatus = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// Owner deletes a booking made at  restaurants
+// Owner deletes a rejected or cancelled booking made at their restaurant
 export const deleteBookingByOwner = async (req: AuthRequest, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = getParam(req.params.id);
 
     if (!mongoose.isValidObjectId(id)) {
       return res.status(400).json({ message: "Invalid booking id" });
