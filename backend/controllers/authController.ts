@@ -5,46 +5,24 @@ import type { AuthRequest } from "../middleware/authMiddleware.js";
 import Booking from "../models/Booking.js";
 import Restaurant from "../models/Restaurant.js";
 import User from "../models/User.js";
+import {
+  EMAIL_REGEX,
+  PAKISTANI_PHONE_REGEX,
+  PASSWORD_MESSAGE,
+  PASSWORD_REGEX,
+  PROFILE_IMAGE_FOLDER,
+  isCloudinaryAsset,
+  normalizePhone,
+  parseDob,
+} from "../utils/validation.js";
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const PAKISTANI_PHONE_REGEX = /^03\d{9}$/;
-const PASSWORD_REGEX =
-  /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
-const normalizePhone = (value: unknown) => {
-  const phone = String(value ?? "").trim();
-  return /^3\d{9}$/.test(phone) ? `0${phone}` : phone;
-};
 
-const parseDob = (value: unknown): Date | null => {
-  if (typeof value !== "string") return null;
 
-  const input = value.trim();
-  let year: number;
-  let month: number;
-  let day: number;
 
-  if (/^\d{4}-\d{2}-\d{2}$/.test(input)) {
-    [year, month, day] = input.split("-").map(Number);
-  } else if (/^\d{2}-\d{2}-\d{4}$/.test(input)) {
-    [day, month, year] = input.split("-").map(Number);
-  } else {
-    return null;
-  }
 
-  const date = new Date(year, month - 1, day);
 
-  // Reject impossible dates such as 31-02-1999.
-  if (
-    date.getFullYear() !== year ||
-    date.getMonth() !== month - 1 ||
-    date.getDate() !== day
-  ) {
-    return null;
-  }
 
-  return date;
-};
 
 const createToken = (userId: string, role: string) => {
   const secret = process.env.JWT_SECRET;
@@ -77,10 +55,7 @@ export const signup = async (req: Request, res: Response) => {
     }
 
     if (typeof password !== "string" || !PASSWORD_REGEX.test(password)) {
-      return res.status(400).json({
-        message:
-          "Password must be at least 8 characters and contain a letter, number, and special character",
-      });
+       return res.status(400).json({ message: PASSWORD_MESSAGE });
     }
 
     if (!["customer", "restaurant", "admin"].includes(requestedRole)) {

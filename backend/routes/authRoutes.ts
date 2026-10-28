@@ -19,4 +19,4 @@ router.get("/me", protect, getMe);
 router.patch("/me", protect, updateAccount);
 router.delete("/me", protect, deleteAccount);
 
-export default router;
+export default router; 
