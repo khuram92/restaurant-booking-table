@@ -17,6 +17,10 @@ export default function ForgotPassword() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Show/Hide password toggles
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   // STEP 1: Send OTP to Email
   const handleSendOtp = async () => {
     if (!email.trim()) {
@@ -62,8 +66,13 @@ export default function ForgotPassword() {
       return;
     }
 
-    if (newPassword.length < 6) {
-      Alert.alert("Error", "Password must be at least 6 characters long.");
+    // Check for at least 8 characters, numbers, and special characters
+    const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>])[a-zA-Z0-9!@#$%^&*(),.?":{}|<>]{8,}$/;
+    if (!passwordRegex.test(newPassword)) {
+      Alert.alert(
+        "Weak Password",
+        "Password must be at least 8 characters long and include numbers and special characters."
+      );
       return;
     }
 
@@ -127,7 +136,7 @@ export default function ForgotPassword() {
             <Text className="text-gray-500 mb-6 text-sm leading-relaxed">
               {step === "email" && "Enter your registered email address and we'll send you a 6-digit verification code."}
               {step === "otp" && `We've sent a 6-digit code to ${email}. Enter it below to proceed.`}
-              {step === "password" && "Enter your new password below and confirm it to finish."}
+              {step === "password" && "Enter your new password below (min 8 chars, numbers & symbols) and confirm it."}
             </Text>
 
             {/* STEP 1: EMAIL INPUT */}
@@ -198,22 +207,40 @@ export default function ForgotPassword() {
             {step === "password" && (
               <>
                 <Text className="text-sm font-semibold mb-2 text-gray-700">New Password</Text>
-                <TextInput
-                  placeholder="New-password"
-                  secureTextEntry
-                  value={newPassword}
-                  onChangeText={setNewPassword}
-                  className="border border-gray-300 rounded-lg px-4 py-3 mb-4 bg-gray-50 text-gray-900"
-                />
+                <View className="flex-row items-center border border-gray-300 rounded-lg bg-gray-50 mb-4 px-4">
+                  <TextInput
+                    placeholder="Min 8 chars, numbers & symbols"
+                    secureTextEntry={!showNewPassword}
+                    value={newPassword}
+                    onChangeText={setNewPassword}
+                    className="flex-1 py-3 text-gray-900"
+                  />
+                  <Pressable onPress={() => setShowNewPassword(!showNewPassword)}>
+                    <Ionicons
+                      name={showNewPassword ? "eye-off-outline" : "eye-outline"}
+                      size={20}
+                      color="gray"
+                    />
+                  </Pressable>
+                </View>
 
                 <Text className="text-sm font-semibold mb-2 text-gray-700">Confirm New Password</Text>
-                <TextInput
-                  placeholder="Re-enter new password"
-                  secureTextEntry
-                  value={confirmPassword}
-                  onChangeText={setConfirmPassword}
-                  className="border border-gray-300 rounded-lg px-4 py-3 mb-6 bg-gray-50 text-gray-900"
-                />
+                <View className="flex-row items-center border border-gray-300 rounded-lg bg-gray-50 mb-6 px-4">
+                  <TextInput
+                    placeholder="Re-enter new password"
+                    secureTextEntry={!showConfirmPassword}
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                    className="flex-1 py-3 text-gray-900"
+                  />
+                  <Pressable onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+                    <Ionicons
+                      name={showConfirmPassword ? "eye-off-outline" : "eye-outline"}
+                      size={20}
+                      color="gray"
+                    />
+                  </Pressable>
+                </View>
 
                 <Pressable
                   onPress={handleResetPassword}
