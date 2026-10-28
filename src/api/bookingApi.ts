@@ -1,6 +1,6 @@
 import * as SecureStore from "expo-secure-store";
 
-const API_URL = "http://10.0.2.2:3000/api";
+import { API_URL, fetchWithTimeout } from "./config";
 
 type PopulatedRestaurant = {
   _id: string;
@@ -57,6 +57,8 @@ const parseResponse = async (response: Response, fallbackMessage: string) => {
 
 /* ------------------------------ Customer ------------------------------ */
 
+// date: "YYYY-MM-DD" (the day the customer picked)
+// time: "19:30" or "7:30 PM", inside the restaurant's opening hours
 export const createBooking = async (bookingData: {
   restaurantId: string;
   date: string;
@@ -68,7 +70,7 @@ export const createBooking = async (bookingData: {
 }) => {
   const headers = await getAuthHeaders();
 
-  const response = await fetch(`${API_URL}/bookings`, {
+  const response = await fetchWithTimeout(`${API_URL}/bookings`, {
     method: "POST",
     headers,
     body: JSON.stringify(bookingData),
@@ -80,16 +82,28 @@ export const createBooking = async (bookingData: {
 export const getMyBookings = async (): Promise<Booking[]> => {
   const headers = await getAuthHeaders();
 
-  const response = await fetch(`${API_URL}/bookings`, { headers });
+  const response = await fetchWithTimeout(`${API_URL}/bookings`, { headers });
 
   const data = await parseResponse(response, "Could not load bookings");
   return data.bookings;
 };
 
+// One of the logged-in customer's own bookings
+export const getBooking = async (bookingId: string): Promise<Booking> => {
+  const headers = await getAuthHeaders();
+
+  const response = await fetchWithTimeout(`${API_URL}/bookings/${bookingId}`, {
+    headers,
+  });
+
+  const data = await parseResponse(response, "Could not load booking");
+  return data.booking;
+};
+
 export const cancelBooking = async (bookingId: string) => {
   const headers = await getAuthHeaders();
 
-  const response = await fetch(`${API_URL}/bookings/${bookingId}/cancel`, {
+  const response = await fetchWithTimeout(`${API_URL}/bookings/${bookingId}/cancel`, {
     method: "PATCH",
     headers,
   });
@@ -104,7 +118,7 @@ export const getRestaurantBookings = async (
   const headers = await getAuthHeaders();
   const query = status ? `?status=${status}` : "";
 
-  const response = await fetch(`${API_URL}/bookings/restaurant${query}`, {
+  const response = await fetchWithTimeout(`${API_URL}/bookings/restaurant${query}`, {
     headers,
   });
 
@@ -119,7 +133,7 @@ export const updateBookingStatus = async (
 ): Promise<Booking> => {
   const headers = await getAuthHeaders();
 
-  const response = await fetch(`${API_URL}/bookings/${bookingId}/status`, {
+  const response = await fetchWithTimeout(`${API_URL}/bookings/${bookingId}/status`, {
     method: "PATCH",
     headers,
     body: JSON.stringify({ status }),
@@ -132,7 +146,7 @@ export const updateBookingStatus = async (
 export const deleteBooking = async (bookingId: string) => {
   const headers = await getAuthHeaders();
 
-  const response = await fetch(`${API_URL}/bookings/${bookingId}`, {
+  const response = await fetchWithTimeout(`${API_URL}/bookings/${bookingId}`, {
     method: "DELETE",
     headers,
   });
