@@ -1,11 +1,12 @@
 import bcrypt from "bcrypt";
 import type { Request, Response } from "express";
-import crypto from "node:crypto";
 import jwt from "jsonwebtoken";
+import crypto from "node:crypto";
 import type { AuthRequest } from "../middleware/authMiddleware.js";
-import Booking from "../models/Booking.js";
 import Restaurant from "../models/Restaurant.js";
 import User from "../models/User.js";
+import { deleteUserCascade } from "../utils/cascade.js";
+import { sendEmail } from "../utils/mailer.js";
 import {
   EMAIL_REGEX,
   PAKISTANI_PHONE_REGEX,
@@ -14,8 +15,6 @@ import {
   normalizePhone,
   parseDob,
 } from "../utils/validation.js";
-import { deleteUserCascade } from "../utils/cascade.js";
-import { sendEmail } from "../utils/mailer.js";
 
 const createToken = (userId: string, role: string) => {
   const secret = process.env.JWT_SECRET;
@@ -263,22 +262,22 @@ export const updateAccount = async (req: AuthRequest, res: Response) => {
 export const deleteAccount = async (req: AuthRequest, res: Response) => {
   try {
     const { password } = req.body;
- 
+
     if (!password || typeof password !== "string") {
       return res
         .status(400)
         .json({ message: "Password is required to delete your account" });
     }
- 
+
     const user = await User.findById(req.userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
- 
+
     if (!(await user.comparePassword(password))) {
       return res.status(401).json({ message: "Incorrect password" });
     }
- 
+
     if (user.role === "restaurant") {
       const owned = await Restaurant.countDocuments({ owner: user._id });
       if (owned > 0) {
@@ -289,7 +288,7 @@ export const deleteAccount = async (req: AuthRequest, res: Response) => {
     }
     await deleteUserCascade(user._id);
     await user.deleteOne();
- 
+
     return res.status(200).json({ message: "Account deleted" });
   } catch (error) {
     console.error("Delete account error:", error);
@@ -297,8 +296,10 @@ export const deleteAccount = async (req: AuthRequest, res: Response) => {
   }
 };
 
-
-export const forgotPassword = async (req: Request, res: Response): Promise<void> => {
+export const forgotPassword = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { email } = req.body;
 
@@ -309,7 +310,9 @@ export const forgotPassword = async (req: Request, res: Response): Promise<void>
 
     const user = await User.findOne({ email: email.toLowerCase() });
     if (!user) {
-      res.status(404).json({ message: "No account found with this email address." });
+      res
+        .status(404)
+        .json({ message: "No account found with this email address." });
       return;
     }
 
@@ -341,17 +344,20 @@ export const forgotPassword = async (req: Request, res: Response): Promise<void>
     });
 
     if (!emailSent) {
-      res.status(500).json({ message: "Failed to send OTP email. Please try again later." });
+      res
+        .status(500)
+        .json({ message: "Failed to send OTP email. Please try again later." });
       return;
     }
 
     res.status(200).json({ message: "OTP sent successfully to your email." });
   } catch (error: any) {
     console.error("Forgot Password Error:", error);
-    res.status(500).json({ message: error.message || "Failed to process forgot password request." });
+    res.status(500).json({
+      message: error.message || "Failed to process forgot password request.",
+    });
   }
 };
-
 
 export const verifyOtp = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -377,22 +383,29 @@ export const verifyOtp = async (req: Request, res: Response): Promise<void> => {
 
     res.status(200).json({ message: "OTP verified successfully." });
   } catch (error: any) {
-    res.status(500).json({ message: error.message || "OTP verification failed." });
+    res
+      .status(500)
+      .json({ message: error.message || "OTP verification failed." });
   }
 };
 
 // 3. Reset Password
-export const resetPassword = async (req: Request, res: Response): Promise<void> => {
+export const resetPassword = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { email, otp, newPassword } = req.body;
 
     if (!email || !otp || !newPassword) {
-      res.status(400).json({ message: "Email, OTP, and new password are required." });
+      res
+        .status(400)
+        .json({ message: "Email, OTP, and new password are required." });
       return;
     }
 
-    if (newPassword.length < 6) {
-      res.status(400).json({ message: "Password must be at least 6 characters." });
+    if (typeof newPassword !== "string" || !PASSWORD_REGEX.test(newPassword)) {
+      res.status(400).json({ message: PASSWORD_MESSAGE });
       return;
     }
 
@@ -405,7 +418,9 @@ export const resetPassword = async (req: Request, res: Response): Promise<void> 
     });
 
     if (!user) {
-      res.status(400).json({ message: "Invalid or expired session. Please request a new OTP." });
+      res.status(400).json({
+        message: "Invalid or expired session. Please request a new OTP.",
+      });
       return;
     }
 
@@ -418,8 +433,12 @@ export const resetPassword = async (req: Request, res: Response): Promise<void> 
     user.resetOtpExpiresAt = undefined;
     await user.save();
 
-    res.status(200).json({ message: "Password reset successful! You can now log in." });
+    res
+      .status(200)
+      .json({ message: "Password reset successful! You can now log in." });
   } catch (error: any) {
-    res.status(500).json({ message: error.message || "Failed to reset password." });
+    res
+      .status(500)
+      .json({ message: error.message || "Failed to reset password." });
   }
 };
