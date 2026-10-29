@@ -74,27 +74,27 @@ const FavoriteCard = ({
           />
         ) : (
           <View className="h-32 w-36 items-center justify-center rounded-l-2xl bg-blue-100">
-            <Text className="text-5xl font-bold text-blue-600">{initial}</Text>
+            <Text className="text-5xl font-bold text-black">{initial}</Text>
           </View>
         )}
 
         <View className="flex-1 justify-between px-3 py-1">
-          <Text numberOfLines={2} className="text-lg font-bold text-blue-600">
+          <Text numberOfLines={2} className="text-lg font-bold text-black">
             {item.name}
           </Text>
-          <Text numberOfLines={1} className="text-sm text-blue-600">
+          <Text numberOfLines={1} className="text-sm text-black">
             {item.cuisine || "Various Cuisines"}
           </Text>
           <View className="flex-row items-center">
             <Stars rating={rating} />
-            <Text className="ml-2 text-base font-semibold text-blue-700">
+            <Text className="ml-2 text-base font-semibold text-[#143d7b]">
               {rating.toFixed(1)}
             </Text>
-            <Text className="ml-1 text-base text-blue-700">
+            <Text className="ml-1 text-base text-[#143d7b]">
               ({item.reviewCount || 0})
             </Text>
           </View>
-          <Text numberOfLines={1} className="text-xs text-blue-600">
+          <Text numberOfLines={1} className="text-xs text-black">
             {item.location || "Lahore, Punjab"}
           </Text>
         </View>
@@ -105,7 +105,7 @@ const FavoriteCard = ({
           accessibilityRole="button"
           accessibilityLabel={`Remove ${item.name} from favourites`}
           className="h-8 w-8 items-center justify-center self-start">
-          <Ionicons name="heart" size={22} color="blue" />
+          <Ionicons name="heart" size={22} color="#143d7b" />
         </Pressable>
       </Pressable>
 
@@ -178,14 +178,14 @@ const Favorite = () => {
       <View className="mb-4 flex-row items-center justify-between mt-2 px-4">
         <Link href="/home" asChild>
           <Pressable className="h-10 w-10 justify-center">
-            <Ionicons name="arrow-back" size={26} color="blue" />
+            <Ionicons name="arrow-back" size={26} color="#143d7b" />
           </Pressable>
         </Link>
-        <Text className="text-2xl font-bold text-blue-700">Favourite</Text>
+        <Text className="text-2xl font-bold text-[#143d7b]">Favourite</Text>
         <NotificationBell
           color="white"
           size={22}
-          containerClassName="h-11 w-11 items-center justify-center rounded-full bg-blue-700"
+          containerClassName="h-11 w-11 items-center justify-center rounded-full bg-[#143d7b]"
         />
       </View>
 

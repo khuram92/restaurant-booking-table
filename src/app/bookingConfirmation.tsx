@@ -195,7 +195,7 @@ const BookingConfirmation = () => {
               </View>
             </View>
           </View>
-          <View className="h-px bg-blue-400 mb-2 mt-4" />
+          <View className="h-px bg-[#143d7b] mb-2 mt-4" />
           <View className="flex-row mt-4 items-center">
             <View className="h-10 w-10 items-center justify-center rounded-full bg-gray-300">
               <Ionicons name="calendar-outline" size={24} color="#143d7b" />
@@ -204,7 +204,7 @@ const BookingConfirmation = () => {
             <View className="px-2">
               <Text className="text-lg">Date</Text>
               <Text
-                className="text-lg font-bold text-blue-500"
+                className="text-lg font-bold text-[#143d7b]"
                 style={{ color: "#143d7b" }}>
                 {formattedDate}
               </Text>
@@ -218,7 +218,7 @@ const BookingConfirmation = () => {
             <View className="px-2">
               <Text className="text-lg">Time</Text>
               <Text
-                className="text-lg font-bold text-blue-500"
+                className="text-lg font-bold text-[#143d7b]"
                 style={{ color: "#143d7b" }}>
                 {time || "No time selected"}
               </Text>
@@ -232,7 +232,7 @@ const BookingConfirmation = () => {
             <View className="px-2">
               <Text className="text-lg">Seat</Text>
               <Text
-                className="text-lg font-bold  text-blue-500 "
+                className="text-lg font-bold  text-[#143d7b] "
                 style={{ color: "#143d7b" }}>
                 {guests || "No guest"}
                 &nbsp; - Person
@@ -251,7 +251,7 @@ const BookingConfirmation = () => {
             <View className="px-2">
               <Text className="text-lg">Floor</Text>
               <Text
-                className="text-lg font-bold text-blue-500"
+                className="text-lg font-bold text-[#143d7b]"
                 style={{ color: "#143d7b" }}>
                 {floor || "NOT Selected"}
               </Text>
@@ -266,7 +266,7 @@ const BookingConfirmation = () => {
             <View className="px-2">
               <Text className="text-lg">Type</Text>
               <Text
-                className="text-lg font-bold text-blue-500"
+                className="text-lg font-bold text-[#143d7b]"
                 style={{ color: "#143d7b" }}>
                 {seatingType || "NOT Selected"}
               </Text>

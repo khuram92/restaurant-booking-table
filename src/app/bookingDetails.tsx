@@ -272,7 +272,7 @@ const BookingDetails = () => {
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
-        <ActivityIndicator size="large" color="blue" />
+        <ActivityIndicator size="large" color="#143d7b" />
       </View>
     );
   }
