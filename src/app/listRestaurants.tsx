@@ -248,14 +248,14 @@ export default function ListRestaurants() {
         <View className="flex-row justify-between  mb-4">
           <Link href={"/home"} asChild>
             <Pressable className=" w-12 h-12 ">
-              <Ionicons name="arrow-back" size={24} color="#2563EB" />
+              <Ionicons name="arrow-back" size={24} color="#143d7b" />
             </Pressable>
           </Link>
-          <Text className="text-blue-600 font-bold text-3xl">Restaurants</Text>
+          <Text className="text-[#143d7b] font-bold text-3xl">Restaurants</Text>
           <NotificationBell
             color="white"
             size={22}
-            containerClassName="h-11 w-11 items-center justify-center rounded-full bg-blue-700"
+            containerClassName="h-11 w-11 items-center justify-center rounded-full bg-[#143d7b]"
           />
         </View>
 
@@ -314,7 +314,7 @@ export default function ListRestaurants() {
               }`}>
               <Text
                 className={`font-semibold ${
-                  activeTab === "Nearby" ? "text-white" : "text-blue-600"
+                  activeTab === "Nearby" ? "text-white" : "text-[#143d7b]"
                 }`}>
                 Nearby
               </Text>
