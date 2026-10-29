@@ -17,7 +17,7 @@ router.use(protect);
 
 router.get("/mine", getMyReviews);
 router.post("/", createReview);
-router.patch("/:id", updateReview);
+
 router.put("/:id/reply", authorize("restaurant", "admin"), replyToReview);
 router.delete("/:id", deleteReview);
 
