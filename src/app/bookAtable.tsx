@@ -211,7 +211,7 @@ export default function BookATable() {
               <Text className="font-semibold">
                 {restaurant?.rating ? restaurant.rating.toFixed(1) : "0.0"}
               </Text>
-              <Text className="text-gray-600">
+              <Text className="text-black">
                 ({restaurant?.reviewCount || 0} Reviews)
               </Text>
             </View>
@@ -219,9 +219,9 @@ export default function BookATable() {
             <View>
               <View className="flex-row items-center justify-center gap-1">
                 <Ionicons name="location-outline" size={18} color="blue" />
-                <Text className="text-gray-600">{restaurant?.city}</Text>
+                <Text className="text-black">{restaurant?.city}</Text>
               </View>
-              <Text className="mt-2 text-gray-600">
+              <Text className="mt-2 text-black">
                 {restaurant?.city}, {restaurant?.province}
               </Text>
             </View>
@@ -229,17 +229,17 @@ export default function BookATable() {
 
           {/* Quick Actions */}
           <View className="flex-row justify-between mt-6">
-            <Pressable className="flex-row border-2 border-blue-400 rounded-full items-center justify-center w-[100px] py-2 gap-2">
-              <Ionicons name="call" size={18} color="#2563EB" />
-              <Text className="text-blue-600 font-medium">Call</Text>
+            <Pressable className="flex-row border-2 border-[#143d7b] rounded-full items-center justify-center w-[100px] py-2 gap-2">
+              <Ionicons name="call" size={18} color="#143d7b" />
+              <Text className="text-[#143d7b] font-medium">Call</Text>
             </Pressable>
-            <Pressable className="flex-row border-2 border-blue-400 rounded-full items-center justify-center w-[100px] py-2 gap-2">
-              <Ionicons name="map" size={18} color="#2563EB" />
-              <Text className="text-blue-600 font-medium">Map</Text>
+            <Pressable className="flex-row border-2 border-[#143d7b] rounded-full items-center justify-center w-[100px] py-2 gap-2">
+              <Ionicons name="map" size={18} color="#143d7b" />
+              <Text className="text-[#143d7b] font-medium">Map</Text>
             </Pressable>
-            <Pressable className="flex-row border-2 border-blue-400 rounded-full items-center justify-center w-[100px] py-2 gap-2">
-              <Ionicons name="share-social" size={18} color="#2563EB" />
-              <Text className="text-blue-600 font-medium">Share</Text>
+            <Pressable className="flex-row border-2 border-[#143d7b] rounded-full items-center justify-center w-[100px] py-2 gap-2">
+              <Ionicons name="share-social" size={18} color="#143d7b" />
+              <Text className="text-[#143d7b] font-medium">Share</Text>
             </Pressable>
           </View>
 
@@ -253,8 +253,8 @@ export default function BookATable() {
                 <Text
                   className={
                     activeTab === tab
-                      ? "text-blue-700 font-semibold border-b-2 border-blue-700 pb-2"
-                      : "text-gray-500 font-medium"
+                      ? "text-blue-700 font-semibold border-b-2 border-[#143d7b] pb-2"
+                      : "text-black font-medium"
                   }>
                   {tab}
                 </Text>
@@ -277,12 +277,12 @@ export default function BookATable() {
               )}
 
               {/* About Us */}
-              <Text className="text-xl font-bold text-blue-700 mt-6">
+              <Text className="text-xl font-bold text-black mt-6">
                 About Us
               </Text>
               <View>
                 <Text
-                  className="text-gray-600 mt-2 leading-5"
+                  className="text-black mt-2 leading-5"
                   numberOfLines={isAboutExpanded ? undefined : 3}>
                   {restaurant?.description ||
                     "No description provided for this restaurant."}
@@ -297,7 +297,7 @@ export default function BookATable() {
               </View>
 
               {/* Timings */}
-              <Text className="text-xl font-bold text-blue-700 mt-6">
+              <Text className="text-xl font-bold text-black mt-6">
                 Timings
               </Text>
               <View className="flex-row items-center gap-3 mt-3 mb-6">
@@ -316,7 +316,7 @@ export default function BookATable() {
               </View>
 
               {/* Available Seating Types */}
-              <Text className="text-xl font-bold text-blue-700 mt-6">
+              <Text className="text-xl font-bold text-black mt-6">
                 Available Seating
               </Text>
               <View className="flex-row flex-wrap gap-2 mt-3 mb-6">
@@ -337,7 +337,7 @@ export default function BookATable() {
               </View>
 
               {/* Floor Numbers */}
-              <Text className="text-xl font-bold text-blue-700 mt-6">
+              <Text className="text-xl font-bold text-black mt-6">
                 Floors
               </Text>
               <View className="flex-row flex-wrap gap-2 mt-3 mb-6">
@@ -356,7 +356,7 @@ export default function BookATable() {
               </View>
 
               {/* Address / Contact */}
-              <Text className="text-xl font-bold text-blue-700 mt-6">
+              <Text className="text-xl font-bold text-black mt-6">
                 Contact & Address:
               </Text>
               <View className="flex-row items-center gap-3 mt-3 mb-6">
@@ -370,7 +370,7 @@ export default function BookATable() {
             </>
           ) : activeTab === "Menu" ? (
             <View className="flex items-center mt-6">
-              <Text className="text-gray-600 font-semibold">
+              <Text className="text-black font-semibold">
                 No Menu Available
               </Text>
             </View>
@@ -431,7 +431,7 @@ export default function BookATable() {
 
                     {/* Review Comment Text (the comment is optional) */}
                     {!!rev.comment && (
-                      <Text className="mt-3 text-sm leading-relaxed text-gray-600 font-normal">
+                      <Text className="mt-3 text-sm leading-relaxed text-black font-normal">
                         "{rev.comment}"
                       </Text>
                     )}
@@ -449,7 +449,7 @@ export default function BookATable() {
                             Response from the restaurant
                           </Text>
                         </View>
-                        <Text className="mt-1 text-sm text-gray-600">
+                        <Text className="mt-1 text-sm text-black">
                           {rev.reply.text}
                         </Text>
                       </View>
