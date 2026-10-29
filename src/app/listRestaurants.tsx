@@ -276,7 +276,7 @@ export default function ListRestaurants() {
 
         {/* Dynamic Cuisine Filter Pills */}
         <View
-          className="mb-2 pb-2 rounded-2xl bg-white"
+          className="mb-2 mt-2 pb-2 rounded-2xl bg-white"
           style={{ boxShadow: "0px 6px 6px -2px rgba(0,0,0,0.25)" }}>
           <ScrollView
             horizontal

@@ -257,14 +257,8 @@ const ListBookings = () => {
 
         {/* Status filter */}
         <View
-          className="mt-2  bg-white"
-          style={{
-            shadowColor: "black",
-            shadowOffset: { width: 0, height: 8 },
-            shadowOpacity: 1,
-            shadowRadius: 4,
-            elevation: 6,
-          }}>
+          className="mb-2 mt-2 rounded-2xl bg-white"
+          style={{ boxShadow: "0px 6px 6px -2px rgba(0,0,0,0.25)" }}>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -279,7 +273,7 @@ const ListBookings = () => {
                   onPress={() => setFilter(key)}
                   accessibilityRole="button"
                   accessibilityState={{ selected: active }}
-                  className={`mb-2 mr-2 h-8 flex-row justify-between rounded-full border p-1 ${
+                  className={` mr-2 flex-row justify-between rounded-full border p-2 ${
                     active
                       ? "border-blue-700 bg-blue-700"
                       : "border-gray-300 bg-white"
