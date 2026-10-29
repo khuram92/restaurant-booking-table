@@ -176,6 +176,7 @@ export const updateAccount = async (req: AuthRequest, res: Response) => {
       phone,
       address,
       dob,
+      foodInterests,
       currentPassword,
       newPassword,
       avatar,
