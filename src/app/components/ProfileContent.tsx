@@ -15,6 +15,7 @@ import {
 import { ActivityIndicator, Button, TextInput } from "react-native-paper";
 import { deleteMe, getMe, updateMe } from "../../api/authApi";
 import AvatarPicker from "./AvatarPicker";
+import { getAllRestaurants } from "../../api/restaurantApi";
 
 type Profile = {
   firstName?: string;
@@ -23,6 +24,7 @@ type Profile = {
   phone?: string;
   email?: string;
   avatar?: string;
+  foodInterests?: string[];
 };
 
 type Props = {
@@ -33,6 +35,25 @@ const clearSession = async () => {
   await SecureStore.deleteItemAsync("authToken");
   await SecureStore.deleteItemAsync("userRole");
   await SecureStore.deleteItemAsync("rememberMePreference");
+};
+const MAX_INTERESTS = 10;
+
+// Every distinct cuisine across the restaurants, e.g. "Korean, Japanese" gives two
+const cuisinesFrom = (restaurants: { cuisines?: unknown }[]): string[] => {
+  const seen = new Map<string, string>(); // lowercase -> name as written
+
+  restaurants.forEach((r) =>
+    String(r.cuisines ?? "")
+      .split(/[,|]/)
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .forEach((name) => {
+        const key = name.toLowerCase();
+        if (!seen.has(key)) seen.set(key, name);
+      }),
+  );
+
+  return [...seen.values()].sort((a, b) => a.localeCompare(b));
 };
 
 const ProfileContent = ({ showFoodInterest = true }: Props) => {
@@ -49,6 +70,12 @@ const ProfileContent = ({ showFoodInterest = true }: Props) => {
   const [newPassword, setNewPassword] = useState("");
   const [saving, setSaving] = useState(false);
   const [address, setAddress] = useState("");
+  const [showInterestModal, setShowInterestModal] = useState(false);
+  const [allCuisines, setAllCuisines] = useState<string[]>([]);
+  const [cuisinesLoading, setCuisinesLoading] = useState(false);
+  const [cuisinesError, setCuisinesError] = useState("");
+  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+  const [savingInterests, setSavingInterests] = useState(false);
 
   const openUpdateModal = () => {
     setFirstName(profile?.firstName ?? "");
@@ -140,6 +167,7 @@ const ProfileContent = ({ showFoodInterest = true }: Props) => {
         phone: u?.phone,
         email: u?.email,
         avatar: u?.avatar,
+        foodInterests: Array.isArray(u?.foodInterests) ? u.foodInterests : [],
       });
     } catch (e) {
       console.log("Error loading profile:", e);
@@ -151,7 +179,78 @@ const ProfileContent = ({ showFoodInterest = true }: Props) => {
       void loadProfile();
     }, [loadProfile]),
   );
+  const loadCuisines = useCallback(async () => {
+    try {
+      setCuisinesLoading(true);
+      setCuisinesError("");
+      setAllCuisines(cuisinesFrom(await getAllRestaurants()));
+    } catch (e) {
+      setCuisinesError(
+        e instanceof Error ? e.message : "Could not load cuisines.",
+      );
+    } finally {
+      setCuisinesLoading(false);
+    }
+  }, []);
 
+  const openInterestModal = () => {
+    setSelectedInterests(profile?.foodInterests ?? []);
+    setShowInterestModal(true);
+    void loadCuisines();
+  };
+
+  const isSelected = (name: string) =>
+    selectedInterests.some((c) => c.toLowerCase() === name.toLowerCase());
+
+  const toggleInterest = (name: string) => {
+    if (isSelected(name)) {
+      setSelectedInterests((cur) =>
+        cur.filter((c) => c.toLowerCase() !== name.toLowerCase()),
+      );
+      return;
+    }
+    if (selectedInterests.length >= MAX_INTERESTS) {
+      Alert.alert(
+        "Limit reached",
+        `You can pick up to ${MAX_INTERESTS} cuisines.`,
+      );
+      return;
+    }
+    setSelectedInterests((cur) => [...cur, name]);
+  };
+
+  const handleSaveInterests = async () => {
+    try {
+      setSavingInterests(true);
+
+      const token = await SecureStore.getItemAsync("authToken");
+      if (!token) {
+        router.replace("/");
+        return;
+      }
+
+      await updateMe(token, { foodInterests: selectedInterests });
+      await loadProfile();
+      setShowInterestModal(false);
+    } catch (error) {
+      Alert.alert(
+        "Could not save",
+        error instanceof Error ? error.message : "Something went wrong.",
+      );
+    } finally {
+      setSavingInterests(false);
+    }
+  };
+
+  // Cuisines from the restaurants, plus any already picked (so none are lost)
+  const interestOptions = (() => {
+    const map = new Map<string, string>();
+    [...allCuisines, ...selectedInterests].forEach((n) => {
+      const key = n.toLowerCase();
+      if (!map.has(key)) map.set(key, n);
+    });
+    return [...map.values()].sort((a, b) => a.localeCompare(b));
+  })();
   const handleLogout = async () => {
     try {
       await clearSession();
@@ -261,11 +360,157 @@ const ProfileContent = ({ showFoodInterest = true }: Props) => {
         </View>
 
         {showFoodInterest && (
-          <View className="flex  mt-4 bg-gray-100 rounded-2xl px-4 py-4">
-            <Text className="text-black font-bold text-xl ">
-              Food Interest
-            </Text>
-          </View>
+          <>
+            <View className="flex mt-4 bg-gray-100 rounded-2xl px-4 py-4">
+              <View className="flex-row items-center justify-between">
+                <Text className="text-black font-bold text-xl ">
+                  Food Interest
+                </Text>
+                <Pressable
+                  onPress={openInterestModal}
+                  hitSlop={8}
+                  accessibilityRole="button"
+                  accessibilityLabel="Edit food interests"
+                  className="flex-row items-center rounded-full bg-blue-100 px-3 py-1.5">
+                  <Ionicons name="create-outline" size={16} color="#2563EB" />
+                  <Text className="ml-1 text-sm font-semibold text-blue-700">
+                    Edit
+                  </Text>
+                </Pressable>
+              </View>
+
+              {profile?.foodInterests?.length ? (
+                <View className="mt-3 flex-row flex-wrap">
+                  {profile.foodInterests.map((name) => (
+                    <View
+                      key={name}
+                      className="mb-2 mr-2 rounded-full bg-blue-600 px-4 py-2">
+                      <Text className="text-sm font-semibold text-white">
+                        {name}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              ) : (
+                <Text className="mt-2 text-sm text-gray-500">
+                  Tell us the cuisines you love. Tap Edit to choose.
+                </Text>
+              )}
+            </View>
+
+            <Modal
+              visible={showInterestModal}
+              transparent
+              animationType="fade"
+              onRequestClose={() => {
+                if (!savingInterests) setShowInterestModal(false);
+              }}>
+              <View className="flex-1 items-center justify-center bg-black/60 px-5">
+                <View
+                  className="w-full rounded-3xl bg-white p-6"
+                  style={{ elevation: 6 }}>
+                  <View className="mb-4 flex-row items-center justify-between border-b border-gray-100 pb-3">
+                    <View>
+                      <Text className="text-xl font-extrabold text-blue-900">
+                        Food interests
+                      </Text>
+                      <Text className="mt-0.5 text-xs text-gray-400">
+                        Pick up to {MAX_INTERESTS} cuisines (
+                        {selectedInterests.length} selected)
+                      </Text>
+                    </View>
+                    <Pressable
+                      onPress={() => setShowInterestModal(false)}
+                      disabled={savingInterests}
+                      hitSlop={8}
+                      className="h-8 w-8 items-center justify-center rounded-full bg-gray-100 active:bg-gray-200">
+                      <Ionicons name="close" size={18} color="#4B5563" />
+                    </Pressable>
+                  </View>
+
+                  {cuisinesLoading && interestOptions.length === 0 ? (
+                    <View className="items-center py-10">
+                      <ActivityIndicator size="large" color="#2563EB" />
+                    </View>
+                  ) : cuisinesError && interestOptions.length === 0 ? (
+                    <View className="items-center py-8">
+                      <Text className="text-center text-gray-600">
+                        {cuisinesError}
+                      </Text>
+                      <Pressable
+                        onPress={() => void loadCuisines()}
+                        className="mt-3 rounded-full bg-blue-600 px-6 py-2">
+                        <Text className="font-semibold text-white">Retry</Text>
+                      </Pressable>
+                    </View>
+                  ) : interestOptions.length === 0 ? (
+                    <Text className="py-8 text-center text-gray-500">
+                      No cuisines available yet.
+                    </Text>
+                  ) : (
+                    <ScrollView
+                      style={{ maxHeight: 320 }}
+                      showsVerticalScrollIndicator={false}>
+                      <View className="flex-row flex-wrap">
+                        {interestOptions.map((name) => {
+                          const selected = isSelected(name);
+                          return (
+                            <Pressable
+                              key={name}
+                              onPress={() => toggleInterest(name)}
+                              accessibilityRole="button"
+                              accessibilityState={{ selected }}
+                              className={`mb-2 mr-2 flex-row items-center rounded-full border px-4 py-2 ${
+                                selected
+                                  ? "border-blue-600 bg-blue-600"
+                                  : "border-gray-300 bg-white"
+                              }`}>
+                              {selected && (
+                                <Ionicons
+                                  name="checkmark"
+                                  size={14}
+                                  color="white"
+                                />
+                              )}
+                              <Text
+                                className={`${selected ? "ml-1 " : ""}text-sm font-semibold ${
+                                  selected ? "text-white" : "text-gray-700"
+                                }`}>
+                                {name}
+                              </Text>
+                            </Pressable>
+                          );
+                        })}
+                      </View>
+                    </ScrollView>
+                  )}
+
+                  <View className="mt-5 flex-row gap-3">
+                    <Pressable
+                      onPress={() => setShowInterestModal(false)}
+                      disabled={savingInterests}
+                      className="flex-1 items-center justify-center rounded-2xl bg-gray-100 py-4 active:bg-gray-200">
+                      <Text className="font-semibold text-gray-700">
+                        Cancel
+                      </Text>
+                    </Pressable>
+                    <Pressable
+                      onPress={handleSaveInterests}
+                      disabled={savingInterests}
+                      className={`flex-1 items-center justify-center rounded-2xl py-4 active:opacity-90 ${
+                        savingInterests ? "bg-blue-400" : "bg-blue-600"
+                      }`}>
+                      {savingInterests ? (
+                        <ActivityIndicator size="small" color="white" />
+                      ) : (
+                        <Text className="font-semibold text-white">Save</Text>
+                      )}
+                    </Pressable>
+                  </View>
+                </View>
+              </View>
+            </Modal>
+          </>
         )}
 
         <View className="mt-4 border-1 bg-blue-400 border border-blue-500 rounded-full justify-center flex ">
