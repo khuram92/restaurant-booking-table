@@ -198,7 +198,7 @@ const ProfileContent = ({ showFoodInterest = true }: Props) => {
   return (
     <View className="flex-1 pt-16 justify-between bg-white ">
       <ScrollView className="px-4  mb-2">
-        <View className="flex items-center mt-6 bg-white border border-gray-300 rounded-2xl">
+        <View className="flex items-center mt-6 bg-white border-dashed border-gray-600 border rounded-2xl">
           <View className="flex mt-14">
             <AvatarPicker
               uri={profile?.avatar}
