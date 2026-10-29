@@ -156,7 +156,7 @@ export default function BookATable() {
   return (
     <View className="flex-1 bg-white pt-16">
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-        <View className="w-full h-72 justify-between bg-blue-600">
+        <View className="w-full h-72 justify-between bg-[#143d7b]">
           {showCover ? (
             <Image
               source={{ uri: coverUri! }}
@@ -253,7 +253,7 @@ export default function BookATable() {
                 <Text
                   className={
                     activeTab === tab
-                      ? "text-blue-700 font-semibold border-b-2 border-[#143d7b] pb-2"
+                      ? "text-[#143d7b] font-semibold border-b-2 border-[#143d7b] pb-2"
                       : "text-black font-medium"
                   }>
                   {tab}
@@ -290,7 +290,7 @@ export default function BookATable() {
                 <Pressable
                   onPress={() => setIsAboutExpanded((expanded) => !expanded)}
                   className="self-start mt-1">
-                  <Text className="text-blue-700 font-medium">
+                  <Text className="text-[#143d7b] font-medium">
                     {isAboutExpanded ? "Read less" : "Read more"}
                   </Text>
                 </Pressable>
@@ -302,13 +302,13 @@ export default function BookATable() {
               </Text>
               <View className="flex-row items-center gap-3 mt-3 mb-6">
                 <View className="flex-row items-center gap-1 bg-gray-100 rounded-full px-3 py-2">
-                  <Ionicons name="time-outline" size={16} color="blue" />
+                  <Ionicons name="time-outline" size={16} color="#143d7b" />
                   <Text className="text-gray-900 text-sm">
                     Open: {restaurant?.openingTime || "9:00 AM"}
                   </Text>
                 </View>
                 <View className="flex-row items-center gap-1 bg-gray-100 rounded-full px-3 py-2">
-                  <Ionicons name="time-outline" size={16} color="blue" />
+                  <Ionicons name="time-outline" size={16} color="#143d7b" />
                   <Text className="text-gray-900 text-sm">
                     Close: {restaurant?.closingTime || "11:45 PM"}
                   </Text>
@@ -328,7 +328,7 @@ export default function BookATable() {
                       <MaterialCommunityIcons
                         name="home-outline"
                         size={16}
-                        color="blue"
+                        color="#143d7b"
                       />
                       <Text className="text-gray-900 text-sm">{type}</Text>
                     </View>
@@ -348,7 +348,7 @@ export default function BookATable() {
                     <MaterialCommunityIcons
                       name="floor-plan"
                       size={16}
-                      color="blue"
+                      color="#143d7b"
                     />
                     <Text className="text-gray-900 text-sm">{floor}</Text>
                   </View>
@@ -361,7 +361,7 @@ export default function BookATable() {
               </Text>
               <View className="flex-row items-center gap-3 mt-3 mb-6">
                 <View className="flex-row items-center gap-1 bg-gray-100 rounded-full px-3 py-2">
-                  <MaterialCommunityIcons name="pin" size={16} color="blue" />
+                  <MaterialCommunityIcons name="pin" size={16} color="#143d7b" />
                   <Text className="text-gray-900 text-sm">
                     {restaurant?.address || "Address not provided"}
                   </Text>
@@ -399,11 +399,11 @@ export default function BookATable() {
                         {avatar ? (
                           <Image
                             source={{ uri: avatar }}
-                            className="h-10 w-10 rounded-full border border-blue-200"
+                            className="h-10 w-10 rounded-full border border-[#143d7b]"
                           />
                         ) : (
-                          <View className="h-10 w-10 items-center justify-center rounded-full bg-blue-100 border border-blue-200">
-                            <Text className="text-xs font-bold text-blue-700">
+                          <View className="h-10 w-10 items-center justify-center rounded-full bg-blue-100 border border-[#143d7b]">
+                            <Text className="text-xs font-bold text-[#143d7b]">
                               {initialsOf(customerName)}
                             </Text>
                           </View>
@@ -438,14 +438,14 @@ export default function BookATable() {
 
                     {/* The restaurant's reply, if it has answered */}
                     {rev.reply && (
-                      <View className="mt-3 rounded-xl border border-blue-100 bg-white p-3">
+                      <View className="mt-3 rounded-xl border border-[#143d7b] bg-white p-3">
                         <View className="flex-row items-center">
                           <Ionicons
                             name="return-down-forward"
                             size={14}
                             color="#2563EB"
                           />
-                          <Text className="ml-1 text-xs font-bold text-blue-700">
+                          <Text className="ml-1 text-xs font-bold text-[#143d7b]">
                             Response from the restaurant
                           </Text>
                         </View>
