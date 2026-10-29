@@ -113,9 +113,7 @@ const RestaurantCard = ({
           <Text className="text-sm font-semibold text-blue-800">
             {(item.rating || 0).toFixed(1)}
           </Text>
-          <Text className="text-sm text-black">
-            ({item.reviewCount || 0})
-          </Text>
+          <Text className="text-sm text-black">({item.reviewCount || 0})</Text>
         </View>
 
         <Text numberOfLines={1} className="text-xs text-black">
@@ -277,7 +275,9 @@ export default function ListRestaurants() {
         </View>
 
         {/* Dynamic Cuisine Filter Pills */}
-        <View className="mb-3">
+        <View
+          className="mb-2 pb-2 rounded-2xl bg-white"
+          style={{ boxShadow: "0px 6px 6px -2px rgba(0,0,0,0.25)" }}>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -294,7 +294,7 @@ export default function ListRestaurants() {
                       : "bg-white border-blue-300"
                   }`}>
                   <Text
-                    className={`font-semibold ${
+                    className={`font-base ${
                       isSelected ? "text-blue-800" : "text-black"
                     }`}>
                     {cuisine}
