@@ -36,7 +36,7 @@ const clearSession = async () => {
   await SecureStore.deleteItemAsync("userRole");
   await SecureStore.deleteItemAsync("rememberMePreference");
 };
-const MAX_INTERESTS = 10;
+const MAX_INTERESTS = 20;
 
 // Every distinct cuisine across the restaurants, e.g. "Korean, Japanese" gives two
 const cuisinesFrom = (restaurants: { cuisines?: unknown }[]): string[] => {
