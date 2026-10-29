@@ -39,7 +39,7 @@ const Stars = ({ rating }: { rating: number }) => (
         key={star}
         name="star"
         size={14}
-        color={star <= Math.round(rating) ? "blue" : "#e5e7eb"}
+        color={star <= Math.round(rating) ? "#143d7b" : "#e5e7eb"}
         style={{ marginRight: 2 }}
       />
     ))}
@@ -81,7 +81,7 @@ const RestaurantCard = ({
           </Text>
         )}
 
-        <View className="absolute bottom-2 right-2 rounded-lg bg-blue-500 px-2 py-0.5">
+        <View className="absolute bottom-2 right-2 rounded-lg bg-[#143d7b] px-2 py-0.5">
           <Text className="text-xs font-bold text-white">
             {item.distance || "Unknown"}
           </Text>
@@ -99,7 +99,7 @@ const RestaurantCard = ({
             <Ionicons
               name={isFavorite ? "heart" : "heart-outline"}
               size={24}
-              color={isFavorite ? "blue" : "#9ca3af"}
+              color={isFavorite ? "#143d7b" : "#9ca3af"}
             />
           </Pressable>
         </View>
@@ -110,7 +110,7 @@ const RestaurantCard = ({
 
         <View className="flex-row items-center gap-1">
           <Stars rating={item.rating || 0} />
-          <Text className="text-sm font-semibold text-blue-800">
+          <Text className="text-sm font-semibold text-[#143d7b]">
             {(item.rating || 0).toFixed(1)}
           </Text>
           <Text className="text-sm text-black">({item.reviewCount || 0})</Text>
@@ -237,7 +237,7 @@ export default function ListRestaurants() {
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
-        <ActivityIndicator size="large" color="blue" />
+        <ActivityIndicator size="large" color="#143d7b" />
       </View>
     );
   }
@@ -290,12 +290,12 @@ export default function ListRestaurants() {
                   onPress={() => setSelectedCuisine(cuisine)}
                   className={`px-5 py-2 rounded-full border ${
                     isSelected
-                      ? "bg-blue-100 border-blue-600"
+                      ? "bg-blue-100 border-[#143d7b]"
                       : "bg-white border-blue-300"
                   }`}>
                   <Text
                     className={`font-base ${
-                      isSelected ? "text-blue-800" : "text-black"
+                      isSelected ? "text-[#143d7b]" : "text-black"
                     }`}>
                     {cuisine}
                   </Text>
@@ -310,7 +310,7 @@ export default function ListRestaurants() {
             <Pressable
               onPress={() => setActiveTab("Nearby")}
               className={`px-5 py-2 rounded-full ${
-                activeTab === "Nearby" ? "bg-blue-700" : "bg-transparent"
+                activeTab === "Nearby" ? "bg-[#143d7b]" : "bg-transparent"
               }`}>
               <Text
                 className={`font-semibold ${
@@ -322,7 +322,7 @@ export default function ListRestaurants() {
             <Pressable
               onPress={() => setActiveTab("All")}
               className={`px-5 py-2 rounded-full ${
-                activeTab === "All" ? "bg-blue-700" : "bg-transparent"
+                activeTab === "All" ? "bg-[#143d7b]" : "bg-transparent"
               }`}>
               <Text
                 className={`font-semibold ${
@@ -333,9 +333,9 @@ export default function ListRestaurants() {
             </Pressable>
           </View>
 
-          <Pressable className="flex-row items-center gap-1 px-4 py-2 rounded-full border border-blue-200 bg-blue-50">
-            <Ionicons name="settings-outline" size={18} color="blue" />
-            <Text className="font-semibold text-blue-800">Filters</Text>
+          <Pressable className="flex-row items-center gap-1 px-4 py-2 rounded-full border border-[#143d7b] bg-blue-50">
+            <Ionicons name="settings-outline" size={18} color="#143d7b" />
+            <Text className="font-semibold text-[#143d7b]">Filters</Text>
           </Pressable>
         </View>
 
@@ -355,7 +355,7 @@ export default function ListRestaurants() {
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             <View className="items-center pt-24">
-              <Ionicons name="restaurant-outline" size={56} color="blue" />
+              <Ionicons name="restaurant-outline" size={56} color="#143d7b" />
               <Text className="mt-4 text-lg font-bold text-gray-900">
                 No Restaurants Found
               </Text>

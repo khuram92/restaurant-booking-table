@@ -46,7 +46,7 @@ export default function NavigationBar({
     <View className="flex-row bg-blue-400 shadow-md">
       {tabs.map((item, index) => {
         const isActive = index === value;
-        const color = isActive ? "blue" : "#FFFFFF";
+        const color = isActive ? "#143d7b" : "#FFFFFF";
 
         return (
           <Pressable
@@ -62,7 +62,7 @@ export default function NavigationBar({
             accessibilityState={{ selected: isActive }}
             className="flex-1 items-center justify-center pt-2 pb-10">
             {isActive && (
-              <View className="absolute top-0 h-1 w-3/5 rounded-b bg-blue-800" />
+              <View className="absolute top-0 h-1 w-3/5 rounded-b bg-[#143d7b]" />
             )}
             <MaterialCommunityIcons name={item.icon} size={30} color={color} />
             <Text
