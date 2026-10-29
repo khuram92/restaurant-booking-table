@@ -24,6 +24,7 @@ const STATUS_STYLES: Record<string, { label: string; className: string }> = {
   confirmed: { label: "Confirmed", className: "bg-green-100 text-green-700" },
   rejected: { label: "Rejected", className: "bg-red-100 text-red-700" },
   cancelled: { label: "Cancelled", className: "bg-gray-200 text-gray-600" },
+  completed: { label: "Completed", className: "bg-blue-100 text-blue-700" },
 };
 
 const getCustomerName = (customer: Booking["customer"]): string => {
