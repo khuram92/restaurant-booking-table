@@ -104,7 +104,7 @@ export type RestaurantQuery = {
   city?: string;
   search?: string;
   page?: number;
-  limit?: number; // server maximum is 100
+  limit?: number; 
 };
 
 export type RestaurantPage = {

@@ -1,20 +1,20 @@
-import {
-  View,
-  Text,
-  Pressable,
-  ScrollView,
-  FlatList,
-  Image,
-  ActivityIndicator,
-  Alert,
-  RefreshControl,
-} from "react-native";
-import React, { useState, useEffect } from "react";
+import { getAllRestaurants } from "@/api/restaurantApi";
 import { Ionicons } from "@expo/vector-icons";
 import { Link, router } from "expo-router";
-import { Searchbar } from "react-native-paper";
 import * as SecureStore from "expo-secure-store";
-import { getAllRestaurants } from "@/api/restaurantApi";
+import { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Image,
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
+import { Searchbar } from "react-native-paper";
 import { getFavorites, toggleFavorite } from "../api/favoritesApi";
 import { resolveImageUrl } from "../api/restaurantApi";
 import NavigationBar from "./components/navigationBar";
@@ -246,129 +246,127 @@ export default function ListRestaurants() {
 
   return (
     <View className="flex-1 bg-white">
+      <View className="flex-1  px-2 pt-16">
+        <View className="flex-row justify-between  mb-4">
+          <Link href={"/home"} asChild>
+            <Pressable className=" w-12 h-12 ">
+              <Ionicons name="arrow-back" size={24} color="#2563EB" />
+            </Pressable>
+          </Link>
+          <Text className="text-blue-600 font-bold text-3xl">Restaurants</Text>
+          <NotificationBell
+            color="white"
+            size={22}
+            containerClassName="h-11 w-11 items-center justify-center rounded-full bg-blue-700"
+          />
+        </View>
 
-    
-    <View className="flex-1  px-2 pt-16">
-      <View className="flex-row justify-between  mb-4">
-        <Link href={"/home"} asChild>
-          <Pressable className=" w-12 h-12 ">
-            <Ionicons name="arrow-back" size={24} color="#2563EB" />
-          </Pressable>
-        </Link>
-        <Text className="text-blue-600 font-bold text-3xl">Restaurants</Text>
-        <NotificationBell
-  color="white"
-  size={22}
-  containerClassName="h-11 w-11 items-center justify-center rounded-full bg-blue-700"
-/>
-      </View>
+        <View className="mb-3">
+          <Searchbar
+            value={search}
+            onChangeText={setSearch}
+            placeholder="Search Restaurants..."
+            style={{
+              backgroundColor: "#f9fafb",
+              borderRadius: 24,
+              borderWidth: 1,
+              borderColor: "#e5e7eb",
+            }}
+            elevation={0}
+          />
+        </View>
 
-      <View className="mb-3">
-        <Searchbar
-          value={search}
-          onChangeText={setSearch}
-          placeholder="Search Restaurants..."
-          style={{
-            backgroundColor: "#f9fafb",
-            borderRadius: 24,
-            borderWidth: 1,
-            borderColor: "#e5e7eb",
-          }}
-          elevation={0}
-        />
-      </View>
-
-      {/* Dynamic Cuisine Filter Pills */}
-      <View className="mb-3">
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ gap: 8 }}>
-          {cuisines.map((cuisine) => {
-            const isSelected = selectedCuisine === cuisine;
-            return (
-              <Pressable
-                key={cuisine}
-                onPress={() => setSelectedCuisine(cuisine)}
-                className={`px-5 py-2 rounded-full border ${
-                  isSelected
-                    ? "bg-blue-100 border-blue-600"
-                    : "bg-white border-blue-300"
-                }`}>
-                <Text
-                  className={`font-semibold ${
-                    isSelected ? "text-blue-800" : "text-blue-600"
+        {/* Dynamic Cuisine Filter Pills */}
+        <View className="mb-3">
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ gap: 8 }}>
+            {cuisines.map((cuisine) => {
+              const isSelected = selectedCuisine === cuisine;
+              return (
+                <Pressable
+                  key={cuisine}
+                  onPress={() => setSelectedCuisine(cuisine)}
+                  className={`px-5 py-2 rounded-full border ${
+                    isSelected
+                      ? "bg-blue-100 border-blue-600"
+                      : "bg-white border-blue-300"
                   }`}>
-                  {cuisine}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </ScrollView>
-      </View>
+                  <Text
+                    className={`font-semibold ${
+                      isSelected ? "text-blue-800" : "text-blue-600"
+                    }`}>
+                    {cuisine}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
+        </View>
 
-      <View className="flex-row items-center justify-between mb-4">
-        <View className="flex-row rounded-full bg-gray-100 p-1 mt-2">
-          <Pressable
-            onPress={() => setActiveTab("Nearby")}
-            className={`px-5 py-2 rounded-full ${
-              activeTab === "Nearby" ? "bg-blue-700" : "bg-transparent"
-            }`}>
-            <Text
-              className={`font-semibold ${
-                activeTab === "Nearby" ? "text-white" : "text-blue-600"
+        <View className="flex-row items-center justify-between mb-4">
+          <View className="flex-row rounded-full bg-gray-100 p-1 mt-2">
+            <Pressable
+              onPress={() => setActiveTab("Nearby")}
+              className={`px-5 py-2 rounded-full ${
+                activeTab === "Nearby" ? "bg-blue-700" : "bg-transparent"
               }`}>
-              Nearby
-            </Text>
-          </Pressable>
-          <Pressable
-            onPress={() => setActiveTab("All")}
-            className={`px-5 py-2 rounded-full ${
-              activeTab === "All" ? "bg-blue-700" : "bg-transparent"
-            }`}>
-            <Text
-              className={`font-semibold ${
-                activeTab === "All" ? "text-white" : "text-blue-600"
+              <Text
+                className={`font-semibold ${
+                  activeTab === "Nearby" ? "text-white" : "text-blue-600"
+                }`}>
+                Nearby
+              </Text>
+            </Pressable>
+            <Pressable
+              onPress={() => setActiveTab("All")}
+              className={`px-5 py-2 rounded-full ${
+                activeTab === "All" ? "bg-blue-700" : "bg-transparent"
               }`}>
-              All
-            </Text>
+              <Text
+                className={`font-semibold ${
+                  activeTab === "All" ? "text-white" : "text-blue-600"
+                }`}>
+                All
+              </Text>
+            </Pressable>
+          </View>
+
+          <Pressable className="flex-row items-center gap-1 px-4 py-2 rounded-full border border-blue-200 bg-blue-50">
+            <Ionicons name="settings-outline" size={18} color="blue" />
+            <Text className="font-semibold text-blue-800">Filters</Text>
           </Pressable>
         </View>
 
-        <Pressable className="flex-row items-center gap-1 px-4 py-2 rounded-full border border-blue-200 bg-blue-50">
-          <Ionicons name="settings-outline" size={18} color="blue" />
-          <Text className="font-semibold text-blue-800">Filters</Text>
-        </Pressable>
+        <FlatList
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          data={filteredRestaurants}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item }) => (
+            <RestaurantCard
+              item={item}
+              isFavorite={favoriteIds.includes(item._id)}
+              onToggleFavorite={handleToggleFavorite}
+            />
+          )}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            <View className="items-center pt-24">
+              <Ionicons name="restaurant-outline" size={56} color="blue" />
+              <Text className="mt-4 text-lg font-bold text-gray-900">
+                No Restaurants Found
+              </Text>
+              <Text className="mt-1 text-center text-sm text-gray-400">
+                Try searching for a different name or category.
+              </Text>
+            </View>
+          }
+        />
       </View>
-
-      <FlatList
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        data={filteredRestaurants}
-        keyExtractor={(item) => item._id}
-        renderItem={({ item }) => (
-          <RestaurantCard
-            item={item}
-            isFavorite={favoriteIds.includes(item._id)}
-            onToggleFavorite={handleToggleFavorite}
-          />
-        )}
-        showsVerticalScrollIndicator={false}
-        ListEmptyComponent={
-          <View className="items-center pt-24">
-            <Ionicons name="restaurant-outline" size={56} color="blue" />
-            <Text className="mt-4 text-lg font-bold text-gray-900">
-              No Restaurants Found
-            </Text>
-            <Text className="mt-1 text-center text-sm text-gray-400">
-              Try searching for a different name or category.
-            </Text>
-          </View>
-        }
-      />
-      </View>
-      <NavigationBar/>
+      <NavigationBar />
     </View>
   );
 }

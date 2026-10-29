@@ -15,6 +15,7 @@ export interface IUser extends Document {
   address: string;
   role: UserRole;
   avatar: string;
+  foodInterests: string[];
   resetOtp?: string;
   resetOtpExpiresAt?: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
@@ -39,6 +40,7 @@ const userSchema = new Schema<IUser>(
       lowercase: true,
       trim: true,
     },
+    foodInterests: { type: [String], default: [] },
     dob: {
       type: Date,
       required: true,
@@ -63,6 +65,7 @@ const userSchema = new Schema<IUser>(
     avatar: { type: String },
     resetOtp: { type: String },
     resetOtpExpiresAt: { type: Date },
+
     favorites: [{ type: Schema.Types.ObjectId, ref: "Restaurant" }],
   },
   { timestamps: true },
