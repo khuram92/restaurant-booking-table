@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.text-143d7b {
+  color: #143d7b;
+}
+.bg-143d7b {
+  background-color: #143d7b;
+}
+.border-143d7b {
+  border-width: 1px;
+  border-style: solid;
+  border-color: #143d7b;
+}

@@ -115,7 +115,7 @@ const RestaurantCard = ({
           </Pressable>
         </View>
 
-        <Text numberOfLines={1} className="text-sm text-blue-600">
+        <Text numberOfLines={1} className="text-sm text-black">
           {item.cuisines || "Various"}
         </Text>
 
@@ -168,7 +168,7 @@ const FeaturedHorizontalCard = ({ item }: { item: Restaurant }) => {
             onError={() => setImageFailed(true)}
           />
         ) : (
-          <Text className="text-4xl font-bold text-blue-600">
+          <Text className="text-4xl font-bold text-black">
             {item.name?.trim().charAt(0).toUpperCase() || "?"}
           </Text>
         )}
@@ -178,7 +178,7 @@ const FeaturedHorizontalCard = ({ item }: { item: Restaurant }) => {
           <Text numberOfLines={1} className="font-bold text-gray-900 text-base">
             {item.name}
           </Text>
-          <Text numberOfLines={1} className="text-xs text-blue-600 mt-0.5">
+          <Text numberOfLines={1} className="text-xs text-black mt-0.5">
             {item.cuisines || "Various"}
           </Text>
         </View>
@@ -453,7 +453,7 @@ export default function Home() {
                       size={28}
                       color={"#3B82F6"}
                     />
-                    <Text className="mt-2 text-center text-sm font-semibold text-blue-600">
+                    <Text className="mt-2 text-center text-sm font-semibold text-black">
                       {label}
                     </Text>
                   </Pressable>
@@ -476,9 +476,7 @@ export default function Home() {
                       }`}>
                       <Text
                         className={`font-semibold ${
-                          activeTab === "Nearby"
-                            ? "text-white"
-                            : "text-blue-600"
+                          activeTab === "Nearby" ? "text-white" : "text-black"
                         }`}>
                         Nearby
                       </Text>
@@ -490,7 +488,7 @@ export default function Home() {
                       }`}>
                       <Text
                         className={`font-semibold ${
-                          activeTab === "All" ? "text-white" : "text-blue-600"
+                          activeTab === "All" ? "text-white" : "text-black"
                         }`}>
                         All
                       </Text>

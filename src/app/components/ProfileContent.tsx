@@ -14,8 +14,8 @@ import {
 } from "react-native";
 import { ActivityIndicator, Button, TextInput } from "react-native-paper";
 import { deleteMe, getMe, updateMe } from "../../api/authApi";
-import AvatarPicker from "./AvatarPicker";
 import { getAllRestaurants } from "../../api/restaurantApi";
+import AvatarPicker from "./AvatarPicker";
 
 type Profile = {
   firstName?: string;
@@ -513,9 +513,11 @@ const ProfileContent = ({ showFoodInterest = true }: Props) => {
           </>
         )}
 
-        <View className="mt-4 border-1 bg-blue-400 border border-blue-500 rounded-full justify-center flex ">
+        <View className="mt-4 border-1  bg-143d7b border border-blue-500 rounded-full justify-center flex ">
           <Button onPress={openUpdateModal}>
-            <Text className="text-xl font-bold text-white">Edit profile </Text>
+            <Text className="text-xl font-semibold text-white">
+              Edit profile{" "}
+            </Text>
           </Button>
         </View>
         <Modal
@@ -633,9 +635,9 @@ const ProfileContent = ({ showFoodInterest = true }: Props) => {
             </ScrollView>
           </KeyboardAvoidingView>
         </Modal>
-        <View className="mt-4 border-1 border border-blue-500 bg-blue-100 rounded-full justify-center flex ">
+        <View className="mt-4 border border-143d7b rounded-full justify-center flex ">
           <Button onPress={handleLogout}>
-            <Text className="text-xl font-bold text-black">Logout </Text>
+            <Text className="text-xl font-semibold text-143d7b">Logout </Text>
           </Button>
         </View>
 
