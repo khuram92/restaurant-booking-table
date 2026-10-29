@@ -124,12 +124,12 @@ const RestaurantCard = ({
           <Text className="text-sm font-semibold text-blue-800">
             {(item.rating || 0).toFixed(1)}
           </Text>
-          <Text className="text-sm text-blue-500">
+          <Text className="text-sm text-black">
             ({item.reviewCount || 0})
           </Text>
         </View>
 
-        <Text numberOfLines={1} className="text-xs text-blue-500">
+        <Text numberOfLines={1} className="text-xs text-black">
           {[item.city, item.province].filter(Boolean).join(", ") ||
             "Location unavailable"}
         </Text>
@@ -367,14 +367,14 @@ export default function Home() {
           />
 
           <View className="flex-1 ml-2">
-            <Text className="text-2xl font-bold text-blue-700">
+            <Text className="text-2xl font-bold text-black">
               Hi, {profile?.lastName ?? "there"}
             </Text>
 
             <View className="flex-row items-center">
               <Text
                 numberOfLines={3}
-                className="flex-1 text-blue-700 text-base">
+                className="flex-1 text-black text-base">
                 {profile?.address || "Address not provided"}
               </Text>
               <Pressable onPress={loadProfile}>
@@ -417,7 +417,7 @@ export default function Home() {
             <>
               {/* Featured Section Header */}
               <View className="flex-row items-center justify-between mt-4">
-                <Text className="font-bold text-blue-500 text-xl">
+                <Text className="font-bold text-black text-xl">
                   Featured Restaurant
                 </Text>
 
@@ -462,7 +462,7 @@ export default function Home() {
 
               {/* Nearby Section Header */}
               <View className="flex my-2 mb-4">
-                <Text className="font-bold text-blue-500 text-xl">
+                <Text className="font-bold text-black text-xl">
                   Nearby Restaurant
                 </Text>
                 <View className="flex-row justify-between my-4">
@@ -476,7 +476,9 @@ export default function Home() {
                       }`}>
                       <Text
                         className={`font-semibold ${
-                          activeTab === "Nearby" ? "text-white" : "text-black"
+                          activeTab === "Nearby"
+                            ? "text-white"
+                            : "text-black"
                         }`}>
                         Nearby
                       </Text>
