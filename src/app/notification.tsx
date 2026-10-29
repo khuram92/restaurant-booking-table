@@ -1,3 +1,6 @@
+import { Ionicons } from "@expo/vector-icons";
+import { router, useFocusEffect, type Href } from "expo-router";
+import * as SecureStore from "expo-secure-store";
 import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
@@ -8,16 +11,12 @@ import {
   Text,
   View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { router, useFocusEffect, type Href } from "expo-router";
-import * as SecureStore from "expo-secure-store";
 import {
   getNotifications,
   markAllNotificationsRead,
   markNotificationRead,
   type AppNotification,
 } from "../api/notificationApi";
-
 
 const OWNER_BOOKINGS_ROUTE: Href = "/restaurant/restaurantDashboard";
 const ADMIN_BOOKINGS_ROUTE: Href = "/admin/allBookings";
@@ -70,7 +69,7 @@ const NotificationCard = ({
         <View className="mb-2 flex-row items-center">
           <Text className="shrink text-lg font-bold">{item.title}</Text>
           {!item.isRead && (
-            <View className="ml-2 h-2.5 w-2.5 rounded-full bg-blue-600" />
+            <View className="ml-2 h-2.5 w-2.5 rounded-full bg-[#143d7b]" />
           )}
         </View>
 
@@ -78,7 +77,7 @@ const NotificationCard = ({
 
         {!item.isRead && (
           <Pressable onPress={() => onMarkRead(item._id)} hitSlop={8}>
-            <Text className="text-base font-normal text-blue-500">
+            <Text className="text-base font-normal text-[#143d7b]">
               Mark as read
             </Text>
           </Pressable>
@@ -86,7 +85,9 @@ const NotificationCard = ({
       </View>
     </View>
 
-    <Text className="ml-3 text-base text-gray-600">{timeAgo(item.createdAt)}</Text>
+    <Text className="ml-3 text-base text-gray-900">
+      {timeAgo(item.createdAt)}
+    </Text>
   </Pressable>
 );
 
@@ -102,7 +103,9 @@ const Notification = () => {
       setItems(notifications);
       setError("");
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "Could not load notifications.");
+      setError(
+        e instanceof Error ? e.message : "Could not load notifications.",
+      );
     } finally {
       setLoading(false);
     }
@@ -129,7 +132,9 @@ const Notification = () => {
   };
 
   const markRead = async (id: string) => {
-    setItems((cur) => cur.map((n) => (n._id === id ? { ...n, isRead: true } : n)));
+    setItems((cur) =>
+      cur.map((n) => (n._id === id ? { ...n, isRead: true } : n)),
+    );
     try {
       await markNotificationRead(id);
     } catch {
@@ -155,7 +160,10 @@ const Notification = () => {
     if (role === "restaurant") router.push(OWNER_BOOKINGS_ROUTE);
     else if (role === "admin") router.push(ADMIN_BOOKINGS_ROUTE);
     else {
-      router.push({ pathname: "/bookingDetails", params: { id: item.booking } });
+      router.push({
+        pathname: "/bookingDetails",
+        params: { id: item.booking },
+      });
     }
   };
 
@@ -165,17 +173,20 @@ const Notification = () => {
     <View className="flex-1 bg-white px-2 pt-16">
       <View className="mb-6 flex-row justify-between">
         <Pressable onPress={goBack} className="h-12 w-12">
-          <Ionicons name="arrow-back" size={24} color="#2563EB" />
+          <Ionicons name="arrow-back" size={24} color="#143d7b" />
         </Pressable>
-        <Text className="text-3xl font-bold text-blue-600">Notifications</Text>
+        <Text className="text-3xl font-bold text-[#143d7b]">Notifications</Text>
         <View className="h-12 w-12 items-end">
-          <Ionicons name="notifications" size={26} color="#2563EB" />
+          <Ionicons name="notifications" size={26} color="#143d7b" />
         </View>
       </View>
 
       {hasUnread && (
-        <Pressable onPress={markAllRead} className="mb-3 self-end px-1" hitSlop={8}>
-          <Text className="text-base font-semibold text-blue-600">
+        <Pressable
+          onPress={markAllRead}
+          className="mb-3 self-end px-1"
+          hitSlop={8}>
+          <Text className="text-base font-semibold text-[#143d7b]">
             Mark all as read
           </Text>
         </Pressable>
@@ -183,18 +194,20 @@ const Notification = () => {
 
       {loading ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#2563EB" />
+          <ActivityIndicator size="large" color="#143d7b" />
         </View>
       ) : error && items.length === 0 ? (
         <View className="flex-1 items-center justify-center px-6">
           <Ionicons name="cloud-offline-outline" size={48} color="#9ca3af" />
-          <Text className="mt-3 text-center text-base text-gray-700">{error}</Text>
+          <Text className="mt-3 text-center text-base text-gray-900">
+            {error}
+          </Text>
           <Pressable
             onPress={() => {
               setLoading(true);
               void load();
             }}
-            className="mt-4 rounded-full bg-blue-700 px-6 py-2">
+            className="mt-4 rounded-full bg-[#143d7b] px-6 py-2">
             <Text className="font-semibold text-white">Retry</Text>
           </Pressable>
         </View>
@@ -212,11 +225,15 @@ const Notification = () => {
           }
           ListEmptyComponent={
             <View className="items-center pt-24">
-              <Ionicons name="notifications-outline" size={56} color="#d1d5db" />
+              <Ionicons
+                name="notifications-outline"
+                size={56}
+                color="#d1d5db"
+              />
               <Text className="mt-4 text-lg font-bold text-gray-900">
                 No notifications yet
               </Text>
-              <Text className="mt-1 text-center text-sm text-gray-400">
+              <Text className="mt-1 text-center text-sm text-gray-900">
                 Updates about your bookings will show up here.
               </Text>
             </View>
