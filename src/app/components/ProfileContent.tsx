@@ -224,7 +224,7 @@ const ProfileContent = ({ showFoodInterest = true }: Props) => {
           </View>
         </View>
 
-        <View className="flex  mt-4 bg-white border border-gray-200 rounded-2xl px-4 py-4">
+        <View className="flex  mt-4 bg-white border border-dashed border-gray-500 rounded-2xl px-4 py-4">
           <Text className="text-black font-bold text-xl ">
             Personal Information
           </Text>
@@ -253,7 +253,7 @@ const ProfileContent = ({ showFoodInterest = true }: Props) => {
             <View className="border-1 bg-white border border-dashed border-gray-500 rounded-xl h-28  p-2 flex ">
               <Text
                 numberOfLines={3}
-                className="text-base ml-2  text-blackfont-medium ">
+                className="text-base ml-2  text-black font-medium ">
                 {profile?.address || "Not Provided"}
               </Text>
             </View>
@@ -268,7 +268,7 @@ const ProfileContent = ({ showFoodInterest = true }: Props) => {
           </View>
         )}
 
-        <View className="mt-4 border-1 bg-amber-400 rounded-full justify-center flex ">
+        <View className="mt-4 border-1 bg-blue-400 border border-blue-500 rounded-full justify-center flex ">
           <Button onPress={openUpdateModal}>
             <Text className="text-xl font-bold text-white">Edit profile </Text>
           </Button>
@@ -388,9 +388,9 @@ const ProfileContent = ({ showFoodInterest = true }: Props) => {
             </ScrollView>
           </KeyboardAvoidingView>
         </Modal>
-        <View className="mt-4 border-1 bg-green-600 rounded-full justify-center flex ">
+        <View className="mt-4 border-1 border border-blue-500 bg-blue-100 rounded-full justify-center flex ">
           <Button onPress={handleLogout}>
-            <Text className="text-xl font-bold text-white">Logout </Text>
+            <Text className="text-xl font-bold text-black">Logout </Text>
           </Button>
         </View>
 
