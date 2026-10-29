@@ -292,14 +292,14 @@ const TableRequirements = () => {
                   color={star <= Math.round(rating) ? "#f59e0b" : "blue"}
                 />
               ))}
-              <Text className="px-2 font-semibold text-blue-700">
+              <Text className="px-2 font-semibold text-[#143d7b]">
                 {rating.toFixed(1)}
               </Text>
-              <Text className="text-gray-500">
+              <Text className="text-gray-900">
                 ({restaurant?.reviewCount || 0})
               </Text>
             </View>
-            <Text numberOfLines={1} className="text-gray-600">
+            <Text numberOfLines={1} className="text-gray-900">
               {location || "Lahore, Punjab"}
             </Text>
           </View>
@@ -319,7 +319,7 @@ const TableRequirements = () => {
           </Pressable>
         </View>
 
-        <View className="h-px bg-blue-400 mb-2 mt-2" />
+        <View className="h-px bg-[#143d7b] mb-2 mt-2" />
 
         {/* Date Selection */}
         <View className="mt-4">
@@ -328,9 +328,9 @@ const TableRequirements = () => {
           <Pressable
             onPress={() => setShowPicker(true)}
             accessibilityRole="button"
-            className="mb-4 mt-2 flex-row items-center justify-between rounded-lg border border-blue-500 px-4 py-3">
+            className="mb-4 mt-2 flex-row items-center justify-between rounded-lg border border-[#143d7b] px-4 py-3">
             <Text className="text-gray-900">{date.toLocaleDateString()}</Text>
-            <Ionicons name="calendar-outline" size={20} color="blue" />
+            <Ionicons name="calendar-outline" size={20} color="#143d7b" />
           </Pressable>
 
           {showPicker && (
