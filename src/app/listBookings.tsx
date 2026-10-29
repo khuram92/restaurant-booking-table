@@ -81,13 +81,13 @@ const InfoColumn = ({
 }) => (
   <View className="flex-1 items-center">
     <Ionicons name={icon} size={24} color="blue" />
-    <Text className="mt-2 text-[10px] tracking-widest text-gray-500">
+    <Text className="mt-2 text-[10px] tracking-widest text-black">
       {label}
     </Text>
     <Text
       numberOfLines={1}
       adjustsFontSizeToFit
-      className="mt-1 text-sm font-bold text-blue-500">
+      className="mt-1 text-sm font-bold text-black">
       {value}
     </Text>
   </View>
@@ -134,8 +134,8 @@ const BookingCard = ({ item }: { item: Booking }) => {
             className="h-14 w-14 rounded-lg"
           />
         ) : (
-          <View className="h-14 w-14 items-center justify-center rounded-lg bg-blue-100">
-            <Text className="text-2xl font-bold text-blue-600">
+          <View className="h-14 w-14 items-center justify-center rounded-lg bg-[#143d7b]">
+            <Text className="text-2xl font-bold text-black">
               {name.trim().charAt(0).toUpperCase() || "?"}
             </Text>
           </View>
@@ -145,7 +145,7 @@ const BookingCard = ({ item }: { item: Booking }) => {
           <Text numberOfLines={1} className="text-lg font-semibold">
             {name}
           </Text>
-          <Text numberOfLines={1} className="text-gray-500">
+          <Text numberOfLines={1} className="text-black">
             {item.seatingType}
           </Text>
         </View>
@@ -179,7 +179,7 @@ const BookingCard = ({ item }: { item: Booking }) => {
 
       {/* Booking ID + action */}
       <View className="flex-row items-center justify-between">
-        <Text className="text-sm tracking-wide text-gray-400">
+        <Text className="text-sm tracking-wide text-black">
           {getBookingCode(item)}
         </Text>
         <Pressable
@@ -279,7 +279,7 @@ const ListBookings = () => {
                       : "border-gray-300 bg-white"
                   }`}>
                   <Text
-                    className={`px-2 ${active ? "text-white" : "text-gray-700"}`}>
+                    className={`px-2 ${active ? "text-white" : "text-black"}`}>
                     {label}
                   </Text>
                 </Pressable>
@@ -295,7 +295,7 @@ const ListBookings = () => {
         ) : error && bookings.length === 0 ? (
           <View className="flex-1 items-center justify-center px-6">
             <Ionicons name="cloud-offline-outline" size={48} color="#9ca3af" />
-            <Text className="mt-3 text-center text-base text-gray-700">
+            <Text className="mt-3 text-center text-base text-black">
               {error}
             </Text>
             <Pressable
@@ -320,12 +320,12 @@ const ListBookings = () => {
             ListEmptyComponent={
               <View className="items-center pt-16">
                 <Ionicons name="calendar-outline" size={56} color="#d1d5db" />
-                <Text className="mt-4 text-lg font-bold text-gray-900">
+                <Text className="mt-4 text-lg font-bold text-black">
                   {filter === "all"
                     ? "No bookings yet"
                     : `No ${activeLabel.toLowerCase()} bookings`}
                 </Text>
-                <Text className="mt-1 text-center text-sm text-gray-400">
+                <Text className="mt-1 text-center text-sm text-black">
                   {filter === "all"
                     ? "Book a table and it will show up here."
                     : "Try another filter."}
