@@ -212,12 +212,12 @@ const ProfileContent = ({ showFoodInterest = true }: Props) => {
           </View>
 
           <View className="flex items-center mt-6">
-            <Text className="text-2xl font-bold text-blue-700">
+            <Text className="text-2xl font-bold text-black">
               {profile?.lastName ?? "there"}
             </Text>
 
             <View className="flex-row items-center mt-4 mb-6">
-              <Text numberOfLines={3} className=" text-blue-700 text-base">
+              <Text numberOfLines={3} className=" text-black text-base">
                 {profile?.address || "Address not provided"}
               </Text>
             </View>
@@ -225,35 +225,35 @@ const ProfileContent = ({ showFoodInterest = true }: Props) => {
         </View>
 
         <View className="flex  mt-4 bg-white border border-gray-200 rounded-2xl px-4 py-4">
-          <Text className="text-blue-600 font-bold text-xl ">
+          <Text className="text-black font-bold text-xl ">
             Personal Information
           </Text>
           <View className="flex mt-8">
-            <View className="border-1 bg-white border border-gray-300  rounded-full h-12  p-2 flex justify-center">
-              <Text className="text-lg ml-4 text-blue-500 font-medium  ">
+            <View className="border-1 bg-white border border-dashed border-gray-500   rounded-full h-12  p-2 flex justify-center">
+              <Text className="text-base ml-4 text-black font-medium  ">
                 {profile?.phone}
               </Text>
             </View>
           </View>
           <View className="flex mt-4">
-            <View className="border-1 bg-white border border-gray-300 rounded-full h-12  p-2 flex justify-center">
-              <Text className="text-lg ml-4 text-blue-500 font-medium ">
+            <View className="border-1 bg-white border border-dashed border-gray-500 rounded-full h-12  p-2 flex justify-center">
+              <Text className="text-base ml-4 text-black font-medium ">
                 {profile?.firstName} {profile?.lastName}
               </Text>
             </View>
           </View>
           <View className="flex mt-4">
-            <View className="border-1 bg-white border border-gray-300 rounded-full h-12  p-2 flex justify-center">
-              <Text className="text-lg ml-4 text-blue-500 font-medium  ">
+            <View className="border-1 bg-white border border-dashed border-gray-500  rounded-full h-12  p-2 flex justify-center">
+              <Text className="text-base ml-4 text-black font-medium  ">
                 {profile?.email}
               </Text>
             </View>
           </View>
           <View className="flex mt-4">
-            <View className="border-1 bg-white border border-gray-300 rounded-xl h-28  p-2 flex ">
+            <View className="border-1 bg-white border border-dashed border-gray-500 rounded-xl h-28  p-2 flex ">
               <Text
                 numberOfLines={3}
-                className="text-lg ml-2  text-blue-500 font-medium ">
+                className="text-base ml-2  text-blackfont-medium ">
                 {profile?.address || "Not Provided"}
               </Text>
             </View>
