@@ -104,7 +104,7 @@ const RestaurantCard = ({
           </Pressable>
         </View>
 
-        <Text numberOfLines={1} className="text-sm text-blue-600">
+        <Text numberOfLines={1} className="text-sm text-black">
           {item.cuisines || "Various"}
         </Text>
 
@@ -113,12 +113,12 @@ const RestaurantCard = ({
           <Text className="text-sm font-semibold text-blue-800">
             {(item.rating || 0).toFixed(1)}
           </Text>
-          <Text className="text-sm text-blue-500">
+          <Text className="text-sm text-black">
             ({item.reviewCount || 0})
           </Text>
         </View>
 
-        <Text numberOfLines={1} className="text-xs text-blue-500">
+        <Text numberOfLines={1} className="text-xs text-black">
           {[item.city, item.province].filter(Boolean).join(", ") ||
             "Location unavailable"}
         </Text>
@@ -295,7 +295,7 @@ export default function ListRestaurants() {
                   }`}>
                   <Text
                     className={`font-semibold ${
-                      isSelected ? "text-blue-800" : "text-blue-600"
+                      isSelected ? "text-blue-800" : "text-black"
                     }`}>
                     {cuisine}
                   </Text>
@@ -326,7 +326,7 @@ export default function ListRestaurants() {
               }`}>
               <Text
                 className={`font-semibold ${
-                  activeTab === "All" ? "text-white" : "text-blue-600"
+                  activeTab === "All" ? "text-white" : "text-black"
                 }`}>
                 All
               </Text>
