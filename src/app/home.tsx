@@ -50,7 +50,7 @@ const Stars = ({ rating }: { rating: number }) => (
         key={star}
         name="star"
         size={14}
-        color={star <= Math.round(rating) ? "blue" : "#e5e7eb"}
+        color={star <= Math.round(rating) ? "#143d7b" : "#e5e7eb"}
         style={{ marginRight: 2 }}
       />
     ))}
@@ -92,7 +92,7 @@ const RestaurantCard = ({
           </Text>
         )}
 
-        <View className="absolute bottom-2 right-2 rounded-lg bg-blue-500 px-2 py-0.5">
+        <View className="absolute bottom-2 right-2 rounded-lg bg-[#143d7b] px-2 py-0.5">
           <Text className="text-xs font-bold text-white">
             {item.distance || "Unknown"}
           </Text>
@@ -110,7 +110,7 @@ const RestaurantCard = ({
             <Ionicons
               name={isFavorite ? "heart" : "heart-outline"}
               size={24}
-              color={isFavorite ? "blue" : "#9ca3af"}
+              color={isFavorite ? "#143d7b" : "#9ca3af"}
             />
           </Pressable>
         </View>
@@ -121,12 +121,10 @@ const RestaurantCard = ({
 
         <View className="flex-row items-center gap-1">
           <Stars rating={item.rating || 0} />
-          <Text className="text-sm font-semibold text-blue-800">
+          <Text className="text-sm font-semibold text-[#143d7b]">
             {(item.rating || 0).toFixed(1)}
           </Text>
-          <Text className="text-sm text-black">
-            ({item.reviewCount || 0})
-          </Text>
+          <Text className="text-sm text-black">({item.reviewCount || 0})</Text>
         </View>
 
         <Text numberOfLines={1} className="text-xs text-black">
@@ -159,7 +157,7 @@ const FeaturedHorizontalCard = ({ item }: { item: Restaurant }) => {
         </View>
       </View>
 
-      <View className="h-20 w-full items-center justify-center bg-blue-50 overflow-hidden">
+      <View className="h-20 w-full items-center justify-center bg-[#143d7b] overflow-hidden">
         {imageUrl && !imageFailed ? (
           <Image
             source={{ uri: imageUrl }}
@@ -347,7 +345,7 @@ export default function Home() {
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
-        <ActivityIndicator size="large" color="blue" />
+        <ActivityIndicator size="large" color="#143d7b" />
       </View>
     );
   }
@@ -363,7 +361,7 @@ export default function Home() {
                 ? { uri: profile.avatar }
                 : require("../../assets/images/user.png")
             }
-            className="w-20 h-20 rounded-full border-2 border-blue-700"
+            className="w-20 h-20 rounded-full border-2 border-[#143d7b]"
           />
 
           <View className="flex-1 ml-2">
@@ -372,13 +370,15 @@ export default function Home() {
             </Text>
 
             <View className="flex-row items-center">
-              <Text
-                numberOfLines={3}
-                className="flex-1 text-black text-base">
+              <Text numberOfLines={3} className="flex-1 text-black text-base">
                 {profile?.address || "Address not provided"}
               </Text>
               <Pressable onPress={loadProfile}>
-                <MaterialCommunityIcons name="refresh" size={20} color="blue" />
+                <MaterialCommunityIcons
+                  name="refresh"
+                  size={20}
+                  color="#143d7b"
+                />
               </Pressable>
             </View>
           </View>
@@ -386,11 +386,11 @@ export default function Home() {
           <View className="flex-row items-center ml-2">
             <Link href="/favorite" asChild>
               <Pressable className="w-11 h-11 rounded-full items-center justify-center mr-2">
-                <Ionicons name="heart" size={20} color="#2563EB" />
+                <Ionicons name="heart" size={20} color="#143d7b" />
               </Pressable>
             </Link>
             <NotificationBell
-              color="#2563EB"
+              color="#143d7b"
               size={22}
               containerClassName="h-11 w-11 items-center justify-center rounded-full"
             />
@@ -423,8 +423,8 @@ export default function Home() {
 
                 <Link href="/featured" asChild>
                   <Pressable className="flex-row items-center">
-                    <Text className="mr-1 text-blue-500 text-lg">See All</Text>
-                    <Ionicons name="arrow-forward" size={20} color="blue" />
+                    <Text className="mr-1 text-[#143d7b] text-lg">See All</Text>
+                    <Ionicons name="arrow-forward" size={20} color="#143d7b" />
                   </Pressable>
                 </Link>
               </View>
@@ -471,14 +471,12 @@ export default function Home() {
                       onPress={() => setActiveTab("Nearby")}
                       className={`px-5 py-2 rounded-full ${
                         activeTab === "Nearby"
-                          ? "bg-blue-700"
+                          ? "bg-[#143d7b]"
                           : "bg-transparent"
                       }`}>
                       <Text
                         className={`font-semibold ${
-                          activeTab === "Nearby"
-                            ? "text-white"
-                            : "text-black"
+                          activeTab === "Nearby" ? "text-white" : "text-black"
                         }`}>
                         Nearby
                       </Text>
@@ -486,7 +484,7 @@ export default function Home() {
                     <Pressable
                       onPress={() => setActiveTab("All")}
                       className={`px-5 py-2 rounded-full ${
-                        activeTab === "All" ? "bg-blue-700" : "bg-transparent"
+                        activeTab === "All" ? "bg-[#143d7b]" : "bg-transparent"
                       }`}>
                       <Text
                         className={`font-semibold ${
@@ -498,10 +496,14 @@ export default function Home() {
                   </View>
                   <Link href="/listRestaurants" asChild>
                     <Pressable className="flex-row items-center">
-                      <Text className="mr-1 text-blue-500 text-lg">
+                      <Text className="mr-1 text-[#143d7b] text-lg">
                         See All
                       </Text>
-                      <Ionicons name="arrow-forward" size={20} color="blue" />
+                      <Ionicons
+                        name="arrow-forward"
+                        size={20}
+                        color="#143d7b"
+                      />
                     </Pressable>
                   </Link>
                 </View>
@@ -517,11 +519,11 @@ export default function Home() {
           )}
           ListEmptyComponent={
             <View className="items-center pt-24">
-              <Ionicons name="restaurant-outline" size={56} color="blue" />
+              <Ionicons name="restaurant-outline" size={56} color="#143d7b" />
               <Text className="mt-4 text-lg font-bold text-gray-900">
                 No Restaurants Found
               </Text>
-              <Text className="mt-1 text-center text-sm text-gray-400">
+              <Text className="mt-1 text-center text-sm text-gray-900">
                 Try searching for a different name or category.
               </Text>
             </View>
