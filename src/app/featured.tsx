@@ -47,7 +47,7 @@ export default function FeaturedScreen() {
     return (
       <View className="flex-1 items-center justify-center bg-gray-50 px-4">
         <Text className="text-center text-red-600 mb-2">{error}</Text>
-        <Text onPress={loadFeatured} className="text-blue-600 font-bold">
+        <Text onPress={loadFeatured} className="text-[#143d7b] font-bold">
           Tap to Retry
         </Text>
       </View>
@@ -60,10 +60,10 @@ export default function FeaturedScreen() {
       <View className="flex-row items-center gap-12 px-4 pb-3 pt-2">
         <Pressable
           onPress={() => router.back()}
-          className="mr-3 rounded-full bg-gray-200/80 p-2 active:bg-gray-300">
-          <Ionicons name="arrow-back" size={20} color="blue" />
+          className="mr-3 rounded-full bg-[#143d7b] p-2 ">
+          <Ionicons name="arrow-back" size={20} color="white" />
         </Pressable>
-        <Text className="text-2xl font-bold text-blue-500">
+        <Text className="text-2xl font-bold text-[#143d7b]">
           Featured Restaurants
         </Text>
       </View>
@@ -141,7 +141,7 @@ export default function FeaturedScreen() {
                   </View>
                 </View>
 
-                <Text numberOfLines={1} className="mt-1 text-xs text-gray-500">
+                <Text numberOfLines={1} className="mt-1 text-xs text-gray-900">
                   {[item.cuisines, location].filter(Boolean).join(" • ")}
                 </Text>
               </View>
@@ -151,7 +151,7 @@ export default function FeaturedScreen() {
         ListEmptyComponent={
           <View className="items-center justify-center py-20">
             <Ionicons name="star-outline" size={48} color="#9CA3AF" />
-            <Text className="mt-2 text-sm text-gray-400">
+            <Text className="mt-2 text-sm text-gray-900">
               No featured restaurants available.
             </Text>
           </View>
