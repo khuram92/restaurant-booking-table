@@ -177,14 +177,14 @@ export default function BookATable() {
           <View className="flex-row justify-between px-4 pt-4">
             <Pressable
               onPress={backPage}
-              className="bg-blue-700 w-11 h-11 rounded-full items-center justify-center">
+              className="bg-[#143d7b] w-11 h-11 rounded-full items-center justify-center">
               <Ionicons name="arrow-back" size={22} color="white" />
             </Pressable>
 
             <Pressable
               onPress={handleToggleFavorite}
               accessibilityRole="button"
-              className="bg-blue-700 w-11 h-11 rounded-full items-center justify-center">
+              className="bg-[#143d7b] w-11 h-11 rounded-full items-center justify-center">
               <Ionicons
                 name={isFavorite ? "heart" : "heart-outline"}
                 size={22}
