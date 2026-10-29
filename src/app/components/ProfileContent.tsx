@@ -361,7 +361,7 @@ const ProfileContent = ({ showFoodInterest = true }: Props) => {
 
         {showFoodInterest && (
           <>
-            <View className="flex mt-4 bg-gray-100 rounded-2xl px-4 py-4">
+            <View className="flex mt-4 bg-gray-100 border-gray-500 rounded-2xl border border-dashed px-4 py-4">
               <View className="flex-row items-center justify-between">
                 <Text className="text-black font-bold text-xl ">
                   Food Interest
