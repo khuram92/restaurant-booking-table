@@ -125,7 +125,7 @@ const BookingConfirmation = () => {
   if (restaurantLoading) {
     return (
       <View className="flex-1 items-center justify-center bg-white">
-        <ActivityIndicator size="large" color="#2563EB" />
+        <ActivityIndicator size="large" color="#143d7b" />
       </View>
     );
   }
@@ -157,13 +157,13 @@ const BookingConfirmation = () => {
     <View className=" flex-1 bg-white px-2 pt-16">
       <View className="flex-row justify-between  mb-4">
         <Pressable onPress={goBack} className=" w-12 h-12 ">
-          <Ionicons name="arrow-back" size={24} color="#2563EB" />
+          <Ionicons name="arrow-back" size={24} color="#143d7b" />
         </Pressable>
-        <Text className="text-blue-600 font-bold text-3xl">Book a Table</Text>
+        <Text className="text-[#143d7b] font-bold text-3xl">Book a Table</Text>
         <NotificationBell
           color="white"
           size={22}
-          containerClassName="h-11 w-11 items-center justify-center rounded-full bg-blue-700"
+          containerClassName="h-11 w-11 items-center justify-center rounded-full bg-[#143d7b]"
         />
       </View>
       <View className="flex  px-2">
@@ -178,21 +178,17 @@ const BookingConfirmation = () => {
                 className="h-28 w-28 rounded-lg"
               />
             ) : (
-              <View className="h-28 w-28 items-center justify-center rounded-lg bg-blue-100">
-                <Text className="text-5xl font-bold text-blue-600">
-                  {initial}
-                </Text>
+              <View className="h-28 w-28 items-center justify-center rounded-lg bg-[#143d7b]">
+                <Text className="text-5xl font-bold text-black">{initial}</Text>
               </View>
             )}
 
             <View className="flex-1 justify-between px-2">
-              <Text
-                numberOfLines={2}
-                className="text-2xl font-bold text-blue-600">
+              <Text numberOfLines={2} className="text-2xl font-bold text-black">
                 {restaurant.name || restaurantName}
               </Text>
               <View className="flex-row items-center">
-                <Ionicons name="location" size={20} color="#2563EB" />
+                <Ionicons name="location" size={20} color="#143d7b" />
                 <Text numberOfLines={1} className="flex-1">
                   {location || "Location unavailable"}
                 </Text>
@@ -202,42 +198,42 @@ const BookingConfirmation = () => {
           <View className="h-px bg-blue-400 mb-2 mt-4" />
           <View className="flex-row mt-4 items-center">
             <View className="h-10 w-10 items-center justify-center rounded-full bg-gray-300">
-              <Ionicons name="calendar-outline" size={24} color="#2563EB" />
+              <Ionicons name="calendar-outline" size={24} color="#143d7b" />
             </View>
 
             <View className="px-2">
               <Text className="text-lg">Date</Text>
               <Text
                 className="text-lg font-bold text-blue-500"
-                style={{ color: "#3b82f6" }}>
+                style={{ color: "#143d7b" }}>
                 {formattedDate}
               </Text>
             </View>
           </View>
           <View className="mt-4 flex-row items-center">
             <View className="h-10 w-10 items-center justify-center rounded-full bg-gray-300">
-              <Ionicons name="time-outline" size={24} color="#2563EB" />
+              <Ionicons name="time-outline" size={24} color="#143d7b" />
             </View>
 
             <View className="px-2">
               <Text className="text-lg">Time</Text>
               <Text
                 className="text-lg font-bold text-blue-500"
-                style={{ color: "#3b82f6" }}>
+                style={{ color: "#143d7b" }}>
                 {time || "No time selected"}
               </Text>
             </View>
           </View>
           <View className="mt-4 flex-row items-center">
             <View className="h-10 w-10 items-center justify-center rounded-full bg-gray-300">
-              <Ionicons name="people" size={24} color="#2563EB" />
+              <Ionicons name="people" size={24} color="#143d7b" />
             </View>
 
             <View className="px-2">
               <Text className="text-lg">Seat</Text>
               <Text
                 className="text-lg font-bold  text-blue-500 "
-                style={{ color: "#3b82f6" }}>
+                style={{ color: "#143d7b" }}>
                 {guests || "No guest"}
                 &nbsp; - Person
               </Text>
@@ -248,7 +244,7 @@ const BookingConfirmation = () => {
               <MaterialCommunityIcons
                 name="floor-plan"
                 size={24}
-                color="#2563EB"
+                color="#143d7b"
               />
             </View>
 
@@ -256,7 +252,7 @@ const BookingConfirmation = () => {
               <Text className="text-lg">Floor</Text>
               <Text
                 className="text-lg font-bold text-blue-500"
-                style={{ color: "#3b82f6" }}>
+                style={{ color: "#143d7b" }}>
                 {floor || "NOT Selected"}
               </Text>
             </View>
@@ -264,23 +260,23 @@ const BookingConfirmation = () => {
 
           <View className="mt-4 flex-row items-center">
             <View className="h-10 w-10 items-center justify-center rounded-full bg-gray-300">
-              <Ionicons name="restaurant" size={24} color="#2563EB" />
+              <Ionicons name="restaurant" size={24} color="#143d7b" />
             </View>
 
             <View className="px-2">
               <Text className="text-lg">Type</Text>
               <Text
                 className="text-lg font-bold text-blue-500"
-                style={{ color: "#3b82f6" }}>
+                style={{ color: "#143d7b" }}>
                 {seatingType || "NOT Selected"}
               </Text>
             </View>
           </View>
           <ScrollView
             showsVerticalScrollIndicator={false}
-            className="mt-4  border border-blue-500 rounded-lg"
+            className="mt-4  border border-[#143d7b] rounded-lg"
             style={{ height: 50 }}>
-            <Text className="font-semibold px-2 text-blue-500">
+            <Text className="font-semibold px-2 text-[#143d7b]">
               {request || "No special Requirements"}
             </Text>
           </ScrollView>
@@ -294,11 +290,12 @@ const BookingConfirmation = () => {
             status={agreed ? "checked" : "unchecked"}
             onPress={() => setAgreed((checked) => !checked)}
           />
-          <Text className="flex-1 text-blue-700">
+          <Text className="flex-1 text-[#143d7b]">
             I agree to the terms and cancellation policy
           </Text>
         </Pressable>
         <Button
+          buttonColor="#143d7b"
           mode="contained"
           disabled={!agreed || loading}
           loading={loading}

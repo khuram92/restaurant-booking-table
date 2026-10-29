@@ -282,7 +282,7 @@ export default function BookATable() {
               </Text>
               <View>
                 <Text
-                  className="text-black mt-2 leading-5"
+                  className="text-gray-900 mt-2 leading-5"
                   numberOfLines={isAboutExpanded ? undefined : 3}>
                   {restaurant?.description ||
                     "No description provided for this restaurant."}
@@ -303,13 +303,13 @@ export default function BookATable() {
               <View className="flex-row items-center gap-3 mt-3 mb-6">
                 <View className="flex-row items-center gap-1 bg-gray-100 rounded-full px-3 py-2">
                   <Ionicons name="time-outline" size={16} color="blue" />
-                  <Text className="text-gray-700 text-sm">
+                  <Text className="text-gray-900 text-sm">
                     Open: {restaurant?.openingTime || "9:00 AM"}
                   </Text>
                 </View>
                 <View className="flex-row items-center gap-1 bg-gray-100 rounded-full px-3 py-2">
                   <Ionicons name="time-outline" size={16} color="blue" />
-                  <Text className="text-gray-700 text-sm">
+                  <Text className="text-gray-900 text-sm">
                     Close: {restaurant?.closingTime || "11:45 PM"}
                   </Text>
                 </View>
@@ -330,7 +330,7 @@ export default function BookATable() {
                         size={16}
                         color="blue"
                       />
-                      <Text className="text-gray-700 text-sm">{type}</Text>
+                      <Text className="text-gray-900 text-sm">{type}</Text>
                     </View>
                   ),
                 )}
@@ -350,7 +350,7 @@ export default function BookATable() {
                       size={16}
                       color="blue"
                     />
-                    <Text className="text-gray-700 text-sm">{floor}</Text>
+                    <Text className="text-gray-900 text-sm">{floor}</Text>
                   </View>
                 ))}
               </View>
@@ -362,7 +362,7 @@ export default function BookATable() {
               <View className="flex-row items-center gap-3 mt-3 mb-6">
                 <View className="flex-row items-center gap-1 bg-gray-100 rounded-full px-3 py-2">
                   <MaterialCommunityIcons name="pin" size={16} color="blue" />
-                  <Text className="text-gray-700 text-sm">
+                  <Text className="text-gray-900 text-sm">
                     {restaurant?.address || "Address not provided"}
                   </Text>
                 </View>
@@ -464,7 +464,7 @@ export default function BookATable() {
 
       {/* Footer Book Button */}
       <View className="px-4 pb-6 pt-3 bg-white">
-        <Button mode="contained" onPress={navigateToBooking}>
+        <Button buttonColor="#143d7b" mode="contained" onPress={navigateToBooking}>
           Book a table
         </Button>
       </View>
