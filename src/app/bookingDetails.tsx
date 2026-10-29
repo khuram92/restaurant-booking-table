@@ -73,7 +73,7 @@ const STATUS_CONFIG: Record<Booking["status"], StatusConfig> = {
     subtitle: "Thanks for dining with us!\nWe hope to see you again soon",
     pillLabel: "Completed",
     pillClass: "bg-blue-100",
-    pillTextClass: "text-blue-700",
+    pillTextClass: "text-[#143d7b]",
     canCancel: false,
   },
 };
@@ -112,14 +112,14 @@ const InfoColumn = ({
     className={`flex-1 items-center py-1 ${
       withDivider ? "border-l border-gray-300" : ""
     }`}>
-    <Ionicons name={icon} size={26} color="blue" />
-    <Text className="mt-2 text-[10px] tracking-widest text-gray-500">
+    <Ionicons name={icon} size={26} color="#143d7b" />
+    <Text className="mt-2 text-[10px] tracking-widest text-gray-900">
       {label}
     </Text>
     <Text
       numberOfLines={1}
       adjustsFontSizeToFit
-      className="mt-2 text-xs font-bold text-blue-500">
+      className="mt-2 text-xs font-bold text-[#143d7b]">
       {value}
     </Text>
   </View>
@@ -288,12 +288,12 @@ const BookingDetails = () => {
             setLoading(true);
             void loadBooking();
           }}
-          className="mt-6 rounded-full border border-blue-700 px-10 py-4">
-          <Text className="font-bold text-blue-700">Try Again</Text>
+          className="mt-6 rounded-full border border-[#143d7b] px-10 py-4">
+          <Text className="font-bold text-[#143d7b]">Try Again</Text>
         </Pressable>
         <Pressable
           onPress={() => router.replace("/home")}
-          className="mt-3 rounded-full bg-blue-700 px-10 py-4">
+          className="mt-3 rounded-full bg-[#143d7b] px-10 py-4">
           <Text className="font-bold text-white">Go Home</Text>
         </Pressable>
       </View>
@@ -326,10 +326,10 @@ const BookingDetails = () => {
             <Ionicons name={config.icon} size={38} color="#143d7b" />
           </View>
 
-          <Text className="mt-6 text-center text-2xl font-bold text-blue-600">
+          <Text className="mt-6 text-center text-2xl font-bold text-[#143d7b]">
             {config.title}
           </Text>
-          <Text className="mt-2 text-center text-sm text-gray-500">
+          <Text className="mt-2 text-center text-sm text-gray-900">
             {config.subtitle}
           </Text>
 
@@ -338,7 +338,7 @@ const BookingDetails = () => {
             style={{ elevation: 4 }}>
             <View className="flex-row items-center p-6">
               <View className="h-12 w-12 items-center justify-center rounded-xl border border-green-100 bg-green-100">
-                <Text className="text-2xl font-bold text-blue-700">
+                <Text className="text-2xl font-bold text-[#143d7b]">
                   {restaurantName.charAt(0).toUpperCase()}
                 </Text>
               </View>
@@ -346,14 +346,14 @@ const BookingDetails = () => {
               <View className="mx-3 flex-1">
                 <Text
                   numberOfLines={1}
-                  className="text-base font-bold text-blue-600">
+                  className="text-base font-bold text-[#143d7b]">
                   {restaurantName}
                 </Text>
                 <View className="mt-1 flex-row items-center">
-                  <Ionicons name="location-sharp" size={14} color="blue" />
+                  <Ionicons name="location-sharp" size={14} color="#143d7b" />
                   <Text
                     numberOfLines={1}
-                    className="ml-1 flex-1 text-xs text-blue-500">
+                    className="ml-1 flex-1 text-xs text-[#143d7b]">
                     {restaurantAddress}
                   </Text>
                 </View>
@@ -402,10 +402,10 @@ const BookingDetails = () => {
 
             <View className="flex-row items-center justify-between p-6">
               <View>
-                <Text className="text-xs tracking-widest text-gray-400">
+                <Text className="text-xs tracking-widest text-gray-900">
                   BOOKING ID
                 </Text>
-                <Text className="mt-1 text-lg font-bold text-blue-500">
+                <Text className="mt-1 text-lg font-bold text-[#143d7b]">
                   {bookingCode}
                 </Text>
               </View>
@@ -434,9 +434,7 @@ const BookingDetails = () => {
                   color="white"
                 />
                 <Text className="ml-2 text-lg font-bold text-white">
-                  {myReview
-                    ? "Submited"
-                    : "Leave a Review"}
+                  {myReview ? "Submited" : "Leave a Review"}
                 </Text>
               </Pressable>
             )}
@@ -445,9 +443,9 @@ const BookingDetails = () => {
               <Pressable
                 onPress={handleCancel}
                 disabled={cancelling}
-                className="mb-3 items-center rounded-full border border-gray-300 bg-red-50 py-4">
+                className="mb-3 items-center rounded-full border border-[#143d7b] bg-red-50 py-4">
                 {cancelling ? (
-                  <ActivityIndicator color="#dc2626" />
+                  <ActivityIndicator color="#143d7b" />
                 ) : (
                   <Text className="text-lg font-semibold text-red-600">
                     Cancel Booking
@@ -459,14 +457,14 @@ const BookingDetails = () => {
             <View className="flex-row gap-3">
               <Pressable
                 onPress={() => router.replace("/home")}
-                className="flex-1 items-center rounded-full border border-gray-200 bg-white py-4">
-                <Text className="text-lg font-semibold text-blue-600">
+                className="flex-1 items-center rounded-full border border-[#143d7b] bg-white py-4">
+                <Text className="text-lg font-semibold text-[#143d7b]">
                   Go Home
                 </Text>
               </Pressable>
               <Pressable
                 onPress={() => router.push("/listBookings")}
-                className="flex-1 items-center rounded-full bg-blue-700 py-4">
+                className="flex-1 items-center rounded-full bg-[#143d7b] py-4">
                 <Text className="text-lg font-bold text-white">
                   My Bookings
                 </Text>
