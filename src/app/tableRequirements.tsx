@@ -289,7 +289,7 @@ const TableRequirements = () => {
                   key={star}
                   name={star <= Math.round(rating) ? "star" : "star-outline"}
                   size={20}
-                  color={star <= Math.round(rating) ? "#f59e0b" : "blue"}
+                  color={star <= Math.round(rating) ? "#143d7b" : "white"}
                 />
               ))}
               <Text className="px-2 font-semibold text-[#143d7b]">
@@ -433,8 +433,8 @@ const TableRequirements = () => {
             }}
             accessibilityRole="button"
             accessibilityLabel="Increase guest count"
-            className="h-8 w-8 items-center justify-center rounded-full border border-gray-300 bg-blue-500">
-            <Ionicons name="add" size={24} color="#143d7b" />
+            className="h-8 w-8 items-center justify-center rounded-full border border-gray-300 bg-[#143d7b]">
+            <Ionicons name="add" size={24} color="" />
           </Pressable>
         </View>
 
@@ -501,7 +501,7 @@ const TableRequirements = () => {
 (optional)`}
               multiline
               textAlignVertical="top"
-              className="h-[120px] rounded-lg border-2 border-blue-400 px-4 py-3 mb-8"
+              className="h-[120px] rounded-lg border-2 border-[#143d7b] px-4 py-3 mb-8"
             />
           </View>
         </View>
