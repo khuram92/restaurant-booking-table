@@ -16,6 +16,8 @@ import {
   parseDob,
 } from "../utils/validation.js";
 
+const MAX_FOOD_INTERESTS = 20;
+
 const createToken = (userId: string, role: string) => {
   const secret = process.env.JWT_SECRET;
   if (!secret) throw new Error("JWT_SECRET is not configured");
@@ -178,6 +180,30 @@ export const updateAccount = async (req: AuthRequest, res: Response) => {
       newPassword,
       avatar,
     } = req.body;
+
+    if (foodInterests !== undefined) {
+      if (
+        !Array.isArray(foodInterests) ||
+        foodInterests.length > MAX_FOOD_INTERESTS
+      ) {
+        return res.status(400).json({
+          message: `Choose up to ${MAX_FOOD_INTERESTS} food interests`,
+        });
+      }
+
+      const cleaned: string[] = [];
+      for (const item of foodInterests) {
+        const name = typeof item === "string" ? item.trim() : "";
+        if (!name || name.length > 40) {
+          return res.status(400).json({ message: "Invalid food interest" });
+        }
+        if (!cleaned.some((c) => c.toLowerCase() === name.toLowerCase())) {
+          cleaned.push(name);
+        }
+      }
+
+      user.foodInterests = cleaned;
+    }
 
     // Simple profile fields
     if (firstName !== undefined) {
