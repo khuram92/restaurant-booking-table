@@ -247,13 +247,15 @@ const TableRequirements = () => {
         nestedScrollEnabled>
         <View className="flex-row justify-between mb-4">
           <Pressable onPress={goBack} className="w-12 h-12">
-            <Ionicons name="arrow-back" size={24} color="#2563EB" />
+            <Ionicons name="arrow-back" size={24} color="#143d7b" />
           </Pressable>
-          <Text className="text-blue-600 font-bold text-3xl">Book a Table</Text>
+          <Text className="text-[#143d7b] font-bold text-3xl">
+            Book a Table
+          </Text>
           <NotificationBell
             color="white"
             size={22}
-            containerClassName="h-11 w-11 items-center justify-center rounded-full bg-blue-700"
+            containerClassName="h-11 w-11 items-center justify-center rounded-full bg-[#143d7b]"
           />
         </View>
 
@@ -268,7 +270,7 @@ const TableRequirements = () => {
             />
           ) : (
             <View className="w-40 h-40 rounded-l-lg items-center justify-center bg-blue-100">
-              <Text className="text-6xl font-bold text-blue-600">
+              <Text className="text-6xl font-bold text-[#143d7b]">
                 {initial}
               </Text>
             </View>
@@ -278,7 +280,7 @@ const TableRequirements = () => {
             <Text numberOfLines={2} className="font-bold text-xl text-black">
               {restaurant?.name || "Restaurant"}
             </Text>
-            <Text numberOfLines={1} className="text-gray-700 font-normal">
+            <Text numberOfLines={1} className="text-gray-900 font-normal">
               {cuisines || "Various Cuisines"}
             </Text>
             <View className="flex-row gap-1 items-center">
@@ -321,13 +323,13 @@ const TableRequirements = () => {
 
         {/* Date Selection */}
         <View className="mt-4">
-          <Text className="text-blue-600 font-bold text-xl">Select Date:</Text>
+          <Text className="text-[#143d7b] font-bold text-xl">Select Date:</Text>
 
           <Pressable
             onPress={() => setShowPicker(true)}
             accessibilityRole="button"
             className="mb-4 mt-2 flex-row items-center justify-between rounded-lg border border-blue-500 px-4 py-3">
-            <Text className="text-gray-700">{date.toLocaleDateString()}</Text>
+            <Text className="text-gray-900">{date.toLocaleDateString()}</Text>
             <Ionicons name="calendar-outline" size={20} color="blue" />
           </Pressable>
 
@@ -342,11 +344,13 @@ const TableRequirements = () => {
         </View>
 
         {/* Time Selection */}
-        <Text className="text-blue-600 font-bold text-xl">Select Timings:</Text>
+        <Text className="text-[#143d7b] font-bold text-xl">
+          Select Timings:
+        </Text>
         <View className="h-[250px]">
           <ScrollView nestedScrollEnabled>
             {timeSlots.length === 0 ? (
-              <Text className="mt-6 text-center text-gray-500">
+              <Text className="mt-6 text-center text-gray-700">
                 No time slots available
               </Text>
             ) : (
@@ -365,7 +369,7 @@ const TableRequirements = () => {
                         onPress={() => setSelectedTime(time)}
                         className={`items-center rounded-full border px-2 py-2 ${
                           selected
-                            ? "border-blue-600 bg-blue-600"
+                            ? "border-[#143d7b] bg-[#143d7b]"
                             : disabled
                               ? "border-gray-100 bg-gray-50"
                               : "border-gray-200 bg-gray-100"
@@ -377,7 +381,7 @@ const TableRequirements = () => {
                               ? "text-sm text-white"
                               : disabled
                                 ? "text-sm text-gray-300"
-                                : "text-sm text-gray-700"
+                                : "text-sm text-gray-900"
                           }>
                           {time}
                         </Text>
@@ -392,11 +396,11 @@ const TableRequirements = () => {
 
         {/* Seat Counter */}
         <View className="mt-4 flex-row justify-between">
-          <Text className="text-blue-600 font-bold text-xl">
+          <Text className="text-[#143d7b] font-bold text-xl">
             Number of Seats
           </Text>
           {maxSeats !== undefined && (
-            <Text className="text-blue-600 font-bold text-sm">
+            <Text className="text-[#143d7b] font-bold text-sm">
               Available {maxSeats} Seats
             </Text>
           )}
@@ -430,13 +434,13 @@ const TableRequirements = () => {
             accessibilityRole="button"
             accessibilityLabel="Increase guest count"
             className="h-8 w-8 items-center justify-center rounded-full border border-gray-300 bg-blue-500">
-            <Ionicons name="add" size={24} color="#333" />
+            <Ionicons name="add" size={24} color="#143d7b" />
           </Pressable>
         </View>
 
         {/* Seating Type & Floor */}
         <View className="mt-4">
-          <Text className="text-blue-600 font-bold text-xl mb-2">
+          <Text className="text-[#143d7b] font-bold text-xl mb-2">
             Seating type
           </Text>
           <RadioButton.Group onValueChange={setSelectedArea} value={area}>
@@ -448,7 +452,7 @@ const TableRequirements = () => {
                   <View
                     key={option}
                     className={`flex-row items-center rounded-lg border-2 ${
-                      selected ? "border-blue-400" : "border-gray-300"
+                      selected ? "border-[#143d7b]" : "border-gray-300"
                     }`}>
                     <RadioButton value={option} />
                     <Text>{option}</Text>
@@ -459,7 +463,7 @@ const TableRequirements = () => {
           </RadioButton.Group>
 
           <View className="mt-4">
-            <Text className="text-blue-600 font-bold text-xl mb-2">
+            <Text className="text-[#143d7b] font-bold text-xl mb-2">
               Select Floor
             </Text>
             <View className="flex-row flex-wrap gap-2">
@@ -472,10 +476,10 @@ const TableRequirements = () => {
                     onPress={() => setSelectedFloorState(floor)}
                     className={`items-center justify-center rounded-full border-2 px-3 py-2 ${
                       selected
-                        ? "border-blue-600 bg-blue-600"
+                        ? "border-[#143d7b] bg-[#143d7b]"
                         : "border-gray-300"
                     }`}>
-                    <Text className={selected ? "text-white" : "text-gray-700"}>
+                    <Text className={selected ? "text-white" : "text-gray-900"}>
                       {floor}
                     </Text>
                   </Pressable>
@@ -485,7 +489,7 @@ const TableRequirements = () => {
           </View>
 
           <View className="mt-4">
-            <Text className="text-blue-600 font-bold text-xl mb-2">
+            <Text className="text-[#143d7b] font-bold text-xl mb-2">
               Special Request
             </Text>
             <TextInput
@@ -504,7 +508,7 @@ const TableRequirements = () => {
       </ScrollView>
 
       <View className="px-4 pb-6 pt-3 bg-white">
-        <Button mode="contained" onPress={handleContinue}>
+        <Button buttonColor="#143d7b" mode="contained" onPress={handleContinue}>
           Continue
         </Button>
       </View>

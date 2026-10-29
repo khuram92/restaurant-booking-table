@@ -323,7 +323,7 @@ const BookingDetails = () => {
         }>
         <View className="items-center px-6 pb-10 pt-20">
           <View className="h-20 w-20 items-center justify-center rounded-full border border-green-100 bg-green-50">
-            <Ionicons name={config.icon} size={38} color="blue" />
+            <Ionicons name={config.icon} size={38} color="#143d7b" />
           </View>
 
           <Text className="mt-6 text-center text-2xl font-bold text-blue-600">

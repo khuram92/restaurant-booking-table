@@ -218,7 +218,7 @@ export default function BookATable() {
 
             <View>
               <View className="flex-row items-center justify-center gap-1">
-                <Ionicons name="location-outline" size={18} color="blue" />
+                <Ionicons name="location-outline" size={18} color="#143d7b" />
                 <Text className="text-black">{restaurant?.city}</Text>
               </View>
               <Text className="mt-2 text-black">
