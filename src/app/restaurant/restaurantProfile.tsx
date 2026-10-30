@@ -315,13 +315,13 @@ const RestaurantProfile = () => {
             </View>
             
           </View>
-          {/* <View className="flex-1 flex-row items-center justify-center rounded-2xl bg-blue-50 py-4">
+          <View className="flex-1 flex-row items-center justify-center rounded-2xl bg-blue-50 py-4">
             <Ionicons name="people" size={20} color="#143d7b" />
             <Text className="ml-2 text-lg font-bold text-gray-900">
               {restaurant.availableSeats ?? 0}
             </Text>
             <Text className="ml-1 text-sm text-gray-500">seats</Text>
-          </View> */}
+          </View>
         </View>
 
         {/* Details */}
