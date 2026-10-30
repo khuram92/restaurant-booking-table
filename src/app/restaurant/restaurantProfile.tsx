@@ -71,7 +71,7 @@ const RestaurantProfile = () => {
   const [saving, setSaving] = useState(false);
   const [photoIndex, setPhotoIndex] = useState(0);
   const [brokenPhotos, setBrokenPhotos] = useState<string[]>([]);
-
+  const rating = restaurant?.rating || 0;
   const load = useCallback(async () => {
     try {
       setRestaurant(await getMyRestaurant());
@@ -180,20 +180,20 @@ const RestaurantProfile = () => {
     );
   }
 
-//   if (editing) {
-//     return (
-//       <View className="flex-1 bg-white">
-//         {header}
-//         <RestaurantForm
-//           initial={restaurantToForm(restaurant)}
-//           submitLabel="Save changes"
-//           submitting={saving}
-//           onSubmit={handleSave}
-//           onCancel={() => setEditing(false)}
-//         />
-//       </View>
-//     );
-//   }
+  //   if (editing) {
+  //     return (
+  //       <View className="flex-1 bg-white">
+  //         {header}
+  //         <RestaurantForm
+  //           initial={restaurantToForm(restaurant)}
+  //           submitLabel="Save changes"
+  //           submitting={saving}
+  //           onSubmit={handleSave}
+  //           onCancel={() => setEditing(false)}
+  //         />
+  //       </View>
+  //     );
+  //   }
 
   const photos = getRestaurantImageUrls(restaurant.images);
   const cover = photos[photoIndex];
@@ -259,16 +259,19 @@ const RestaurantProfile = () => {
           )}
 
           <View className="absolute bottom-0 left-0 right-0  p-4">
-            <Text numberOfLines={1} className="text-2xl font-bold bg-black/50 px-2 py-1 rounded overflow-hidden self-start text-white">
+            <Text
+              numberOfLines={1}
+              className="text-2xl font-bold bg-black/50 px-2 py-1 rounded overflow-hidden self-start text-white">
               {restaurant.name}
             </Text>
-            <Text numberOfLines={1} className="text-base text-white bg-black/50 px-2 py-1 rounded overflow-hidden self-start">
+            <Text
+              numberOfLines={1}
+              className="text-base text-white bg-black/50 px-2 py-1 rounded overflow-hidden self-start">
               {restaurant.cuisines}
             </Text>
           </View>
         </View>
 
-       
         {photos.length > 1 && (
           <ScrollView
             horizontal
@@ -292,24 +295,33 @@ const RestaurantProfile = () => {
           </ScrollView>
         )}
 
-        {/* Rating and seats */}
-        <View className="mx-4 mt-4 flex-row gap-3">
+        <View className="mx-4 mt-4 flex gap-3">
           <View className="flex-1 flex-row items-center justify-center rounded-2xl bg-amber-50 py-4">
-            <Ionicons name="star" size={20} color="#F59E0B" />
-            <Text className="ml-2 text-lg font-bold text-gray-900">
-              {(restaurant.rating ?? 0).toFixed(1)}
-            </Text>
-            <Text className="ml-1 text-sm text-gray-500">
+            <View className="flex-row gap-1 items-center">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Ionicons
+                  key={star}
+                  name={star <= Math.round(rating) ? "star" : "star-outline"}
+                  size={20}
+                  color={star <= Math.round(rating) ? "#143d7b" : "#143d7b"}
+                />
+              ))}
+              <Text className="px-2 font-semibold text-[#143d7b]">
+                {rating.toFixed(1)}
+              </Text>
+              <Text className="ml-1 text-sm text-gray-500">
               ({restaurant.reviewCount ?? 0})
             </Text>
+            </View>
+            
           </View>
-          <View className="flex-1 flex-row items-center justify-center rounded-2xl bg-blue-50 py-4">
-            <Ionicons name="people" size={20} color="#2563EB" />
+          {/* <View className="flex-1 flex-row items-center justify-center rounded-2xl bg-blue-50 py-4">
+            <Ionicons name="people" size={20} color="#143d7b" />
             <Text className="ml-2 text-lg font-bold text-gray-900">
               {restaurant.availableSeats ?? 0}
             </Text>
             <Text className="ml-1 text-sm text-gray-500">seats</Text>
-          </View>
+          </View> */}
         </View>
 
         {/* Details */}

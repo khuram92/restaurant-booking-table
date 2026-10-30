@@ -145,7 +145,7 @@ export default function BookATable() {
     .map((u) => resolveImageUrl(u))
     .filter((u): u is string => !!u);
   const hasImages = imagesList.length > 0;
-const rating = restaurant?.rating || 0;
+  const rating = restaurant?.rating || 0;
   const coverUri = hasImages
     ? imagesList[currentPhotoIndex % imagesList.length]
     : null;
@@ -206,8 +206,7 @@ const rating = restaurant?.rating || 0;
         {/* Content Details */}
         <View className="flex-1 -mt-6 bg-white rounded-t-3xl px-4 pt-6">
           <View className="flex-row justify-between">
-            
-              <View className="flex-row gap-1 items-center">
+            <View className="flex-row gap-1 items-center">
               {[1, 2, 3, 4, 5].map((star) => (
                 <Ionicons
                   key={star}
@@ -223,8 +222,6 @@ const rating = restaurant?.rating || 0;
                 ({restaurant?.reviewCount || 0})
               </Text>
             </View>
-              
-            
 
             <View>
               <View className="flex-row items-center justify-center gap-1">
