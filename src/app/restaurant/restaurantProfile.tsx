@@ -21,6 +21,7 @@ import {
 } from "../../api/restaurantApi";
 import { parseTimeToMinutes } from "@/utils/validation";
 import RestaurantForm, { restaurantToForm } from "../components/RestaurantForm";
+import { SafeAreaInsetsContext } from "react-native-safe-area-context";
 
 type IconName = React.ComponentProps<typeof Ionicons>["name"];
 
@@ -400,16 +401,19 @@ const RestaurantProfile = () => {
           </Text>
         </View>
 
+       
+      </ScrollView>
+      <View
+        className="border-t border-gray-100 bg-white px-4 p-3"
+        >
         <Pressable
           onPress={() => setEditing(true)}
           accessibilityRole="button"
-          className="mx-4 mt-6 flex-row items-center justify-center rounded-full bg-[#143d7b] py-4">
+          className="flex-row items-center justify-center rounded-full bg-[#143d7b] py-4 active:opacity-90">
           <Ionicons name="create-outline" size={18} color="white" />
-          <Text className="ml-2 text-lg font-bold text-white">
-            Edit details
-          </Text>
+          <Text className="ml-2 text-lg font-bold text-white">Edit details</Text>
         </Pressable>
-      </ScrollView>
+      </View>
     </View>
   );
 };
