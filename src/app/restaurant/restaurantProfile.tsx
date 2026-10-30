@@ -105,6 +105,11 @@ const RestaurantProfile = () => {
   const open = restaurant
     ? isOpenNow(restaurant.openingTime, restaurant.closingTime)
     : false;
+  const cuisines = String(restaurant?.cuisines ?? "")
+    .split(/[,|]/)
+    .map((c) => c.trim())
+    .filter(Boolean)
+    .slice(0, 4);
   const [brokenPhotos, setBrokenPhotos] = useState<string[]>([]);
   const rating = restaurant?.rating || 0;
   const load = useCallback(async () => {
@@ -311,17 +316,27 @@ const RestaurantProfile = () => {
             </View>
           )}
 
-          <View className="absolute bottom-0 left-0 right-0  p-4">
-            <Text
-              numberOfLines={1}
-              className="text-2xl font-bold bg-black/50 px-2 py-1 rounded overflow-hidden self-start text-white">
-              {restaurant.name}
-            </Text>
-            <Text
-              numberOfLines={1}
-              className="text-base text-white bg-black/50 px-2 py-1 rounded overflow-hidden self-start">
-              {restaurant.cuisines}
-            </Text>
+          <View
+            pointerEvents="none"
+            className="absolute bottom-0 left-0 right-0">
+            <View className="bg-black/45 px-4 pb-4 pt-1">
+              <Text numberOfLines={1} className="text-2xl font-bold text-white">
+                {restaurant.name}
+              </Text>
+              {cuisines.length > 0 && (
+                <View className="mt-1 flex-row flex-wrap">
+                  {cuisines.map((c) => (
+                    <View
+                      key={c}
+                      className="mb-1 mr-2 rounded-full bg-white/25 px-3 py-1">
+                      <Text className="text-xs font-semibold text-white">
+                        {c}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              )}
+            </View>
           </View>
         </View>
 
