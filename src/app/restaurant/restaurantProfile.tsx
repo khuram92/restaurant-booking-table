@@ -258,7 +258,7 @@ const RestaurantProfile = () => {
             </View>
           )}
 
-          <View className="absolute bottom-0 left-0 right-0 bg-black/45 p-4">
+          <View className="absolute bottom-0 left-0 right-0  p-4">
             <Text numberOfLines={1} className="text-2xl font-bold text-white">
               {restaurant.name}
             </Text>
