@@ -451,7 +451,7 @@ export default function Home() {
                     <MaterialCommunityIcons
                       name={icon}
                       size={28}
-                      color={"#3B82F6"}
+                      color={"#143d7b"}
                     />
                     <Text className="mt-2 text-center text-sm font-semibold text-black">
                       {label}
