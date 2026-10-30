@@ -398,7 +398,8 @@ export default function Home() {
         </View>
 
         {/* Search Bar */}
-        <View className="flex-row items-center rounded-full mt-4">
+        <View className="flex-row items-center rounded-full mt-4 mb-4" 
+        style={{ boxShadow: "0px 6px 6px -2px rgba(0,0,0,0.25)" }}>
           <Searchbar
             value={search}
             onChangeText={setSearch}
