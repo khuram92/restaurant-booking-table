@@ -352,20 +352,26 @@ const RestaurantProfile = () => {
         <View className="mx-4 mt-4 flex gap-3">
           <View className="flex-1 flex-row items-center justify-center rounded-2xl bg-amber-50 py-4">
             <View className="flex-row gap-1 items-center">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <Ionicons
-                  key={star}
-                  name={star <= Math.round(rating) ? "star" : "star-outline"}
-                  size={20}
-                  color={star <= Math.round(rating) ? "#143d7b" : "#143d7b"}
-                />
-              ))}
-              <Text className="px-2 font-semibold text-[#143d7b]">
-                {rating.toFixed(1)}
-              </Text>
-              <Text className="ml-1 text-sm text-gray-500">
-                ({restaurant.reviewCount ?? 0})
-              </Text>
+              <Pressable
+                onPress={() => router.push("/restaurant/restaurantReviews")}
+                accessibilityRole="button"
+                accessibilityLabel="Open reviews"
+                className="flex-1 flex-row items-center justify-center rounded-2xl bg-amber-50 py-4 active:opacity-70">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Ionicons
+                    key={star}
+                    name={star <= Math.round(rating) ? "star" : "star-outline"}
+                    size={20}
+                    color={star <= Math.round(rating) ? "#143d7b" : "#143d7b"}
+                  />
+                ))}
+                <Text className="px-2 font-semibold text-[#143d7b]">
+                  {rating.toFixed(1)}
+                </Text>
+                <Text className="ml-1 text-sm text-gray-900">
+                  ({restaurant.reviewCount ?? 0})
+                </Text>
+              </Pressable>
             </View>
           </View>
           <View className="flex-1 flex-row items-center justify-center rounded-2xl bg-blue-50 py-4">
@@ -373,7 +379,7 @@ const RestaurantProfile = () => {
             <Text className="ml-2 text-lg font-bold text-gray-900">
               {restaurant.availableSeats ?? 0}
             </Text>
-            <Text className="ml-1 text-sm text-gray-500">seats Avaliable</Text>
+            <Text className="ml-1 text-sm text-gray-900">seats Avaliable</Text>
           </View>
         </View>
 
