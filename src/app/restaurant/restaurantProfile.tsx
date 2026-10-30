@@ -19,6 +19,7 @@ import {
   type NewRestaurant,
   type Restaurant,
 } from "../../api/restaurantApi";
+import { parseTimeToMinutes } from "@/utils/validation";
 // import RestaurantForm, { restaurantToForm } from "../components/RestaurantForm";
 
 type IconName = React.ComponentProps<typeof Ionicons>["name"];
@@ -33,10 +34,22 @@ const keepStoredImages = (stored: string[] = [], edited: string[]) => {
 };
 
 const Pill = ({ text }: { text: string }) => (
-  <View className="mb-1 mr-2 rounded-2xl border border-blue-100 bg-blue-50 px-4 py-2">
+  <View className="mb-1 mr-2 rounded-2xl border border-blue-200 bg-blue-100 px-4 py-2">
     <Text className="text-base text-gray-900">{text}</Text>
   </View>
 );
+const isOpenNow = (opening?: string, closing?: string): boolean | null => {
+  const open = parseTimeToMinutes(opening);
+  const close = parseTimeToMinutes(closing);
+  if (open === null || close === null) return null;
+
+  const now = new Date();
+  const current = now.getHours() * 60 + now.getMinutes();
+
+  if (open === close) return true; // open 24 hours
+  if (open < close) return current >= open && current < close;
+  return current >= open || current < close; // closes after midnight
+};
 
 const Row = ({
   icon,
@@ -63,8 +76,8 @@ const Row = ({
       className="mb-3 flex-row items-center">
       <Ionicons name={icon} size={20} color="#143d7b" />
 
-      <View className="ml-3 flex-1">
-        <Text className="mb-1 text-xs text-gray-600">{label}</Text>
+      <View className="ml-3 flex-1 gap-1">
+        <Text className="mb-1 text-xm text-gray-600">{label}:</Text>
         <View className="flex-row flex-wrap">
           {items.length ? (
             items.map((t, i) => <Pill key={`${t}-${i}`} text={t} />)
