@@ -32,6 +32,12 @@ const keepStoredImages = (stored: string[] = [], edited: string[]) => {
   return edited.map((url) => originals.get(url) ?? url);
 };
 
+const Pill = ({ text }: { text: string }) => (
+  <View className="mb-1 mr-2 rounded-2xl border border-blue-100 bg-blue-50 px-4 py-2">
+    <Text className="text-base text-gray-900">{text}</Text>
+  </View>
+);
+
 const Row = ({
   icon,
   label,
@@ -41,26 +47,39 @@ const Row = ({
 }: {
   icon: IconName;
   label: string;
-  value: string;
+  value: string | string[];
   actionIcon?: IconName;
   onPress?: () => void;
-}) => (
-  <Pressable
-    onPress={onPress}
-    disabled={!onPress}
-    accessibilityRole={onPress ? "button" : undefined}
-    className="flex-row items-center border-b border-gray-100 py-3">
-    <Ionicons name={icon} size={20} color="#143d7b" />
-    <View className="ml-3 flex-1">
-      <Text className="text-xm text-gray-600">{label}</Text>
-      <Text className="text-base text-gray-900">{value}</Text>
-    </View>
-    {onPress && actionIcon && (
-      <Ionicons name={actionIcon} size={20} color="#143d7b" />
-    )}
-  </Pressable>
-);
+}) => {
+  const items = (Array.isArray(value) ? value : [value]).filter(
+    (v) => v && v.trim(),
+  );
 
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={!onPress}
+      accessibilityRole={onPress ? "button" : undefined}
+      className="mb-3 flex-row items-center">
+      <Ionicons name={icon} size={20} color="#143d7b" />
+
+      <View className="ml-3 flex-1">
+        <Text className="mb-1 text-xs text-gray-600">{label}</Text>
+        <View className="flex-row flex-wrap">
+          {items.length ? (
+            items.map((t, i) => <Pill key={`${t}-${i}`} text={t} />)
+          ) : (
+            <Pill text="Not added" />
+          )}
+        </View>
+      </View>
+
+      {onPress && actionIcon && (
+        <Ionicons name={actionIcon} size={20} color="#143d7b" />
+      )}
+    </Pressable>
+  );
+};
 const RestaurantProfile = () => {
   const [restaurant, setRestaurant] = useState<Restaurant | null | undefined>(
     undefined,
@@ -240,8 +259,6 @@ const RestaurantProfile = () => {
             </Text>
           </View>
         )}
-
-        {/* Cover photo with name on top */}
         <View className="mx-4 h-52 overflow-hidden rounded-3xl bg-[#143d7b]">
           {showCover ? (
             <Image
@@ -310,10 +327,9 @@ const RestaurantProfile = () => {
                 {rating.toFixed(1)}
               </Text>
               <Text className="ml-1 text-sm text-gray-500">
-              ({restaurant.reviewCount ?? 0})
-            </Text>
+                ({restaurant.reviewCount ?? 0})
+              </Text>
             </View>
-            
           </View>
           <View className="flex-1 flex-row items-center justify-center rounded-2xl bg-blue-50 py-4">
             <Ionicons name="people" size={20} color="#143d7b" />
@@ -329,35 +345,38 @@ const RestaurantProfile = () => {
           <Row
             icon="location-outline"
             label="Address "
-            value={address || "Not added"}
+            value={address}
             actionIcon="navigate-outline"
             // onPress={address ? openMaps : undefined}
           />
           <Row
             icon="call-outline"
             label="Phone "
-            value={restaurant.phone || "Not added"}
+            value={restaurant.phone || ""}
             actionIcon="call"
             // onPress={restaurant.phone ? callRestaurant : undefined}
           />
           <Row
-            icon="time-outline"
+            icon="time-outline" 
             label="Opening hours"
             value={
               restaurant.openingTime && restaurant.closingTime
-                ? `${restaurant.openingTime} - ${restaurant.closingTime}`
-                : "Not added"
+                ? [
+                    `Opens ${restaurant.openingTime}`,
+                    `Closes ${restaurant.closingTime}`,
+                  ]
+                : []
             }
           />
           <Row
             icon="home-outline"
             label="Seating types"
-            value={restaurant.seatingTypes?.join(", ") || "Not added"}
+            value={restaurant.seatingTypes ?? []}
           />
           <Row
             icon="layers-outline"
             label="Floors"
-            value={restaurant.floorNumbers?.join(", ") || "Not added"}
+            value={restaurant.floorNumbers ?? []}
           />
         </View>
         <View className="mx-4 mt-4 rounded-2xl border border-gray-100 bg-white p-4">
