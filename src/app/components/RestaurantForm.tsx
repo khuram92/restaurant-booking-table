@@ -123,7 +123,7 @@ const validate = (v: RestaurantFormValues): string | null => {
 };
 
 export const Section = ({ title }: { title: string }) => (
-  <Text className="mb-3 mt-6 text-xl font-bold text-blue-700">{title}</Text>
+  <Text className="mb-3 mt-6 text-xl font-bold text-[#143d7b]">{title}</Text>
 );
 
 export const Field = ({
@@ -132,13 +132,13 @@ export const Field = ({
   ...props
 }: TextInputProps & { label: string; required?: boolean }) => (
   <View className="mb-4">
-    <Text className="mb-1 text-sm font-semibold text-gray-700">
+    <Text className="mb-1 text-sm font-semibold text-gray-900">
       {label}
       {required ? <Text className="text-red-500"> *</Text> : null}
     </Text>
     <TextInput
       placeholderTextColor="#9ca3af"
-      className="rounded-lg border border-blue-300 px-3 py-3 text-base text-gray-900"
+      className="rounded-lg border border-[#143d7b] px-3 py-3 text-base text-gray-900"
       {...props}
     />
   </View>
@@ -170,13 +170,13 @@ export const TimeField = ({
 
   return (
     <View className="flex-1">
-      <Text className="mb-1 text-sm font-semibold text-gray-700">
+      <Text className="mb-1 text-sm font-semibold text-gray-900">
         {label}
         <Text className="text-red-500"> *</Text>
       </Text>
       <Pressable
         onPress={() => setShow(true)}
-        className="flex-row items-center justify-between rounded-lg border border-blue-300 px-3 py-3">
+        className="flex-row items-center justify-between rounded-lg border border-[#143d7b] px-3 py-3">
         <Text className={value ? "text-gray-900" : "text-gray-400"}>
           {value || "Select time"}
         </Text>
@@ -196,7 +196,7 @@ export const TimeField = ({
       )}
       {show && Platform.OS === "ios" && (
         <Pressable onPress={() => setShow(false)} className="mt-1 self-end">
-          <Text className="font-semibold text-blue-700">Done</Text>
+          <Text className="font-semibold text-[#143d7b]">Done</Text>
         </Pressable>
       )}
     </View>
@@ -234,7 +234,7 @@ export const StringListInput = ({
 
   return (
     <View className="mb-4">
-      <Text className="mb-1 text-sm font-semibold text-gray-700">
+      <Text className="mb-1 text-sm font-semibold text-gray-900">
         {label}
         {required ? <Text className="text-red-500"> *</Text> : null}
       </Text>
@@ -247,13 +247,13 @@ export const StringListInput = ({
           placeholder={placeholder}
           placeholderTextColor="#9ca3af"
           returnKeyType="done"
-          className="flex-1 rounded-lg border border-blue-300 px-3 py-3 text-base text-gray-900"
+          className="flex-1 rounded-lg border border-[#143d7b]] px-3 py-3 text-base text-gray-900"
         />
         <Pressable
           onPress={() => add(text)}
           accessibilityRole="button"
           accessibilityLabel={`Add ${label}`}
-          className="ml-2 h-12 w-12 items-center justify-center rounded-lg bg-blue-700">
+          className="ml-2 h-12 w-12 items-center justify-center rounded-lg bg-[#143d7b]]">
           <Ionicons name="add" size={24} color="white" />
         </Pressable>
       </View>
@@ -279,7 +279,7 @@ export const StringListInput = ({
             <View
               key={item}
               className="mb-2 mr-2 flex-row items-center rounded-full bg-blue-100 px-3 py-1">
-              <Text numberOfLines={1} className="max-w-[220px] text-sm text-blue-800">
+              <Text numberOfLines={1} className="max-w-[220px] text-sm text-[#143d7b]">
                 {item}
               </Text>
               <Pressable
@@ -444,7 +444,7 @@ const RestaurantForm = ({
           disabled={submitting}
           accessibilityRole="button"
           className={`mt-6 items-center rounded-full py-4 ${
-            submitting ? "bg-blue-400" : "bg-blue-700"
+            submitting ? "bg-blue-400" : "bg-[#143d7b]"
           }`}>
           {submitting ? (
             <ActivityIndicator color="white" />
@@ -459,7 +459,7 @@ const RestaurantForm = ({
             disabled={submitting}
             accessibilityRole="button"
             className="mt-3 items-center rounded-full border border-gray-300 py-4">
-            <Text className="text-lg font-semibold text-gray-700">Cancel</Text>
+            <Text className="text-lg font-semibold text-gray-900">Cancel</Text>
           </Pressable>
         )}
       </ScrollView>
