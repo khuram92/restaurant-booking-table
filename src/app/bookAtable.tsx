@@ -194,10 +194,10 @@ export default function BookATable() {
           </View>
 
           <View className="mb-4 p-4">
-            <Text className="text-2xl font-bold text-white">
+            <Text className="text-2xl font-bold text-white bg-black/50 px-2 py-1 rounded overflow-hidden self-start">
               {restaurant?.name || "Restaurant Name"}
             </Text>
-            <Text className="text-base text-white">
+            <Text className="text-base text-white bg-black/50 px-2 py-1 rounded overflow-hidden self-start mt-1">
               {restaurant?.cuisines || "Cuisines"}
             </Text>
           </View>
@@ -297,9 +297,7 @@ export default function BookATable() {
               </View>
 
               {/* Timings */}
-              <Text className="text-xl font-bold text-black mt-6">
-                Timings
-              </Text>
+              <Text className="text-xl font-bold text-black mt-6">Timings</Text>
               <View className="flex-row items-center gap-3 mt-3 mb-6">
                 <View className="flex-row items-center gap-1 bg-gray-100 rounded-full px-3 py-2">
                   <Ionicons name="time-outline" size={16} color="#143d7b" />
@@ -337,9 +335,7 @@ export default function BookATable() {
               </View>
 
               {/* Floor Numbers */}
-              <Text className="text-xl font-bold text-black mt-6">
-                Floors
-              </Text>
+              <Text className="text-xl font-bold text-black mt-6">Floors</Text>
               <View className="flex-row flex-wrap gap-2 mt-3 mb-6">
                 {(restaurant?.floorNumbers || ["First Floor"]).map((floor) => (
                   <View
@@ -361,7 +357,11 @@ export default function BookATable() {
               </Text>
               <View className="flex-row items-center gap-3 mt-3 mb-6">
                 <View className="flex-row items-center gap-1 bg-gray-100 rounded-full px-3 py-2">
-                  <MaterialCommunityIcons name="pin" size={16} color="#143d7b" />
+                  <MaterialCommunityIcons
+                    name="pin"
+                    size={16}
+                    color="#143d7b"
+                  />
                   <Text className="text-gray-900 text-sm">
                     {restaurant?.address || "Address not provided"}
                   </Text>
@@ -464,7 +464,10 @@ export default function BookATable() {
 
       {/* Footer Book Button */}
       <View className="px-4 pb-6 pt-3 bg-white">
-        <Button buttonColor="#143d7b" mode="contained" onPress={navigateToBooking}>
+        <Button
+          buttonColor="#143d7b"
+          mode="contained"
+          onPress={navigateToBooking}>
           Book a table
         </Button>
       </View>
