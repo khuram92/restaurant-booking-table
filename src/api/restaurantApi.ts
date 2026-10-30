@@ -145,20 +145,37 @@ export const getEveryRestaurant = async (
   }
   return all;
 };
+export const getRestaurantImageUrls = (images?: string[]): string[] =>
+  (images ?? [])
+    .map((url) => resolveImageUrl(url))
+    .filter((url): url is string => !!url);
 
 export const resolveImageUrl = (url?: string): string | undefined => {
   if (!url) return undefined;
+  let result = url.trim();
 
-  try {
-    if (url.includes("google.com/imgres")) {
-      const real = new URL(url).searchParams.get("imgurl");
-      if (real) url = real;
+  // Unwrap Google Images "imgres" links
+  if (result.includes("google.com/imgres")) {
+    const match = result.match(/[?&]imgurl=([^&]+)/i);
+    if (match) {
+      try {
+        result = decodeURIComponent(match[1]);
+      } catch {
+        // keep the original link if decoding fails
+      }
     }
-  } catch {
-    // fall through with the original url
   }
 
-  return url.replace(/^http:\/\//i, "https://");
+  // Cloudinary: serve an optimised format and quality
+  if (
+    result.includes("res.cloudinary.com") &&
+    result.includes("/upload/") &&
+    !result.includes("f_auto")
+  ) {
+    result = result.replace("/upload/", "/upload/f_auto,q_auto/");
+  }
+
+  return result.replace(/^http:\/\//i, "https://");
 };
 
 export const fetchFeaturedRestaurants = async (): Promise<
