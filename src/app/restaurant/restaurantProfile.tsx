@@ -158,27 +158,27 @@ const RestaurantProfile = () => {
     );
   }
 
-//   if (restaurant === null) {
-//     return (
-//       <View className="flex-1 bg-white">
-//         {header}
-//         <View className="flex-1 items-center justify-center px-6">
-//           <Ionicons name="restaurant-outline" size={56} color="#d1d5db" />
-//           <Text className="mt-3 text-lg font-bold text-gray-900">
-//             No restaurant yet
-//           </Text>
-//           <Text className="mt-1 text-center text-gray-500">
-//             Create your restaurant to start receiving bookings.
-//           </Text>
-//           <Pressable
-//             onPress={() => router.push("/restaurant/createRestaurant")}
-//             className="mt-4 rounded-full bg-[#143d7b] px-8 py-3">
-//             <Text className="font-semibold text-white">Create restaurant</Text>
-//           </Pressable>
-//         </View>
-//       </View>
-//     );
-//   }
+  if (restaurant === null) {
+    return (
+      <View className="flex-1 bg-white">
+        {header}
+        <View className="flex-1 items-center justify-center px-6">
+          <Ionicons name="restaurant-outline" size={56} color="#d1d5db" />
+          <Text className="mt-3 text-lg font-bold text-gray-900">
+            No restaurant yet
+          </Text>
+          <Text className="mt-1 text-center text-gray-500">
+            Create your restaurant to start receiving bookings.
+          </Text>
+          <Pressable
+            onPress={() => router.push("/restaurant/createRestaurant")}
+            className="mt-4 rounded-full bg-[#143d7b] px-8 py-3">
+            <Text className="font-semibold text-white">Create restaurant</Text>
+          </Pressable>
+        </View>
+      </View>
+    );
+  }
 
   //   if (editing) {
   //     return (
