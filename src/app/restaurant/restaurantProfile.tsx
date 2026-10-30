@@ -266,12 +266,14 @@ const RestaurantProfile = () => {
             </Text>
           </View>
         ) : (
-          <View className="mx-4 mb-3 flex-row items-center self-start rounded-full bg-green-50 px-4 py-2">
-            <View className="h-2.5 w-2.5 rounded-full bg-green-500" />
-            <Text className="ml-2 text-sm font-semibold text-green-800">
-              Active · visible to customers
-            </Text>
-          </View>
+          <View className="mx-4 mb-3 flex-row items-center">
+            <View className="flex-row items-center rounded-full bg-green-50 px-4 py-2">
+              <View className="h-2.5 w-2.5 rounded-full bg-green-500" />
+              <Text className="ml-2 text-sm font-semibold text-green-800">
+                Active
+              </Text>
+            </View>
+            </View>
         )}
         <View className="mx-4 h-52 overflow-hidden rounded-3xl bg-[#143d7b]">
           {showCover ? (
