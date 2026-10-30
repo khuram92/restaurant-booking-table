@@ -360,8 +360,6 @@ const RestaurantProfile = () => {
             value={restaurant.floorNumbers?.join(", ") || "Not added"}
           />
         </View>
-
-        {/* About */}
         <View className="mx-4 mt-4 rounded-2xl border border-gray-100 bg-white p-4">
           <Text className="mb-2 text-lg font-bold text-blue-900">About</Text>
           <Text className="text-base leading-6 text-gray-700">
@@ -374,7 +372,7 @@ const RestaurantProfile = () => {
           onPress={() => setEditing(true)}
           accessibilityRole="button"
           className="mx-4 mt-6 flex-row items-center justify-center rounded-full bg-blue-700 py-4">
-          <Ionicons name="create-outline" size={20} color="white" />
+          <Ionicons name="create-outline" size={18} color="white" />
           <Text className="ml-2 text-lg font-bold text-white">
             Edit details
           </Text>
