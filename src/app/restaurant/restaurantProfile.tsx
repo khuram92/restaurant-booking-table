@@ -130,7 +130,7 @@ const RestaurantProfile = () => {
       <View className="flex-1 bg-white">
         {header}
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color="#2563EB" />
+          <ActivityIndicator size="large" color="#143d7b" />
         </View>
       </View>
     );
@@ -224,12 +224,19 @@ const RestaurantProfile = () => {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }>
-        {disabled && (
+        {disabled ? (
           <View className="mx-4 mb-3 flex-row items-center rounded-xl bg-orange-50 p-3">
             <Ionicons name="alert-circle" size={20} color="#EA580C" />
             <Text className="ml-2 flex-1 text-sm text-orange-800">
               An admin has switched your restaurant off. Customers can't see or
               book it.
+            </Text>
+          </View>
+        ) : (
+          <View className="mx-4 mb-3 flex-row items-center self-start rounded-full bg-green-50 px-4 py-2">
+            <View className="h-2.5 w-2.5 rounded-full bg-green-500" />
+            <Text className="ml-2 text-sm font-semibold text-green-800">
+              Active · visible to customers
             </Text>
           </View>
         )}
