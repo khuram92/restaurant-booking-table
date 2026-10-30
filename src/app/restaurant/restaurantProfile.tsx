@@ -1,19 +1,21 @@
+import { Ionicons } from "@expo/vector-icons";
+import { router, useFocusEffect } from "expo-router";
 import React, { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
   Image,
+  Linking,
   Pressable,
   RefreshControl,
   ScrollView,
   Text,
   View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { router, useFocusEffect } from "expo-router";
 import {
   getMyRestaurant,
   getRestaurantImageUrls,
+  resolveImageUrl,
   updateRestaurant,
   type NewRestaurant,
   type Restaurant,
@@ -22,90 +24,56 @@ import RestaurantForm, { restaurantToForm } from "../components/RestaurantForm";
 
 type IconName = React.ComponentProps<typeof Ionicons>["name"];
 
-/* ------------------------------ Components ------------------------------ */
 
-// Shows nothing broken: falls back if the link can't be loaded
-const SafeImage = ({
-  uri,
-  className,
-  fallback,
-}: {
-  uri?: string;
-  className: string;
-  fallback: React.ReactNode;
-}) => {
-  const [failed, setFailed] = useState(false);
-  if (!uri || failed) return <>{fallback}</>;
-
-  return (
-    <Image
-      source={{ uri }}
-      resizeMode="cover"
-      onError={() => setFailed(true)}
-      className={className}
-    />
-  );
+const keepStoredImages = (stored: string[] = [], edited: string[]) => {
+  const originals = new Map<string, string>();
+  stored.forEach((raw) => {
+    const resolved = resolveImageUrl(raw);
+    if (resolved) originals.set(resolved, raw);
+  });
+  return edited.map((url) => originals.get(url) ?? url);
 };
 
-const Card = ({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) => (
-  <View
-    className="mx-4 mt-4 rounded-2xl border border-gray-100 bg-white p-4"
-    style={{ elevation: 1 }}>
-    <Text className="mb-3 text-lg font-bold text-blue-900">{title}</Text>
-    {children}
-  </View>
-);
-
-const InfoRow = ({ icon, text }: { icon: IconName; text: string }) => (
-  <View className="mb-2 flex-row items-start">
-    <Ionicons name={icon} size={18} color="#2563EB" style={{ marginTop: 2 }} />
-    <Text className="ml-3 flex-1 text-base text-gray-700">{text}</Text>
-  </View>
-);
-
-const Chip = ({ label }: { label: string }) => (
-  <View className="mb-2 mr-2 rounded-full bg-blue-100 px-3 py-1.5">
-    <Text className="text-sm font-semibold text-blue-800">{label}</Text>
-  </View>
-);
-
-const Stat = ({
+const Row = ({
   icon,
-  tint,
-  value,
   label,
+  value,
+  actionIcon,
+  onPress,
 }: {
   icon: IconName;
-  tint: string;
-  value: string;
   label: string;
+  value: string;
+  actionIcon?: IconName;
+  onPress?: () => void;
 }) => (
-  <View
-    className="flex-1 items-center rounded-2xl border border-gray-100 bg-white py-4"
-    style={{ elevation: 1 }}>
-    <Ionicons name={icon} size={22} color={tint} />
-    <Text className="mt-1 text-xl font-bold text-gray-900">{value}</Text>
-    <Text className="text-xs text-gray-500">{label}</Text>
-  </View>
+  <Pressable
+    onPress={onPress}
+    disabled={!onPress}
+    accessibilityRole={onPress ? "button" : undefined}
+    className="flex-row items-center border-b border-gray-100 py-3">
+    <Ionicons name={icon} size={20} color="#2563EB" />
+    <View className="ml-3 flex-1">
+      <Text className="text-xs text-gray-500">{label}</Text>
+      <Text className="text-base text-gray-900">{value}</Text>
+    </View>
+    {onPress && actionIcon && (
+      <Ionicons name={actionIcon} size={20} color="#2563EB" />
+    )}
+  </Pressable>
 );
 
-/* -------------------------------- Screen -------------------------------- */
-
-export default function MyRestaurant() {
-  // Restaurant = has one, null = none yet, undefined = couldn't check
+const RestaurantProfile = () => {
+  // Restaurant = has one, null = none yet, undefined = couldn't load
   const [restaurant, setRestaurant] = useState<Restaurant | null | undefined>(
     undefined,
   );
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [mode, setMode] = useState<"view" | "edit">("view");
+  const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [photoIndex, setPhotoIndex] = useState(0);
+  const [brokenPhotos, setBrokenPhotos] = useState<string[]>([]);
 
   const load = useCallback(async () => {
     try {
@@ -134,9 +102,13 @@ export default function MyRestaurant() {
 
     try {
       setSaving(true);
-      const updated = await updateRestaurant(restaurant._id, payload);
+      const updated = await updateRestaurant(restaurant._id, {
+        ...payload,
+        images: keepStoredImages(restaurant.images, payload.images),
+      });
       setRestaurant(updated);
-      setMode("view");
+      setPhotoIndex(0);
+      setEditing(false);
       Alert.alert("Saved", "Your restaurant details were updated.");
     } catch (error) {
       Alert.alert(
@@ -148,13 +120,11 @@ export default function MyRestaurant() {
     }
   };
 
-  const editing = mode === "edit" && !!restaurant;
-
   const header = (
     <View className="flex-row items-center justify-between px-4 pb-3 pt-16">
       {editing ? (
         <Pressable
-          onPress={() => setMode("view")}
+          onPress={() => setEditing(false)}
           disabled={saving}
           hitSlop={8}
           accessibilityRole="button"
@@ -172,7 +142,7 @@ export default function MyRestaurant() {
 
       {!editing && restaurant ? (
         <Pressable
-          onPress={() => setMode("edit")}
+          onPress={() => setEditing(true)}
           hitSlop={8}
           accessibilityRole="button"
           accessibilityLabel="Edit restaurant"
@@ -231,7 +201,7 @@ export default function MyRestaurant() {
             Create your restaurant to start receiving bookings.
           </Text>
           <Pressable
-            onPress={() => router.push("/(restaurant)/createRestaurant")}
+            onPress={() => router.push("/restaurant/createRestaurant")}
             className="mt-4 rounded-full bg-blue-700 px-8 py-3">
             <Text className="font-semibold text-white">Create restaurant</Text>
           </Pressable>
@@ -249,20 +219,32 @@ export default function MyRestaurant() {
           submitLabel="Save changes"
           submitting={saving}
           onSubmit={handleSave}
-          onCancel={() => setMode("view")}
+          onCancel={() => setEditing(false)}
         />
       </View>
     );
   }
 
-  /* ----------------------------- View mode ----------------------------- */
+  /* ----------------------------- Details ----------------------------- */
 
-  const images = getRestaurantImageUrls(restaurant.images);
+  const photos = getRestaurantImageUrls(restaurant.images);
+  const cover = photos[photoIndex];
+  const showCover = !!cover && !brokenPhotos.includes(cover);
   const initial = restaurant.name?.trim().charAt(0).toUpperCase() || "?";
   const disabled = restaurant.isActive === false;
-  const location = [restaurant.address, restaurant.city, restaurant.province]
+  const address = [restaurant.address, restaurant.city, restaurant.province]
     .filter(Boolean)
     .join(", ");
+
+//   const callRestaurant = () =>
+//     Linking.openURL(`tel:${restaurant.phone.replace(/\s/g, "")}`).catch(() =>
+//       Alert.alert("Could not call", "No phone app is available."),
+//     );
+
+//   const openMaps = () =>
+//     Linking.openURL(
+//       `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`,
+//     ).catch(() => Alert.alert("Could not open maps", "No maps app is available."));
 
   return (
     <View className="flex-1 bg-white">
@@ -270,38 +252,36 @@ export default function MyRestaurant() {
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 32 }}
+        contentContainerStyle={{ paddingBottom: 40 }}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }>
         {disabled && (
-          <View className="mx-4 mb-4 flex-row items-start rounded-2xl bg-orange-50 p-4">
-            <Ionicons name="alert-circle" size={22} color="#EA580C" />
-            <View className="ml-3 flex-1">
-              <Text className="font-bold text-orange-800">
-                Hidden from customers
-              </Text>
-              <Text className="mt-0.5 text-sm text-orange-700">
-                An admin has switched your restaurant off, so customers can't
-                find it or book it. Contact the admin to have it re-enabled.
-              </Text>
-            </View>
+          <View className="mx-4 mb-3 flex-row items-center rounded-xl bg-orange-50 p-3">
+            <Ionicons name="alert-circle" size={20} color="#EA580C" />
+            <Text className="ml-2 flex-1 text-sm text-orange-800">
+              An admin has switched your restaurant off. Customers can't see or
+              book it.
+            </Text>
           </View>
         )}
 
-        {/* Cover */}
+        {/* Cover photo with name on top */}
         <View className="mx-4 h-52 overflow-hidden rounded-3xl bg-blue-600">
-          <SafeImage
-            uri={images[0]}
-            className="h-full w-full"
-            fallback={
-              <View className="flex-1 items-center justify-center">
-                <Text className="text-8xl font-bold text-white opacity-40">
-                  {initial}
-                </Text>
-              </View>
-            }
-          />
+          {showCover ? (
+            <Image
+              source={{ uri: cover }}
+              resizeMode="cover"
+              onError={() => setBrokenPhotos((cur) => [...cur, cover])}
+              className="h-full w-full"
+            />
+          ) : (
+            <View className="flex-1 items-center justify-center">
+              <Text className="text-8xl font-bold text-white opacity-40">
+                {initial}
+              </Text>
+            </View>
+          )}
 
           <View className="absolute bottom-0 left-0 right-0 bg-black/45 p-4">
             <Text numberOfLines={1} className="text-2xl font-bold text-white">
@@ -311,125 +291,98 @@ export default function MyRestaurant() {
               {restaurant.cuisines}
             </Text>
           </View>
-
-          <View
-            className={`absolute right-3 top-3 rounded-full px-3 py-1 ${
-              disabled ? "bg-orange-500" : "bg-green-600"
-            }`}>
-            <Text className="text-xs font-bold text-white">
-              {disabled ? "Disabled" : "Active"}
-            </Text>
-          </View>
         </View>
 
-        {/* Quick numbers */}
+        {/* Tap a photo to show it above */}
+        {photos.length > 1 && (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            className="mt-3"
+            contentContainerStyle={{ paddingHorizontal: 16 }}>
+            {photos.map((uri, index) => (
+              <Pressable
+                key={uri}
+                onPress={() => setPhotoIndex(index)}
+                accessibilityRole="button"
+                accessibilityLabel={`Show photo ${index + 1}`}
+                className={`mr-2 overflow-hidden rounded-xl border-2 ${
+                  index === photoIndex ? "border-blue-600" : "border-transparent"
+                }`}>
+                <Image source={{ uri }} className="h-16 w-16" />
+              </Pressable>
+            ))}
+          </ScrollView>
+        )}
+
+        {/* Rating and seats */}
         <View className="mx-4 mt-4 flex-row gap-3">
-          <Stat
-            icon="star"
-            tint="#F59E0B"
-            value={(restaurant.rating ?? 0).toFixed(1)}
-            label={`${restaurant.reviewCount ?? 0} reviews`}
+          <View className="flex-1 flex-row items-center justify-center rounded-2xl bg-amber-50 py-4">
+            <Ionicons name="star" size={20} color="#F59E0B" />
+            <Text className="ml-2 text-lg font-bold text-gray-900">
+              {(restaurant.rating ?? 0).toFixed(1)}
+            </Text>
+            <Text className="ml-1 text-sm text-gray-500">
+              ({restaurant.reviewCount ?? 0})
+            </Text>
+          </View>
+          <View className="flex-1 flex-row items-center justify-center rounded-2xl bg-blue-50 py-4">
+            <Ionicons name="people" size={20} color="#2563EB" />
+            <Text className="ml-2 text-lg font-bold text-gray-900">
+              {restaurant.availableSeats ?? 0}
+            </Text>
+            <Text className="ml-1 text-sm text-gray-500">seats</Text>
+          </View>
+        </View>
+
+        {/* Details */}
+        <View className="mx-4 mt-4 rounded-2xl border border-gray-100 bg-white px-4">
+          <Row
+            icon="location-outline"
+            label="Address (tap to open Maps)"
+            value={address || "Not added"}
+            actionIcon="navigate-outline"
+            // onPress={address ? openMaps : undefined}
           />
-          <Stat
-            icon="people"
-            tint="#2563EB"
-            value={String(restaurant.availableSeats ?? 0)}
-            label="Seats"
+          <Row
+            icon="call-outline"
+            label="Phone (tap to call)"
+            value={restaurant.phone || "Not added"}
+            actionIcon="call"
+            // onPress={restaurant.phone ? callRestaurant : undefined}
           />
-          <Stat
-            icon="images"
-            tint="#7C3AED"
-            value={String(images.length)}
-            label="Photos"
+          <Row
+            icon="time-outline"
+            label="Opening hours"
+            value={
+              restaurant.openingTime && restaurant.closingTime
+                ? `${restaurant.openingTime} - ${restaurant.closingTime}`
+                : "Not added"
+            }
+          />
+          <Row
+            icon="home-outline"
+            label="Seating types"
+            value={restaurant.seatingTypes?.join(", ") || "Not added"}
+          />
+          <Row
+            icon="layers-outline"
+            label="Floors"
+            value={restaurant.floorNumbers?.join(", ") || "Not added"}
           />
         </View>
 
-        <Card title="About">
-          {restaurant.description ? (
-            <Text className="text-base leading-6 text-gray-700">
-              {restaurant.description}
-            </Text>
-          ) : (
-            <Text className="text-gray-400">
-              No description yet. Tap Edit to tell customers about your
-              restaurant.
-            </Text>
-          )}
-        </Card>
-
-        <Card title="Contact & location">
-          <InfoRow icon="location-outline" text={location || "No address added"} />
-          <InfoRow icon="call-outline" text={restaurant.phone || "No phone added"} />
-        </Card>
-
-        <Card title="Opening hours">
-          <View className="flex-row gap-3">
-            <View className="flex-1 flex-row items-center rounded-full bg-gray-100 px-4 py-2">
-              <Ionicons name="time-outline" size={16} color="#2563EB" />
-              <Text className="ml-2 text-sm text-gray-700">
-                Opens {restaurant.openingTime || "-"}
-              </Text>
-            </View>
-            <View className="flex-1 flex-row items-center rounded-full bg-gray-100 px-4 py-2">
-              <Ionicons name="time-outline" size={16} color="#2563EB" />
-              <Text className="ml-2 text-sm text-gray-700">
-                Closes {restaurant.closingTime || "-"}
-              </Text>
-            </View>
-          </View>
-        </Card>
-
-        <Card title="Seating">
-          <Text className="mb-2 text-sm font-semibold text-gray-500">
-            Seating types
+        {/* About */}
+        <View className="mx-4 mt-4 rounded-2xl border border-gray-100 bg-white p-4">
+          <Text className="mb-2 text-lg font-bold text-blue-900">About</Text>
+          <Text className="text-base leading-6 text-gray-700">
+            {restaurant.description ||
+              "No description yet. Tap Edit details to add one."}
           </Text>
-          <View className="flex-row flex-wrap">
-            {restaurant.seatingTypes?.length ? (
-              restaurant.seatingTypes.map((t) => <Chip key={t} label={t} />)
-            ) : (
-              <Text className="text-gray-400">None added</Text>
-            )}
-          </View>
-
-          <Text className="mb-2 mt-2 text-sm font-semibold text-gray-500">
-            Floors
-          </Text>
-          <View className="flex-row flex-wrap">
-            {restaurant.floorNumbers?.length ? (
-              restaurant.floorNumbers.map((f) => <Chip key={f} label={f} />)
-            ) : (
-              <Text className="text-gray-400">None added</Text>
-            )}
-          </View>
-        </Card>
-
-        <Card title="Photos">
-          {images.length === 0 ? (
-            <Text className="text-gray-400">
-              No photos yet. Tap Edit to add some.
-            </Text>
-          ) : (
-            <View className="flex-row flex-wrap">
-              {images.map((uri, index) => (
-                <View key={uri} className="mb-3 mr-3">
-                  <SafeImage
-                    uri={uri}
-                    className="h-24 w-24 rounded-xl"
-                    fallback={<View className="h-24 w-24 rounded-xl bg-gray-200" />}
-                  />
-                  {index === 0 && (
-                    <Text className="absolute bottom-1 left-1 rounded bg-blue-700 px-1 text-[10px] font-bold text-white">
-                      Cover
-                    </Text>
-                  )}
-                </View>
-              ))}
-            </View>
-          )}
-        </Card>
+        </View>
 
         <Pressable
-          onPress={() => setMode("edit")}
+          onPress={() => setEditing(true)}
           accessibilityRole="button"
           className="mx-4 mt-6 flex-row items-center justify-center rounded-full bg-blue-700 py-4">
           <Ionicons name="create-outline" size={20} color="white" />
@@ -438,4 +391,6 @@ export default function MyRestaurant() {
       </ScrollView>
     </View>
   );
-}
+};
+
+export default RestaurantProfile;
