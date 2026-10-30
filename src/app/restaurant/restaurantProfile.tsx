@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   Alert,
   Image,
+  Linking,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -243,10 +244,10 @@ const RestaurantProfile = () => {
     .filter(Boolean)
     .join(", ");
 
-  //   const callRestaurant = () =>
-  //     Linking.openURL(`tel:${restaurant.phone.replace(/\s/g, "")}`).catch(() =>
-  //       Alert.alert("Could not call", "No phone app is available."),
-  //     );
+  const callRestaurant = () =>
+    Linking.openURL(`tel:${restaurant.phone.replace(/\s/g, "")}`).catch(() =>
+      Alert.alert("Could not call", "No phone app is available."),
+    );
 
   //   const openMaps = () =>
   //     Linking.openURL(
@@ -410,8 +411,8 @@ const RestaurantProfile = () => {
             icon="call-outline"
             label="Phone "
             value={restaurant.phone || ""}
-            actionIcon="call"
-            // onPress={restaurant.phone ? callRestaurant : undefined}
+
+            onPress={restaurant.phone ? callRestaurant : undefined}
           />
           <Row
             icon="time-outline"
