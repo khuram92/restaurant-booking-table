@@ -20,7 +20,7 @@ import {
   type Restaurant,
 } from "../../api/restaurantApi";
 import { parseTimeToMinutes } from "@/utils/validation";
-// import RestaurantForm, { restaurantToForm } from "../components/RestaurantForm";
+import RestaurantForm, { restaurantToForm } from "../components/RestaurantForm";
 
 type IconName = React.ComponentProps<typeof Ionicons>["name"];
 
@@ -212,20 +212,20 @@ const RestaurantProfile = () => {
     );
   }
 
-  //   if (editing) {
-  //     return (
-  //       <View className="flex-1 bg-white">
-  //         {header}
-  //         <RestaurantForm
-  //           initial={restaurantToForm(restaurant)}
-  //           submitLabel="Save changes"
-  //           submitting={saving}
-  //           onSubmit={handleSave}
-  //           onCancel={() => setEditing(false)}
-  //         />
-  //       </View>
-  //     );
-  //   }
+    if (editing) {
+      return (
+        <View className="flex-1 bg-white">
+          {header}
+          <RestaurantForm
+            initial={restaurantToForm(restaurant)}
+            submitLabel="Save changes"
+            submitting={saving}
+            onSubmit={handleSave}
+            onCancel={() => setEditing(false)}
+          />
+        </View>
+      );
+    }
 
   const photos = getRestaurantImageUrls(restaurant.images);
   const cover = photos[photoIndex];
