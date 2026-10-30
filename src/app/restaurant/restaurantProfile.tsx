@@ -320,22 +320,22 @@ const RestaurantProfile = () => {
             <Text className="ml-2 text-lg font-bold text-gray-900">
               {restaurant.availableSeats ?? 0}
             </Text>
-            <Text className="ml-1 text-sm text-gray-500">seats</Text>
+            <Text className="ml-1 text-sm text-gray-500">seats Avaliable</Text>
           </View>
         </View>
 
         {/* Details */}
-        <View className="mx-4 mt-4 rounded-2xl border border-gray-100 bg-white px-4">
+        <View className="mx-4 mt-4 rounded-2xl border border-gray-100 bg-white px-4 gap-2">
           <Row
             icon="location-outline"
-            label="Address (tap to open Maps)"
+            label="Address "
             value={address || "Not added"}
             actionIcon="navigate-outline"
             // onPress={address ? openMaps : undefined}
           />
           <Row
             icon="call-outline"
-            label="Phone (tap to call)"
+            label="Phone "
             value={restaurant.phone || "Not added"}
             actionIcon="call"
             // onPress={restaurant.phone ? callRestaurant : undefined}
