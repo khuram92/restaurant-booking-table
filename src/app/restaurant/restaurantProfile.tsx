@@ -1,3 +1,4 @@
+import { parseTimeToMinutes } from "@/utils/validation";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useFocusEffect } from "expo-router";
 import React, { useCallback, useState } from "react";
@@ -19,9 +20,7 @@ import {
   type NewRestaurant,
   type Restaurant,
 } from "../../api/restaurantApi";
-import { parseTimeToMinutes } from "@/utils/validation";
 import RestaurantForm, { restaurantToForm } from "../components/RestaurantForm";
-import { SafeAreaInsetsContext } from "react-native-safe-area-context";
 
 type IconName = React.ComponentProps<typeof Ionicons>["name"];
 
@@ -103,6 +102,9 @@ const RestaurantProfile = () => {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [photoIndex, setPhotoIndex] = useState(0);
+  const open = restaurant
+    ? isOpenNow(restaurant.openingTime, restaurant.closingTime)
+    : false;
   const [brokenPhotos, setBrokenPhotos] = useState<string[]>([]);
   const rating = restaurant?.rating || 0;
   const load = useCallback(async () => {
@@ -213,20 +215,20 @@ const RestaurantProfile = () => {
     );
   }
 
-    if (editing) {
-      return (
-        <View className="flex-1 bg-white">
-          {header}
-          <RestaurantForm
-            initial={restaurantToForm(restaurant)}
-            submitLabel="Save changes"
-            submitting={saving}
-            onSubmit={handleSave}
-            onCancel={() => setEditing(false)}
-          />
-        </View>
-      );
-    }
+  if (editing) {
+    return (
+      <View className="flex-1 bg-white">
+        {header}
+        <RestaurantForm
+          initial={restaurantToForm(restaurant)}
+          submitLabel="Save changes"
+          submitting={saving}
+          onSubmit={handleSave}
+          onCancel={() => setEditing(false)}
+        />
+      </View>
+    );
+  }
 
   const photos = getRestaurantImageUrls(restaurant.images);
   const cover = photos[photoIndex];
@@ -268,12 +270,31 @@ const RestaurantProfile = () => {
         ) : (
           <View className="mx-4 mb-3 flex-row items-center">
             <View className="flex-row items-center rounded-full bg-green-50 px-4 py-2">
-              <View className="h-2.5 w-2.5 rounded-full bg-green-500" />
+              <View className="h-2.5 w-2.5 rounded-full bg-[#143d7b]" />
               <Text className="ml-2 text-sm font-semibold text-green-800">
                 Active
               </Text>
             </View>
-            </View>
+
+            {open !== null && (
+              <View
+                className={`ml-2 flex-row items-center rounded-full px-4 py-2 ${
+                  open ? "bg-emerald-100" : "bg-gray-200"
+                }`}>
+                <Ionicons
+                  name="time-outline"
+                  size={16}
+                  color={open ? "#143d7b" : "#374151"}
+                />
+                <Text
+                  className={`ml-1 text-sm font-semibold ${
+                    open ? "text-[#143d7b]" : "text-gray-700"
+                  }`}>
+                  {open ? "Open now" : "Closed now"}
+                </Text>
+              </View>
+            )}
+          </View>
         )}
         <View className="mx-4 h-52 overflow-hidden rounded-3xl bg-[#143d7b]">
           {showCover ? (
@@ -373,7 +394,7 @@ const RestaurantProfile = () => {
             // onPress={restaurant.phone ? callRestaurant : undefined}
           />
           <Row
-            icon="time-outline" 
+            icon="time-outline"
             label="Opening hours"
             value={
               restaurant.openingTime && restaurant.closingTime
@@ -402,18 +423,16 @@ const RestaurantProfile = () => {
               "No description yet. Tap Edit details to add one."}
           </Text>
         </View>
-
-       
       </ScrollView>
-      <View
-        className="border-t border-gray-100 bg-white px-4 p-3"
-        >
+      <View className="border-t border-gray-100 bg-white px-4 p-3">
         <Pressable
           onPress={() => setEditing(true)}
           accessibilityRole="button"
           className="flex-row items-center justify-center rounded-full bg-[#143d7b] py-4 active:opacity-90">
           <Ionicons name="create-outline" size={18} color="white" />
-          <Text className="ml-2 text-lg font-bold text-white">Edit details</Text>
+          <Text className="ml-2 text-lg font-bold text-white">
+            Edit details
+          </Text>
         </Pressable>
       </View>
     </View>
