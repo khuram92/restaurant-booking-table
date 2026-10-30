@@ -119,7 +119,7 @@ const RestaurantProfile = () => {
 
   const header = (
     <View className="flex-row items-center justify-center px-4 pb-3 pt-16">
-      <Text className="text-2xl text-center font-bold text-blue-900">
+      <Text className="text-2xl text-center font-bold text-[#143d7b]">
         {editing ? "Edit Restaurant" : "My Restaurant"}
       </Text>
     </View>
@@ -150,7 +150,7 @@ const RestaurantProfile = () => {
               setLoading(true);
               void load();
             }}
-            className="mt-4 rounded-full bg-blue-700 px-6 py-2">
+            className="mt-4 rounded-full bg-[#143d7b] px-6 py-2">
             <Text className="font-semibold text-white">Retry</Text>
           </Pressable>
         </View>
@@ -172,7 +172,7 @@ const RestaurantProfile = () => {
           </Text>
           <Pressable
             onPress={() => router.push("/restaurant/createRestaurant")}
-            className="mt-4 rounded-full bg-blue-700 px-8 py-3">
+            className="mt-4 rounded-full bg-[#143d7b] px-8 py-3">
             <Text className="font-semibold text-white">Create restaurant</Text>
           </Pressable>
         </View>
@@ -242,7 +242,7 @@ const RestaurantProfile = () => {
         )}
 
         {/* Cover photo with name on top */}
-        <View className="mx-4 h-52 overflow-hidden rounded-3xl bg-blue-600">
+        <View className="mx-4 h-52 overflow-hidden rounded-3xl bg-[#143d7b]">
           {showCover ? (
             <Image
               source={{ uri: cover }}
@@ -286,7 +286,7 @@ const RestaurantProfile = () => {
                 accessibilityLabel={`Show photo ${index + 1}`}
                 className={`mr-2 overflow-hidden rounded-xl border-2 ${
                   index === photoIndex
-                    ? "border-blue-600"
+                    ? "border-[#143d7b]"
                     : "border-transparent"
                 }`}>
                 <Image source={{ uri }} className="h-16 w-16" />
@@ -371,7 +371,7 @@ const RestaurantProfile = () => {
         <Pressable
           onPress={() => setEditing(true)}
           accessibilityRole="button"
-          className="mx-4 mt-6 flex-row items-center justify-center rounded-full bg-blue-700 py-4">
+          className="mx-4 mt-6 flex-row items-center justify-center rounded-full bg-[#143d7b] py-4">
           <Ionicons name="create-outline" size={18} color="white" />
           <Text className="ml-2 text-lg font-bold text-white">
             Edit details
