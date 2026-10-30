@@ -5,7 +5,6 @@ import {
   ActivityIndicator,
   Alert,
   Image,
-  Linking,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -23,7 +22,6 @@ import {
 import RestaurantForm, { restaurantToForm } from "../components/RestaurantForm";
 
 type IconName = React.ComponentProps<typeof Ionicons>["name"];
-
 
 const keepStoredImages = (stored: string[] = [], edited: string[]) => {
   const originals = new Map<string, string>();
@@ -64,7 +62,6 @@ const Row = ({
 );
 
 const RestaurantProfile = () => {
-  // Restaurant = has one, null = none yet, undefined = couldn't load
   const [restaurant, setRestaurant] = useState<Restaurant | null | undefined>(
     undefined,
   );
@@ -121,37 +118,10 @@ const RestaurantProfile = () => {
   };
 
   const header = (
-    <View className="flex-row items-center justify-between px-4 pb-3 pt-16">
-      {editing ? (
-        <Pressable
-          onPress={() => setEditing(false)}
-          disabled={saving}
-          hitSlop={8}
-          accessibilityRole="button"
-          accessibilityLabel="Cancel editing"
-          className="h-10 w-10 items-center justify-center rounded-full bg-blue-50">
-          <Ionicons name="close" size={22} color="#2563EB" />
-        </Pressable>
-      ) : (
-        <View className="h-10 w-10" />
-      )}
-
-      <Text className="text-2xl font-bold text-blue-900">
+    <View className="flex-row items-center justify-center px-4 pb-3 pt-16">
+      <Text className="text-2xl text-center font-bold text-blue-900">
         {editing ? "Edit Restaurant" : "My Restaurant"}
       </Text>
-
-      {!editing && restaurant ? (
-        <Pressable
-          onPress={() => setEditing(true)}
-          hitSlop={8}
-          accessibilityRole="button"
-          accessibilityLabel="Edit restaurant"
-          className="h-10 w-10 items-center justify-center rounded-full bg-blue-50">
-          <Ionicons name="create-outline" size={22} color="#2563EB" />
-        </Pressable>
-      ) : (
-        <View className="h-10 w-10" />
-      )}
     </View>
   );
 
@@ -225,8 +195,6 @@ const RestaurantProfile = () => {
     );
   }
 
-  /* ----------------------------- Details ----------------------------- */
-
   const photos = getRestaurantImageUrls(restaurant.images);
   const cover = photos[photoIndex];
   const showCover = !!cover && !brokenPhotos.includes(cover);
@@ -236,15 +204,15 @@ const RestaurantProfile = () => {
     .filter(Boolean)
     .join(", ");
 
-//   const callRestaurant = () =>
-//     Linking.openURL(`tel:${restaurant.phone.replace(/\s/g, "")}`).catch(() =>
-//       Alert.alert("Could not call", "No phone app is available."),
-//     );
+  //   const callRestaurant = () =>
+  //     Linking.openURL(`tel:${restaurant.phone.replace(/\s/g, "")}`).catch(() =>
+  //       Alert.alert("Could not call", "No phone app is available."),
+  //     );
 
-//   const openMaps = () =>
-//     Linking.openURL(
-//       `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`,
-//     ).catch(() => Alert.alert("Could not open maps", "No maps app is available."));
+  //   const openMaps = () =>
+  //     Linking.openURL(
+  //       `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`,
+  //     ).catch(() => Alert.alert("Could not open maps", "No maps app is available."));
 
   return (
     <View className="flex-1 bg-white">
@@ -307,7 +275,9 @@ const RestaurantProfile = () => {
                 accessibilityRole="button"
                 accessibilityLabel={`Show photo ${index + 1}`}
                 className={`mr-2 overflow-hidden rounded-xl border-2 ${
-                  index === photoIndex ? "border-blue-600" : "border-transparent"
+                  index === photoIndex
+                    ? "border-blue-600"
+                    : "border-transparent"
                 }`}>
                 <Image source={{ uri }} className="h-16 w-16" />
               </Pressable>
@@ -386,7 +356,9 @@ const RestaurantProfile = () => {
           accessibilityRole="button"
           className="mx-4 mt-6 flex-row items-center justify-center rounded-full bg-blue-700 py-4">
           <Ionicons name="create-outline" size={20} color="white" />
-          <Text className="ml-2 text-lg font-bold text-white">Edit details</Text>
+          <Text className="ml-2 text-lg font-bold text-white">
+            Edit details
+          </Text>
         </Pressable>
       </ScrollView>
     </View>
