@@ -14,9 +14,14 @@ const DEFAULT_TABS: Tab[] = [
     route: "/restaurant/restaurantDashboard",
   },
   {
+    name: "My Restaurant",
+    icon: "silverware-fork-knife",
+    route: "/restaurant/restaurantProfile",
+  },
+  {
     name: "Profile",
     icon: "account-circle",
-    route: "/restaurant/restaurantProfile",
+    route: "/restaurant/restaurantOwner",
   },
 ];
 

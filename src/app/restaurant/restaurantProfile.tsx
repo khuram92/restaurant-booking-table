@@ -1,5 +1,12 @@
-import ProfileContent from "../components/ProfileContent";
+import { View, Text } from 'react-native'
+import React from 'react'
 
-export default function RestaurantProfile() {
-  return <ProfileContent showFoodInterest={false} />;
+const restaurantProfile = () => {
+  return (
+    <View>
+      <Text>restaurantProfile</Text>
+    </View>
+  )
 }
+
+export default restaurantProfile

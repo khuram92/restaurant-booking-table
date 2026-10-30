@@ -104,7 +104,7 @@ export type RestaurantQuery = {
   city?: string;
   search?: string;
   page?: number;
-  limit?: number; 
+  limit?: number;
 };
 
 export type RestaurantPage = {
@@ -169,9 +169,27 @@ export const fetchFeaturedRestaurants = async (): Promise<
 
     return response.data.restaurants;
   } catch (error: any) {
-  
     throw new Error(
       error?.response?.data?.message || "Failed to fetch featured restaurants",
+    );
+  }
+};
+
+export const updateRestaurant = async (
+  id: string,
+  changes: Partial<NewRestaurant>,
+): Promise<Restaurant> => {
+  const token = await SecureStore.getItemAsync("authToken");
+  if (!token) throw new Error("You must be logged in");
+
+  try {
+    const response = await API.patch(`/restaurants/${id}`, changes, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data.restaurant;
+  } catch (error: any) {
+    throw new Error(
+      error?.response?.data?.message || "Could not update restaurant",
     );
   }
 };
