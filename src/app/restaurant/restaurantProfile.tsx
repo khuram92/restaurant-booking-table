@@ -259,7 +259,7 @@ const RestaurantProfile = () => {
           )}
 
           <View className="absolute bottom-0 left-0 right-0  p-4">
-            <Text numberOfLines={1} className="text-2xl font-bold text-white">
+            <Text numberOfLines={1} className="text-2xl font-bold bg-black/50 px-2 py-1 rounded overflow-hidden self-start text-white">
               {restaurant.name}
             </Text>
             <Text numberOfLines={1} className="text-base text-white">
