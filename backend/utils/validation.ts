@@ -1,9 +1,16 @@
 export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export const PAKISTANI_PHONE_REGEX = /^03\d{9}$/;
+
+// 8 to 72 characters (bcrypt ignores anything past 72), with a letter, a number
+// and a special character. Any non-space symbol counts as special.
 export const PASSWORD_REGEX =
-  /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d\s]).{8,72}$/;
 export const PASSWORD_MESSAGE =
-  "Password must be at least 8 characters and contain a letter, number, and special character";
+  "Password must be 8 to 72 characters and contain a letter, a number, and a special character";
+
+// 9:00 AM, 09:00 AM, 9:00AM, 21:30
+const TIME_REGEX =
+  /^(?:(?:0?[1-9]|1[0-2]):[0-5]\d\s?(?:AM|PM)|(?:[01]?\d|2[0-3]):[0-5]\d)$/i;
 
 /** Express 5 types allow params to be string | string[]. Always get a string. */
 export const getParam = (value: string | string[] | undefined): string =>
@@ -13,12 +20,22 @@ export const getParam = (value: string | string[] | undefined): string =>
 export const escapeRegex = (s: string) =>
   s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
+/**
+ * Turns the usual ways of typing a Pakistani mobile number into 03XXXXXXXXX:
+ * 0300 1234567, 0300-1234567, +92 300 1234567, 0092 300 1234567, 923001234567, 3001234567
+ */
 export const normalizePhone = (value: unknown) => {
-  const phone = String(value ?? "").trim();
-  return /^3\d{9}$/.test(phone) ? `0${phone}` : phone;
+  let phone = String(value ?? "").replace(/[\s\-()]/g, "");
+
+  if (phone.startsWith("+92")) phone = `0${phone.slice(3)}`;
+  else if (phone.startsWith("0092")) phone = `0${phone.slice(4)}`;
+  else if (/^92\d{10}$/.test(phone)) phone = `0${phone.slice(2)}`;
+  else if (/^3\d{9}$/.test(phone)) phone = `0${phone}`;
+
+  return phone;
 };
 
-/** Accepts YYYY-MM-DD, DD-MM-YYYY, or an ISO string starting with YYYY-MM-DD. Rejects impossible and future dates. */
+/** Accepts YYYY-MM-DD, DD-MM-YYYY, or an ISO string starting with YYYY-MM-DD. Rejects impossible, future and pre-1900 dates. */
 export const parseDob = (value: unknown): Date | null => {
   if (typeof value !== "string") return null;
 
@@ -45,7 +62,7 @@ export const parseDob = (value: unknown): Date | null => {
   ) {
     return null;
   }
-  if (date > new Date()) return null;
+  if (date > new Date() || year < 1900) return null;
   return date;
 };
 
@@ -151,6 +168,14 @@ export const sanitizeRestaurantInput = (
       return { error: `${key} must be text of up to ${max} characters` };
     }
     data[key] = body[key].trim();
+  }
+
+  // Opening and closing times must look like a time (the app builds booking slots from them)
+  for (const key of ["openingTime", "closingTime"] as const) {
+    const value = data[key];
+    if (typeof value === "string" && value !== "" && !TIME_REGEX.test(value)) {
+      return { error: `${key} must look like 9:00 AM or 21:30` };
+    }
   }
 
   // The model stores cuisines as ONE string (e.g. "Italian, BBQ"); arrays are joined.

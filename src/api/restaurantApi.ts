@@ -183,7 +183,7 @@ export const updateRestaurant = async (
   if (!token) throw new Error("You must be logged in");
 
   try {
-    const response = await API.patch(`/restaurants/${id}`, changes, {
+    const response = await API.put(`/restaurants/${id}`, changes, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data.restaurant;
