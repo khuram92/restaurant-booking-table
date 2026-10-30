@@ -214,7 +214,6 @@ const RestaurantProfile = () => {
       </View>
     );
   }
-
   if (editing) {
     return (
       <View className="flex-1 bg-white">
