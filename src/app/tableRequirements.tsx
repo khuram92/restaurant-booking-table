@@ -289,7 +289,7 @@ const TableRequirements = () => {
                   key={star}
                   name={star <= Math.round(rating) ? "star" : "star-outline"}
                   size={20}
-                  color={star <= Math.round(rating) ? "#143d7b" : "white"}
+                  color={star <= Math.round(rating) ? "#143d7b" : "#143d7b"}
                 />
               ))}
               <Text className="px-2 font-semibold text-[#143d7b]">

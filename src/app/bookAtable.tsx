@@ -145,7 +145,7 @@ export default function BookATable() {
     .map((u) => resolveImageUrl(u))
     .filter((u): u is string => !!u);
   const hasImages = imagesList.length > 0;
-
+const rating = restaurant?.rating || 0;
   const coverUri = hasImages
     ? imagesList[currentPhotoIndex % imagesList.length]
     : null;
@@ -206,15 +206,25 @@ export default function BookATable() {
         {/* Content Details */}
         <View className="flex-1 -mt-6 bg-white rounded-t-3xl px-4 pt-6">
           <View className="flex-row justify-between">
-            <View className="flex-row items-center gap-2">
-              <MaterialCommunityIcons name="star" size={24} color="#facc15" />
-              <Text className="font-semibold">
-                {restaurant?.rating ? restaurant.rating.toFixed(1) : "0.0"}
+            
+              <View className="flex-row gap-1 items-center">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Ionicons
+                  key={star}
+                  name={star <= Math.round(rating) ? "star" : "star-outline"}
+                  size={20}
+                  color={star <= Math.round(rating) ? "#143d7b" : "#143d7b"}
+                />
+              ))}
+              <Text className="px-2 font-semibold text-[#143d7b]">
+                {rating.toFixed(1)}
               </Text>
-              <Text className="text-black">
-                ({restaurant?.reviewCount || 0} Reviews)
+              <Text className="text-gray-900">
+                ({restaurant?.reviewCount || 0})
               </Text>
             </View>
+              
+            
 
             <View>
               <View className="flex-row items-center justify-center gap-1">
