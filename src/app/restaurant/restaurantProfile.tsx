@@ -50,13 +50,13 @@ const Row = ({
     disabled={!onPress}
     accessibilityRole={onPress ? "button" : undefined}
     className="flex-row items-center border-b border-gray-100 py-3">
-    <Ionicons name={icon} size={20} color="#2563EB" />
+    <Ionicons name={icon} size={20} color="#143d7b" />
     <View className="ml-3 flex-1">
-      <Text className="text-xs text-gray-500">{label}</Text>
+      <Text className="text-xm text-gray-600">{label}</Text>
       <Text className="text-base text-gray-900">{value}</Text>
     </View>
     {onPress && actionIcon && (
-      <Ionicons name={actionIcon} size={20} color="#2563EB" />
+      <Ionicons name={actionIcon} size={20} color="#143d7b" />
     )}
   </Pressable>
 );
@@ -361,7 +361,7 @@ const RestaurantProfile = () => {
           />
         </View>
         <View className="mx-4 mt-4 rounded-2xl border border-gray-100 bg-white p-4">
-          <Text className="mb-2 text-lg font-bold text-blue-900">About</Text>
+          <Text className="mb-2 text-lg font-bold text-[#143d7b]">About</Text>
           <Text className="text-base leading-6 text-gray-700">
             {restaurant.description ||
               "No description yet. Tap Edit details to add one."}
