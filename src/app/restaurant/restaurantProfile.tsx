@@ -404,7 +404,7 @@ const RestaurantProfile = () => {
             icon="location-outline"
             label="Address "
             value={address}
-            actionIcon="navigate-outline"
+           
             // onPress={address ? openMaps : undefined}
           />
           <Row
